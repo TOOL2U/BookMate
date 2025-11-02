@@ -122,16 +122,16 @@ async function fetchUploadedBalances(): Promise<Map<string, UploadedBalance>> {
 /**
  * Fetch all transactions from inbox
  */
-async function fetchTransactions(): Promise<Transaction[]> {
+async function fetchTransactions(request: NextRequest): Promise<Transaction[]> {
   try {
     // Call the inbox API to get all transactions
-    // Use BASE_URL for server-side API calls (NEXT_PUBLIC_* vars are for client-side only)
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    // Use the request's origin for internal API calls (works in both dev and production)
+    const origin = request.nextUrl.origin;
 
-    console.log('  → Fetching from URL:', `${baseUrl}/api/inbox`);
-    console.log('  → BASE_URL env var:', process.env.BASE_URL);
+    console.log('  → Fetching from URL:', `${origin}/api/inbox`);
+    console.log('  → Origin:', origin);
 
-    const response = await fetch(`${baseUrl}/api/inbox`, {
+    const response = await fetch(`${origin}/api/inbox`, {
       method: 'GET',
     });
 
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
 
     // Step 2: Fetch all transactions
     console.log('  → Fetching transactions from inbox...');
-    const transactions = await fetchTransactions();
+    const transactions = await fetchTransactions(request);
     console.log(`  ✓ Found ${transactions.length} transactions`);
 
     // Step 3: Calculate running balances
