@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchInboxData } from '@/app/api/inbox/route';
+import { fetchInboxData } from '@/app/api/inbox/inbox-utils';
 import { google } from 'googleapis';
 import path from 'path';
 
