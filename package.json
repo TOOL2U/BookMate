@@ -1,5 +1,5 @@
 {
-  "name": "accounting-buddy-app",
+  "name": "bookmate",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -28,6 +28,7 @@
     "node-fetch": "^2.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "recharts": "^3.3.0",
     "tailwindcss": "^4.1.16",
     "uuid": "^13.0.0"
   },

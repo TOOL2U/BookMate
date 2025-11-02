@@ -72,7 +72,7 @@ export default function Navigation() {
               <motion.span
                 className="text-lg font-bold text-slate-300 group-hover:text-slate-200 transition-colors"
               >
-                Accounting Buddy
+                BookMate
               </motion.span>
             </div>
           </Link>

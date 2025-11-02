@@ -357,18 +357,9 @@ export default function InboxPage() {
             <h3 className="text-xl font-bold text-text-primary mb-2">
               No entries yet
             </h3>
-            <p className="text-text-secondary mb-6 max-w-md mx-auto">
+            <p className="text-text-secondary max-w-md mx-auto">
               Your inbox is empty. Upload a receipt or add a manual entry to get started.
             </p>
-            <Link href="/upload">
-              <Button
-                variant="primary"
-                className="bg-gradient-to-r from-status-info to-brand-primary hover:from-status-info/90 hover:to-brand-primary/90"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Add First Entry
-              </Button>
-            </Link>
           </motion.div>
         </Card>
       )}

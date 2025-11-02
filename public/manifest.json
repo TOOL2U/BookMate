@@ -1,6 +1,6 @@
 {
-  "name": "Accounting Buddy",
-  "short_name": "AccBuddy",
+  "name": "BookMate",
+  "short_name": "BookMate",
   "description": "AI-powered receipt tracking and P&L automation",
   "start_url": "/",
   "display": "standalone",

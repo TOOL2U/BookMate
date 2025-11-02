@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       // Check for success in JSON format
       if (responseData.ok === true || responseData.success) {
         console.log('[✔] Sheets append → status: SUCCESS (JSON format)');
-        console.log('✅ Accounting Buddy Receipt Upload Complete — Data appended to Google Sheets');
+        console.log('✅ BookMate Receipt Upload Complete — Data appended to Google Sheets');
         return NextResponse.json({
           success: true,
           message: 'Receipt added to Google Sheet successfully',
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
     // Check if Apps Script returned success (plain text format)
     if (responseText.includes('Success')) {
       console.log('[✔] Sheets append → status: SUCCESS (text format)');
-      console.log('✅ Accounting Buddy Receipt Upload Complete — Data appended to Google Sheets');
+      console.log('✅ BookMate Receipt Upload Complete — Data appended to Google Sheets');
       return NextResponse.json({
         success: true,
         message: 'Receipt added to Google Sheet successfully',

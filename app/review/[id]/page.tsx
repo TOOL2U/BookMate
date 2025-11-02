@@ -38,7 +38,7 @@ export default function ReviewPage() {
     .filter(op => !['FIXED COSTS', 'Fixed Costs', 'EXPENSES', 'REVENUES', 'Property'].includes(op))
     .filter(op => categorySearch.trim() === '' || op.toLowerCase().includes(categorySearch.toLowerCase()));
 
-  // Form data state - expanded schema for Accounting Buddy P&L 2025
+  // Form data state - expanded schema for BookMate P&L 2025
   const [formData, setFormData] = useState({
     day: '',
     month: '',

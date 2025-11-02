@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Comprehensive Test Suite for Accounting Buddy
+ * Comprehensive Test Suite for BookMate
  * 
  * This script runs ALL possible tests for the webapp:
  * - Environment validation
@@ -424,7 +424,7 @@ function testDependencies() {
 
 async function runAllTests() {
   log('\n' + '='.repeat(70), 'bright');
-  log('  🧪 ACCOUNTING BUDDY - COMPREHENSIVE TEST SUITE', 'bright');
+  log('  🧪 BOOKMATE - COMPREHENSIVE TEST SUITE', 'bright');
   log('='.repeat(70) + '\n', 'bright');
 
   const startTime = Date.now();

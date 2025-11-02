@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import AdminShell from '@/components/layout/AdminShell';
 import CategoryTable from '@/components/settings/CategoryTable';
-import { Settings as SettingsIcon, Info, RefreshCw } from 'lucide-react';
+import { Settings as SettingsIcon, RefreshCw, Cloud, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface OptionsData {
   properties: string[];
@@ -11,10 +11,26 @@ interface OptionsData {
   typeOfPayments: string[];
 }
 
+interface SyncStatus {
+  lastSynced: string | null;
+  lastModified: string | null;
+  needsSync: boolean;
+  source: string;
+}
+
 export default function SettingsPage() {
   const [data, setData] = useState<OptionsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 5000);
+  };
 
   const fetchOptions = async () => {
     try {
@@ -28,13 +44,98 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error fetching options:', error);
+      showToast('Failed to load categories', 'error');
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchSyncStatus = async () => {
+    try {
+      const res = await fetch('/api/categories/sync');
+      const result = await res.json();
+      if (result.ok) {
+        setSyncStatus(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching sync status:', error);
+    }
+  };
+
+  const handleUpdate = async (
+    type: string,
+    action: 'add' | 'edit' | 'delete',
+    oldValue?: string,
+    newValue?: string,
+    index?: number
+  ) => {
+    try {
+      setIsUpdating(true);
+
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, action, oldValue, newValue, index }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.ok) {
+        throw new Error(result.error || 'Failed to update category');
+      }
+
+      // Update local state
+      if (data) {
+        const updatedData = { ...data };
+        if (type === 'property') {
+          updatedData.properties = result.data.items;
+        } else if (type === 'typeOfOperation') {
+          updatedData.typeOfOperations = result.data.items;
+        } else if (type === 'typeOfPayment') {
+          updatedData.typeOfPayments = result.data.items;
+        }
+        setData(updatedData);
+      }
+
+      showToast(result.message, 'success');
+      await fetchSyncStatus();
+    } catch (error) {
+      console.error('Error updating category:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to update category', 'error');
+      throw error;
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSyncToSheets = async () => {
+    try {
+      setIsSyncing(true);
+      showToast('Syncing to Google Sheets...', 'success');
+
+      const res = await fetch('/api/categories/sync', {
+        method: 'POST',
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.ok) {
+        throw new Error(result.error || 'Failed to sync to Google Sheets');
+      }
+
+      showToast('Successfully synced to Google Sheets!', 'success');
+      await fetchSyncStatus();
+    } catch (error) {
+      console.error('Error syncing to sheets:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to sync to Google Sheets', 'error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   useEffect(() => {
     fetchOptions();
+    fetchSyncStatus();
   }, []);
 
   return (
@@ -45,41 +146,77 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <SettingsIcon className="w-8 h-8 text-blue-500" />
-              <h1 className="text-3xl font-bold text-white">Settings</h1>
+              <h1 className="text-3xl font-bold text-white">Category Management</h1>
             </div>
-            <button
-              onClick={fetchOptions}
-              disabled={loading}
-              className="p-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
-              aria-label="Refresh data"
-            >
-              <RefreshCw className={`w-5 h-5 text-slate-400 ${loading ? 'animate-spin' : ''}`} />
-            </button>
+            <div className="flex items-center gap-2">
+              {syncStatus?.needsSync && (
+                <button
+                  onClick={handleSyncToSheets}
+                  disabled={isSyncing}
+                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium transition-all duration-200 flex items-center gap-2"
+                >
+                  {isSyncing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <Cloud className="w-4 h-4" />
+                      Sync to Sheets
+                    </>
+                  )}
+                </button>
+              )}
+              <button
+                onClick={fetchOptions}
+                disabled={loading}
+                className="p-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
+                aria-label="Refresh data"
+              >
+                <RefreshCw className={`w-5 h-5 text-slate-400 ${loading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
           </div>
           <p className="text-slate-400">Manage business categories and configuration</p>
           {lastUpdated && (
             <p className="text-xs text-slate-500 mt-2">
-              Last synced from Google Sheets: {lastUpdated}
+              Last updated: {lastUpdated}
             </p>
           )}
         </div>
 
-        {/* Info Banner */}
-        <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 backdrop-blur-sm border border-blue-700/30 rounded-xl p-6">
-          <div className="flex items-start gap-4">
-            <Info className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-white font-semibold mb-2">Category Management (Coming Soon)</h3>
-              <p className="text-slate-300 text-sm mb-3">
-                Changes made here will automatically update your Google Sheet and roll out to both web and mobile apps.
-              </p>
-              <p className="text-slate-400 text-xs">
-                For now, this page displays your current categories in read-only mode. 
-                Full editing capabilities will be available in Phase 3.
-              </p>
+        {/* Sync Status Banner */}
+        {syncStatus && (
+          <div className={`backdrop-blur-sm border rounded-xl p-4 ${
+            syncStatus.needsSync
+              ? 'bg-gradient-to-r from-orange-900/20 to-yellow-900/20 border-orange-700/30'
+              : 'bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-700/30'
+          }`}>
+            <div className="flex items-start gap-3">
+              {syncStatus.needsSync ? (
+                <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+              ) : (
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1">
+                <h3 className="text-white font-semibold text-sm mb-1">
+                  {syncStatus.needsSync ? 'Pending Changes' : 'All Synced'}
+                </h3>
+                <p className="text-slate-300 text-xs">
+                  {syncStatus.needsSync
+                    ? 'You have unsaved changes. Click "Sync to Sheets" to update Google Sheets and mobile app.'
+                    : 'All changes are synced to Google Sheets and available in the mobile app.'}
+                </p>
+                {syncStatus.lastSynced && (
+                  <p className="text-slate-400 text-xs mt-1">
+                    Last synced: {new Date(syncStatus.lastSynced).toLocaleString()}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Category Tables */}
         <div className="space-y-6">
@@ -90,6 +227,9 @@ export default function SettingsPage() {
             items={data?.properties || []}
             loading={loading}
             icon="🏠"
+            categoryType="property"
+            onUpdate={handleUpdate}
+            isUpdating={isUpdating}
           />
 
           {/* Type of Operations */}
@@ -99,6 +239,9 @@ export default function SettingsPage() {
             items={data?.typeOfOperations || []}
             loading={loading}
             icon="💼"
+            categoryType="typeOfOperation"
+            onUpdate={handleUpdate}
+            isUpdating={isUpdating}
           />
 
           {/* Type of Payments */}
@@ -108,59 +251,31 @@ export default function SettingsPage() {
             items={data?.typeOfPayments || []}
             loading={loading}
             icon="💳"
+            categoryType="typeOfPayment"
+            onUpdate={handleUpdate}
+            isUpdating={isUpdating}
           />
         </div>
 
-        {/* Future Features Preview */}
-        <div className="bg-gradient-to-br from-slate-800/30 to-slate-900/30 backdrop-blur-sm border border-slate-700/30 rounded-xl p-6">
-          <h3 className="text-white font-semibold mb-4">Coming in Phase 3</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-green-500">✓</span>
-              </div>
-              <div>
-                <p className="text-white text-sm font-medium">Add New Categories</p>
-                <p className="text-slate-400 text-xs mt-1">
-                  Create new expense types, properties, or payment methods
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-green-500">✓</span>
-              </div>
-              <div>
-                <p className="text-white text-sm font-medium">Edit Existing Items</p>
-                <p className="text-slate-400 text-xs mt-1">
-                  Rename or modify category names
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-green-500">✓</span>
-              </div>
-              <div>
-                <p className="text-white text-sm font-medium">Archive Categories</p>
-                <p className="text-slate-400 text-xs mt-1">
-                  Hide unused categories without deleting data
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-green-500">✓</span>
-              </div>
-              <div>
-                <p className="text-white text-sm font-medium">Auto-Sync to Mobile</p>
-                <p className="text-slate-400 text-xs mt-1">
-                  Changes instantly available in mobile app dropdowns
-                </p>
+        {/* Toast Notification */}
+        {toast && (
+          <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
+            <div className={`px-6 py-4 rounded-xl shadow-2xl backdrop-blur-sm border ${
+              toast.type === 'success'
+                ? 'bg-green-900/90 border-green-700/50 text-green-100'
+                : 'bg-red-900/90 border-red-700/50 text-red-100'
+            }`}>
+              <div className="flex items-center gap-3">
+                {toast.type === 'success' ? (
+                  <CheckCircle className="w-5 h-5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5" />
+                )}
+                <p className="font-medium">{toast.message}</p>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </AdminShell>
   );

@@ -1,6 +1,6 @@
 /**
  * Validates and sanitizes receipt data payload for Google Sheets
- * Expanded schema to match Accounting Buddy P&L 2025 spreadsheet
+ * Expanded schema to match BookMate P&L 2025 spreadsheet
  * Trims whitespace and converts numeric fields to numbers
  */
 

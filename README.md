@@ -1,7 +1,7 @@
-# Accounting Buddy — Phase 1 (MVP)
+# BookMate — Phase 1 (MVP)
 
-[![Production](https://img.shields.io/badge/status-production-green)](https://github.com/TOOL2U/AccountingBuddy)
-[![Version](https://img.shields.io/badge/version-1.0.0--final-blue)](https://github.com/TOOL2U/AccountingBuddy/releases/tag/v1.0.0-final)
+[![Production](https://img.shields.io/badge/status-production-green)](https://github.com/TOOL2U/BookMate-Application)
+[![Version](https://img.shields.io/badge/version-1.0.0--final-blue)](https://github.com/TOOL2U/BookMate-Application/releases/tag/v1.0.0-final)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 ## Purpose
@@ -13,7 +13,7 @@ A simple web app that converts receipts (image/PDF) into structured data and app
 - **Intelligent Dropdown Matching**: Fuzzy matching with keyword recognition and Levenshtein distance
 - **Confidence Scoring**: Visual indicators for uncertain matches (<0.8 confidence threshold)
 - **Canonical Options**: All dropdown values validated against `/config/options.json`
-- **10-Field Accounting Schema**: Matches "Accounting Buddy P&L 2025.xlsx" structure
+- **10-Field Accounting Schema**: Matches "BookMate P&L 2025.xlsx" structure
 
 ## 🚀 Production Deployment
 
@@ -23,7 +23,7 @@ A simple web app that converts receipts (image/PDF) into structured data and app
 
 ### Quick Deploy to Vercel:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TOOL2U/AccountingBuddy/tree/main/accounting-buddy-app)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TOOL2U/BookMate-Application/tree/main)
 
 **Required Environment Variables:**
 - `GOOGLE_VISION_KEY` - Google Cloud Vision API key
@@ -116,7 +116,7 @@ components/
 
 **Canonical Schema:** `/docs/Accounting_Buddy_P&L_2025.csv`
 
-The application uses a **10-field accounting schema** that matches the structure of the "Accounting Buddy P&L 2025" spreadsheet:
+The application uses a **10-field accounting schema** that matches the structure of the "BookMate P&L 2025" spreadsheet:
 
 | Column | Field | Type | Example | Description |
 |--------|-------|------|---------|-------------|
@@ -187,9 +187,9 @@ Complete project documentation is available:
 
 ## 🔗 Links
 
-- **Repository:** https://github.com/TOOL2U/AccountingBuddy
-- **Release v1.0.0-final:** https://github.com/TOOL2U/AccountingBuddy/releases/tag/v1.0.0-final
-- **Issues:** https://github.com/TOOL2U/AccountingBuddy/issues
+- **Repository:** https://github.com/TOOL2U/BookMate-Application
+- **Release v1.0.0-final:** https://github.com/TOOL2U/BookMate-Application/releases/tag/v1.0.0-final
+- **Issues:** https://github.com/TOOL2U/BookMate-Application/issues
 
 All buttons currently show mock alerts. API integration will be added in subsequent stages.
 

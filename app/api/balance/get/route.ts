@@ -12,6 +12,14 @@ let balanceCache: CachedBalance | null = null;
 const CACHE_TTL = 30 * 1000; // 30 seconds
 
 /**
+ * Clear the cache (called when balances are updated)
+ */
+export function clearBalanceGetCache() {
+  balanceCache = null;
+  console.log('🗑️ Balance get cache cleared');
+}
+
+/**
  * POST /api/balance/get
  * Get latest balances and reconciliation data from Google Sheets
  */

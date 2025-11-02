@@ -2,6 +2,34 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseLikelyBalance } from '@/utils/balanceParse';
 
 /**
+ * Detect bank name from OCR text
+ */
+function detectBankName(text: string): string | null {
+  const lowerText = text.toLowerCase();
+
+  // Common Thai banks
+  const bankPatterns = [
+    { pattern: /bangkok\s*bank/i, name: 'Bank Transfer - Bangkok Bank - Shaun Ducker' },
+    { pattern: /kasikorn|k\s*bank/i, name: 'Kasikorn Bank' },
+    { pattern: /siam\s*commercial|scb/i, name: 'Siam Commercial Bank' },
+    { pattern: /krungsri|ayudhya/i, name: 'Krungsri Bank' },
+    { pattern: /krungthai|ktb/i, name: 'Krungthai Bank' },
+    { pattern: /tmb|thanachart/i, name: 'TMB Bank' },
+    { pattern: /uob/i, name: 'UOB Bank' },
+    { pattern: /cimb/i, name: 'CIMB Bank' },
+    { pattern: /cash/i, name: 'Cash' },
+  ];
+
+  for (const { pattern, name } of bankPatterns) {
+    if (pattern.test(lowerText)) {
+      return name;
+    }
+  }
+
+  return null;
+}
+
+/**
  * POST /api/balance/ocr
  * Extract bank balance from screenshot using Google Cloud Vision API
  */
@@ -102,14 +130,27 @@ export async function POST(request: NextRequest) {
 
     if (!parsed) {
       return NextResponse.json({
+        ok: false,
         bankBalance: null,
+        balances: [],
         rawText,
         error: 'Could not detect a balance amount in the image',
       });
     }
 
+    // Try to detect bank name from the text
+    const bankName = detectBankName(rawText);
+
+    // Return both old format (bankBalance) and new format (balances array)
     return NextResponse.json({
-      bankBalance: parsed.value,
+      ok: true,
+      bankBalance: parsed.value, // Legacy format
+      balances: [
+        {
+          bankName: bankName || 'Unknown Bank',
+          balance: parsed.value
+        }
+      ],
       rawText,
       sourceLine: parsed.sourceLine,
       confidence: parsed.confidence,

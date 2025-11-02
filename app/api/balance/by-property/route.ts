@@ -55,6 +55,14 @@ let propertyBalanceCache: CachedPropertyBalances | null = null;
 const CACHE_TTL = 30 * 1000; // 30 seconds
 
 /**
+ * Clear the cache (called when balances are updated)
+ */
+export function clearPropertyBalanceCache() {
+  propertyBalanceCache = null;
+  console.log('🗑️ Property balance cache cleared');
+}
+
+/**
  * Fetch uploaded balances from "Bank & Cash Balance" sheet
  * Returns the most recent balance for each bank
  */

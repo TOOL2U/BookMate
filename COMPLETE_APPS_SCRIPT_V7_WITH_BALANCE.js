@@ -1,5 +1,5 @@
 /**
- * Google Apps Script - Accounting Buddy Webhook + Dynamic P&L + Inbox + Balance Management
+ * Google Apps Script - BookMate Webhook + Dynamic P&L + Inbox + Balance Management
  * Version 8.4 (V8)
  *
  * DEPLOYMENT INSTRUCTIONS:
@@ -37,7 +37,7 @@
 // ============================================================================
 const EXPECTED_SECRET = "VqwvzpO3Ja5Yn+qhWg6DLwTspv/t2V8f3CXI+iJ9Dz8=";
 const CACHE_TTL_SECONDS = 60;
-const SHEET_NAME = 'Accounting Buddy P&L 2025';
+const SHEET_NAME = 'BookMate P&L 2025';
 const BALANCES_SHEET_NAME = 'Bank & Cash Balance';
 const HEADER_ROW = 6; // Data starts from row 6
 
@@ -353,7 +353,7 @@ function doGet(e) {
       return ContentService
     .createTextOutput(JSON.stringify({
       status: 'ok',
-      message: 'Accounting Buddy webhook + Dynamic P&L + Inbox + Balance + Overhead Expenses',
+      message: 'BookMate webhook + Dynamic P&L + Inbox + Balance + Overhead Expenses',
       version: '7.1 - With Overhead Expenses Modal Support',
       timestamp: new Date().toISOString(),
       endpoints: {

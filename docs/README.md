@@ -1,4 +1,4 @@
-# Accounting Buddy — Phase 1 (MVP)
+# BookMate — Phase 1 (MVP)
 
 ## Purpose
 A simple web app that converts receipts (image/PDF) into structured data and appends them to a Google Sheet.  
