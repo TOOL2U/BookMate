@@ -56,8 +56,9 @@ const CACHE_TTL = 30 * 1000; // 30 seconds
 
 /**
  * Clear the cache (called when balances are updated)
+ * Note: Not exported to comply with Next.js API route requirements
  */
-export function clearPropertyBalanceCache() {
+function clearPropertyBalanceCache() {
   propertyBalanceCache = null;
   console.log('🗑️ Property balance cache cleared');
 }
