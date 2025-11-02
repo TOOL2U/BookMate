@@ -475,6 +475,14 @@ function handleWebhook(payload) {
       return createErrorResponse('Missing required fields: ' + missingFields.join(', '));
     }
 
+    // Convert numeric month to text format (e.g., 11 -> "Nov")
+    var month = payload.month;
+    if (typeof month === 'number' || !isNaN(month)) {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      month = monthNames[parseInt(month) - 1] || month;
+      Logger.log('→ Converted numeric month ' + payload.month + ' to ' + month);
+    }
+
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
     if (!sheet) {
       return createErrorResponse('Sheet "' + SHEET_NAME + '" not found');
@@ -483,7 +491,7 @@ function handleWebhook(payload) {
     const rowData = [
       '',
       payload.day || '',
-      payload.month || '',
+      month || '',
       payload.year || '',
       payload.property || '',
       payload.typeOfOperation || '',

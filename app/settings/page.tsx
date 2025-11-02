@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import AdminShell from '@/components/layout/AdminShell';
 import CategoryTable from '@/components/settings/CategoryTable';
+import ExpenseCategoryManager from '@/components/settings/ExpenseCategoryManager';
 import { Settings as SettingsIcon, RefreshCw, Cloud, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface OptionsData {
@@ -220,6 +221,9 @@ export default function SettingsPage() {
 
         {/* Category Tables */}
         <div className="space-y-6">
+          {/* NEW: Expense Categories (Google Sheets Integration) */}
+          <ExpenseCategoryManager onUpdate={fetchOptions} />
+
           {/* Properties */}
           <CategoryTable
             title="Properties"

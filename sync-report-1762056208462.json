@@ -1,0 +1,117 @@
+{
+  "timestamp": "2025-11-02T04:03:28.462Z",
+  "summary": {
+    "dropdownChanges": 40,
+    "appsScriptModified": false,
+    "dryRun": false
+  },
+  "changes": {
+    "typeOfOperation": {
+      "added": [],
+      "removed": [
+        "Revenue - Commision",
+        "Revenue - Sales",
+        "Revenue - Services",
+        "Revenue - Rental Income",
+        "EXP - Utilities - Gas",
+        "EXP - Utilities - Water",
+        "EXP - Utilities  - Electricity",
+        "OVERHEAD EXPENSES",
+        "EXP - Administration & General - License & Certificates",
+        "EXP - Construction - Structure",
+        "EXP - Construction - Overheads/General/Unclassified",
+        "EXP - HR - Employees Salaries",
+        "EXP - Administration & General - Legal",
+        "EXP - Administration & General - Professional fees",
+        "EXP - Administration & General - Office supplies",
+        "EXP - Administration & General  - Subscription, Software & Membership",
+        "EXP - Construction - Electric Supplies",
+        "EXP - Appliances & Electronics",
+        "EXP - Windows, Doors, Locks & Hardware",
+        "EXP - Repairs & Maintenance  - Furniture & Decorative Items",
+        "EXP - Repairs & Maintenance  - Waste removal",
+        "EXP - Repairs & Maintenance - Tools & Equipment",
+        "EXP - Repairs & Maintenance - Painting & Decoration",
+        "EXP - Repairs & Maintenance - Electrical & Mechanical",
+        "EXP - Repairs & Maintenance - Landscaping",
+        "EXP - Sales & Marketing -  Professional Marketing Services",
+        "EXP - Construction - Wall",
+        "EXP - Other Expenses",
+        "EXP - Personal - Massage",
+        "EXP - Household - Alcohol",
+        "EXP - Household - Groceries",
+        "EXP - Household - Nappies",
+        "EXP - Household - Toiletries"
+      ],
+      "total": 0
+    },
+    "properties": {
+      "added": [],
+      "removed": [
+        "Sia Moon - Land - General",
+        "Alesia House",
+        "Lanna House",
+        "Parents House",
+        "Shaun Ducker - Personal",
+        "Maria Ren - Personal",
+        "Family"
+      ],
+      "total": 0
+    },
+    "typeOfPayment": {
+      "added": [],
+      "removed": [],
+      "total": 4
+    }
+  },
+  "pnlStructure": {
+    "propertyPersonStart": 14,
+    "propertyPersonEnd": 20,
+    "propertyPersonCount": 7,
+    "overheadStart": 31,
+    "overheadEnd": 58,
+    "overheadCount": 28
+  },
+  "namedRanges": {
+    "Month_Total_Revenue": {
+      "row": 11,
+      "sheet": 637199885
+    },
+    "Year_Total_Revenue": {
+      "row": 11,
+      "sheet": 637199885
+    },
+    "Month_Total_Overheads": {
+      "row": 59,
+      "sheet": 637199885
+    },
+    "Year_Total_Overheads": {
+      "row": 59,
+      "sheet": 637199885
+    },
+    "Month_GOP": {
+      "row": 62,
+      "sheet": 637199885
+    },
+    "Year_GOP": {
+      "row": 62,
+      "sheet": 637199885
+    },
+    "Month_EBITDA_Margin": {
+      "row": 63,
+      "sheet": 637199885
+    },
+    "Year_EBITDA_Margin": {
+      "row": 63,
+      "sheet": 637199885
+    },
+    "Month_Property_Person_Expense": {
+      "row": 21,
+      "sheet": 637199885
+    },
+    "Year_Property_Person_Expense": {
+      "row": 21,
+      "sheet": 637199885
+    }
+  }
+}
