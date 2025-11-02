@@ -3,7 +3,7 @@
 # Comprehensive Vercel Endpoint Test
 # Tests all production endpoints with detailed output
 
-BASE_URL="https://bookmate.siamoon.com"
+BASE_URL="https://accounting.siamoon.com"
 
 echo "=========================================="
 echo "  Vercel Production Endpoint Tests"
