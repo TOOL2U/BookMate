@@ -13,8 +13,9 @@ const CACHE_TTL = 30 * 1000; // 30 seconds
 
 /**
  * Clear the cache (called when balances are updated)
+ * Note: Not exported because Next.js API routes only allow specific exports
  */
-export function clearBalanceGetCache() {
+function clearBalanceGetCache() {
   balanceCache = null;
   console.log('🗑️ Balance get cache cleared');
 }
