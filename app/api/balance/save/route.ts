@@ -1,32 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Import cache clearing functions
-let clearPropertyBalanceCache: (() => void) | null = null;
-let clearBalanceGetCache: (() => void) | null = null;
-
-// Dynamically import cache clearing functions to avoid circular dependencies
-async function invalidateCaches() {
-  try {
-    // Clear the by-property cache
-    if (!clearPropertyBalanceCache) {
-      const byPropertyModule = await import('../by-property/route');
-      clearPropertyBalanceCache = byPropertyModule.clearPropertyBalanceCache;
-    }
-    clearPropertyBalanceCache?.();
-
-    // Clear the get cache
-    if (!clearBalanceGetCache) {
-      const getModule = await import('../get/route');
-      clearBalanceGetCache = getModule.clearBalanceGetCache;
-    }
-    clearBalanceGetCache?.();
-
-    console.log('🔄 [BALANCE SAVE] Invalidated all balance caches');
-  } catch (error) {
-    console.error('⚠️ [BALANCE SAVE] Failed to invalidate caches:', error);
-  }
-}
-
 /**
  * POST /api/balance/save
  * Save balance for a specific bank or cash to Google Sheets
@@ -35,6 +8,9 @@ async function invalidateCaches() {
  * - bankName: "Cash" | "Bank Transfer - Bangkok Bank - Shaun Ducker" | etc.
  * - balance: number
  * - note: optional string
+ *
+ * Note: Cache invalidation removed due to Next.js API route export restrictions.
+ * Caches will expire naturally after their TTL period (30-60s).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -173,8 +149,8 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ [BALANCE SAVE] Success! Saved:', finalBankName, '=', finalBalance);
 
-    // Invalidate caches so next fetch gets fresh data
-    await invalidateCaches();
+    // Note: Cache invalidation removed due to Next.js API route export restrictions
+    // Caches will expire naturally after their TTL (30-60s)
 
     return NextResponse.json({
       ok: true,
