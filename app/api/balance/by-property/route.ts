@@ -133,10 +133,17 @@ async function fetchTransactions(request: NextRequest): Promise<Transaction[]> {
 
     const response = await fetch(`${origin}/api/inbox`, {
       method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
+    console.log('  → Response status:', response.status, response.statusText);
+
     if (!response.ok) {
-      throw new Error('Failed to fetch transactions');
+      const errorText = await response.text();
+      console.error('  → Response error:', errorText);
+      throw new Error(`Failed to fetch transactions: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -144,6 +151,10 @@ async function fetchTransactions(request: NextRequest): Promise<Transaction[]> {
     return data.data || [];
   } catch (error) {
     console.error('Error fetching transactions:', error);
+    if (error instanceof Error) {
+      console.error('  → Error message:', error.message);
+      console.error('  → Error stack:', error.stack);
+    }
     throw error;
   }
 }
