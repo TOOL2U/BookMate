@@ -292,20 +292,55 @@ export async function POST(request: NextRequest) {
  * Helper: Get Google credentials from environment or file
  */
 function getCredentials() {
-  // Try environment variable first (for production/Vercel)
+  // Try parsing the service account key from environment (Vercel/Production format)
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+    try {
+      const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+      console.log('[EXPENSES] Using credentials from GOOGLE_SERVICE_ACCOUNT_KEY');
+      return credentials;
+    } catch (error) {
+      console.error('[EXPENSES] Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY:', error);
+    }
+  }
+
+  // Try alternative environment variable names
   if (process.env.GOOGLE_CREDENTIALS_JSON) {
     try {
       return JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
     } catch (error) {
-      console.error('[EXPENSES] Failed to parse GOOGLE_CREDENTIALS_JSON from environment');
+      console.error('[EXPENSES] Failed to parse GOOGLE_CREDENTIALS_JSON');
     }
+  }
+
+  // Try building from individual fields
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+    console.log('[EXPENSES] Using credentials from individual env vars');
+    return {
+      type: 'service_account',
+      project_id: process.env.GOOGLE_PROJECT_ID || 'accounting-buddy-476114',
+      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      client_id: process.env.GOOGLE_CLIENT_ID || '',
+      auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+      token_uri: 'https://oauth2.googleapis.com/token',
+      auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+      universe_domain: 'googleapis.com',
+    };
   }
 
   // Fall back to file (for local development)
   const credPath = path.join(process.cwd(), 'config', 'google-credentials.json');
   if (fs.existsSync(credPath)) {
+    console.log('[EXPENSES] Using credentials from config file');
     return JSON.parse(fs.readFileSync(credPath, 'utf8'));
   }
 
-  throw new Error('Google credentials not found. Set GOOGLE_CREDENTIALS_JSON environment variable or create config/google-credentials.json');
+  throw new Error(
+    'Google credentials not found.\n' +
+    'Set one of:\n' +
+    '  - GOOGLE_SERVICE_ACCOUNT_KEY (full JSON)\n' +
+    '  - GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_PRIVATE_KEY\n' +
+    '  - Create config/google-credentials.json\n' +
+    'See EXPENSE_CATEGORY_MANAGEMENT.md for setup.'
+  );
 }
