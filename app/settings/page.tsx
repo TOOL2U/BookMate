@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import AdminShell from '@/components/layout/AdminShell';
 import CategoryTable from '@/components/settings/CategoryTable';
 import ExpenseCategoryManager from '@/components/settings/ExpenseCategoryManager';
+import PropertyManager from '@/components/settings/PropertyManager';
+import PaymentTypeManager from '@/components/settings/PaymentTypeManager';
 import { Settings as SettingsIcon, RefreshCw, Cloud, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface OptionsData {
@@ -224,6 +226,9 @@ export default function SettingsPage() {
           {/* NEW: Expense Categories (Google Sheets Integration) */}
           <ExpenseCategoryManager onUpdate={fetchOptions} />
 
+          {/* NEW: Property Management (Google Sheets Integration) */}
+          <PropertyManager />
+
           {/* Properties */}
           <CategoryTable
             title="Properties"
@@ -247,6 +252,9 @@ export default function SettingsPage() {
             onUpdate={handleUpdate}
             isUpdating={isUpdating}
           />
+
+          {/* NEW: Payment Type Management (Google Sheets Integration) */}
+          <PaymentTypeManager />
 
           {/* Type of Payments */}
           <CategoryTable

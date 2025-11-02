@@ -7,11 +7,11 @@ import path from 'path';
  * NEW Expense Category Management API
  * 
  * Connects to the automated Google Sheets backend.
- * Writes ONLY to Data!B30:B (expense categories).
+ * Writes ONLY to Data!B2:B (expense categories).
  * The Apps Script automatically updates P&L sheet.
  * 
  * Architecture:
- * - Data sheet: User-editable category list (Column B)
+ * - Data sheet: User-editable category list (Column B starting at B2)
  * - P&L sheet: Auto-generated from Data!B via ARRAYFORMULA
  * - Apps Script: onEdit trigger rebuilds formulas when Data!B changes
  */
@@ -25,7 +25,7 @@ interface ExpenseCategoryAction {
 
 // Constants matching Apps Script
 const DATA_SHEET = 'Data';
-const DATA_CATEGORY_START_ROW = 30; // B30 is first expense category row
+const DATA_CATEGORY_START_ROW = 2; // B2 is first expense category row
 const DATA_CATEGORY_COL = 2; // Column B (0-indexed: A=1, B=2)
 
 /**
