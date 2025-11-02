@@ -18,7 +18,7 @@ interface TableRow {
   category: string;
   monthValue: number;
   yearValue: number;
-  type: 'revenue' | 'expense' | 'profit' | 'margin' | 'header';
+  type: 'revenue' | 'expense' | 'profit' | 'margin' | 'header' | 'info';
   indent?: boolean;
 }
 
@@ -55,13 +55,16 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
     // Expenses Section
     { category: 'EXPENSES', monthValue: 0, yearValue: 0, type: 'header' },
     { category: 'Overheads', monthValue: monthData?.overheads || 0, yearValue: yearData?.overheads || 0, type: 'expense', indent: true },
-    { category: 'Property/Person Expenses', monthValue: monthData?.propertyPersonExpense || 0, yearValue: yearData?.propertyPersonExpense || 0, type: 'expense', indent: true },
     { 
       category: 'Total Expenses', 
-      monthValue: (monthData?.overheads || 0) + (monthData?.propertyPersonExpense || 0), 
-      yearValue: (yearData?.overheads || 0) + (yearData?.propertyPersonExpense || 0), 
+      monthValue: monthData?.overheads || 0,  // Only overheads, not including Property/Person
+      yearValue: yearData?.overheads || 0,    // Matches Q80 in spreadsheet
       type: 'expense' 
     },
+    
+    // Property/Person tracking (informational only, not part of expenses)
+    { category: 'PROPERTY/PERSON TRACKING', monthValue: 0, yearValue: 0, type: 'header' },
+    { category: 'Property/Person Expenses', monthValue: monthData?.propertyPersonExpense || 0, yearValue: yearData?.propertyPersonExpense || 0, type: 'info', indent: true },
     
     // Profit Section
     { category: 'PROFITABILITY', monthValue: 0, yearValue: 0, type: 'header' },
@@ -107,13 +110,14 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                 const isMargin = row.type === 'margin';
                 const isExpense = row.type === 'expense';
                 const isRevenue = row.type === 'revenue';
+                const isInfo = row.type === 'info';
 
                 // Calculate percentage of revenue
-                const monthPercent = row.type !== 'header' && row.type !== 'margin' 
+                const monthPercent = row.type !== 'header' && row.type !== 'margin' && row.type !== 'info'
                   ? calculatePercentage(row.monthValue, monthData?.revenue || 0)
                   : row.type === 'margin' ? row.monthValue.toFixed(1) : '-';
                 
-                const yearPercent = row.type !== 'header' && row.type !== 'margin'
+                const yearPercent = row.type !== 'header' && row.type !== 'margin' && row.type !== 'info'
                   ? calculatePercentage(row.yearValue, yearData?.revenue || 0)
                   : row.type === 'margin' ? row.yearValue.toFixed(1) : '-';
 
@@ -144,7 +148,8 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                       ${isMargin ? 'text-blue-400 font-bold' : ''}
                       ${isExpense ? 'text-red-400' : ''}
                       ${isRevenue ? 'text-green-400' : ''}
-                      ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue ? 'text-white' : ''}
+                      ${isInfo ? 'text-slate-400 italic' : ''}
+                      ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue && !isInfo ? 'text-white' : ''}
                     `}>
                       {isHeader ? '-' : isMargin ? `${row.monthValue.toFixed(1)}%` : `฿${formatCurrency(row.monthValue)}`}
                     </td>
@@ -157,7 +162,8 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                       ${isMargin ? 'text-blue-400 font-bold' : ''}
                       ${isExpense ? 'text-red-400' : ''}
                       ${isRevenue ? 'text-green-400' : ''}
-                      ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue ? 'text-white' : ''}
+                      ${isInfo ? 'text-slate-400 italic' : ''}
+                      ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue && !isInfo ? 'text-white' : ''}
                     `}>
                       {isHeader ? '-' : isMargin ? `${row.yearValue.toFixed(1)}%` : `฿${formatCurrency(row.yearValue)}`}
                     </td>
@@ -166,8 +172,9 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                     <td className={`
                       py-4 px-6 text-right font-mono text-slate-400
                       ${isHeader ? 'text-slate-500' : ''}
+                      ${isInfo ? 'italic' : ''}
                     `}>
-                      {isHeader ? '-' : isMargin ? 'Margin' : `${monthPercent}% / ${yearPercent}%`}
+                      {isHeader ? '-' : isMargin ? 'Margin' : isInfo ? 'Tracking Only' : `${monthPercent}% / ${yearPercent}%`}
                     </td>
                   </tr>
                 );

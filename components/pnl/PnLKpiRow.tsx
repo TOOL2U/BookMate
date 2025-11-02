@@ -95,9 +95,10 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
 }
 
 export default function PnLKpiRow({ monthData, yearData, updatedAt, isLoading }: PnLKpiRowProps) {
-  // Calculate total expenses
-  const monthExpenses = (monthData?.overheads || 0) + (monthData?.propertyPersonExpense || 0);
-  const yearExpenses = (yearData?.overheads || 0) + (yearData?.propertyPersonExpense || 0);
+  // Monthly expenses should only be overheads (matching Q80 in spreadsheet)
+  // Property/Person is tracking only, not part of expenses
+  const monthExpenses = monthData?.overheads || 0;
+  const yearExpenses = yearData?.overheads || 0;
 
   return (
     <div className="space-y-6">
@@ -112,7 +113,7 @@ export default function PnLKpiRow({ monthData, yearData, updatedAt, isLoading }:
         <KPICard
           title="Monthly Expenses"
           value={monthExpenses}
-          subtitle="Overheads + Property/Person"
+          subtitle="Total Overhead Expenses"
           isLoading={isLoading}
         />
         <KPICard
