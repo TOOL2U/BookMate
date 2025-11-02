@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fetchInboxData } from '@/app/api/inbox/route';
 import { google } from 'googleapis';
 import path from 'path';
 
@@ -122,33 +123,15 @@ async function fetchUploadedBalances(): Promise<Map<string, UploadedBalance>> {
 /**
  * Fetch all transactions from inbox
  */
-async function fetchTransactions(request: NextRequest): Promise<Transaction[]> {
+async function fetchTransactions(): Promise<Transaction[]> {
   try {
-    // Call the inbox API to get all transactions
-    // Use the request's origin for internal API calls (works in both dev and production)
-    const origin = request.nextUrl.origin;
-
-    console.log('  → Fetching from URL:', `${origin}/api/inbox`);
-    console.log('  → Origin:', origin);
-
-    const response = await fetch(`${origin}/api/inbox`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    console.log('  → Response status:', response.status, response.statusText);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('  → Response error:', errorText);
-      throw new Error(`Failed to fetch transactions: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log('  ✓ Fetched', data.data?.length || 0, 'transactions');
-    return data.data || [];
+    console.log('  → Fetching transactions directly from inbox module...');
+    
+    // Call the inbox function directly (avoids HTTP overhead and auth issues)
+    const data = await fetchInboxData();
+    
+    console.log('  ✓ Fetched', data?.length || 0, 'transactions');
+    return data || [];
   } catch (error) {
     console.error('Error fetching transactions:', error);
     if (error instanceof Error) {
@@ -230,7 +213,7 @@ export async function POST(request: NextRequest) {
 
     // Step 2: Fetch all transactions
     console.log('  → Fetching transactions from inbox...');
-    const transactions = await fetchTransactions(request);
+    const transactions = await fetchTransactions();
     console.log(`  ✓ Found ${transactions.length} transactions`);
 
     // Step 3: Calculate running balances
