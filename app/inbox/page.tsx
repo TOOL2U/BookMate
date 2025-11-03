@@ -107,12 +107,12 @@ export default function InboxPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <InboxIcon className="w-8 h-8 text-blue-500" />
+              <InboxIcon className="w-8 h-8 text-[#00D9FF]" />
               <div>
-                <h1 className="text-3xl font-bold text-white">Inbox</h1>
-                <p className="text-slate-400 text-sm mt-1">
+                <h1 className="text-3xl font-bold text-[#FFFFFF]">Inbox</h1>
+                <p className="text-[#A0A0A0] text-sm mt-1">
                   <span className="inline-flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
+                    <Sparkles className="w-4 h-4 text-[#00D9FF]" />
                     View and manage your processed entries
                   </span>
                 </p>
@@ -121,9 +121,9 @@ export default function InboxPage() {
             <button
               onClick={() => fetchReceipts(true)}
               disabled={isRefreshing}
-              className="p-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
+              className="p-2 bg-[#1A1A1A] hover:bg-[#222222] rounded-lg transition-all duration-300 disabled:opacity-50 border border-[#2A2A2A] hover:border-[#00D9FF] hover:shadow-[0_0_20px_rgba(0,217,255,0.4)]"
             >
-              <RefreshCw className={`w-5 h-5 text-slate-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-5 h-5 text-[#A0A0A0] ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
@@ -137,8 +137,8 @@ export default function InboxPage() {
             exit={{ opacity: 0, y: -10 }}
             className="mb-6"
           >
-            <Card className="border-status-danger/30 bg-status-danger/10">
-              <div className="flex items-center gap-3 text-status-danger">
+            <Card glowColor="pink" className="bg-[#FF3366]/10">
+              <div className="flex items-center gap-3 text-[#FF3366]">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Error loading receipts</p>

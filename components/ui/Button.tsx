@@ -17,14 +17,15 @@ export default function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseClasses = 'font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap';
+  const baseClasses = 'font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap';
 
+  // Mobile app dark theme button variants with cyan/neon colors
   const variantClasses = {
-    primary: 'bg-slate-800/40 hover:bg-slate-700/50 text-white border border-blue-500/20 hover:border-blue-400/40 shadow-[0_0_8px_rgba(59,130,246,0.1)] hover:shadow-[0_0_15px_rgba(59,130,246,0.2)] disabled:bg-slate-900/20 disabled:cursor-not-allowed disabled:shadow-none disabled:opacity-50 backdrop-blur-sm',
-    secondary: 'bg-slate-800/30 hover:bg-slate-700/40 text-slate-300 hover:text-white border border-slate-500/20 hover:border-slate-400/30 shadow-[0_0_6px_rgba(148,163,184,0.08)] hover:shadow-[0_0_12px_rgba(148,163,184,0.15)] disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm',
-    outline: 'border border-slate-500/30 text-slate-300 hover:text-white hover:bg-slate-800/20 hover:border-blue-400/30 hover:shadow-[0_0_10px_rgba(59,130,246,0.12)] disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm',
-    ghost: 'text-slate-400 hover:bg-slate-800/20 hover:text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed',
-    danger: 'bg-slate-800/40 hover:bg-red-900/30 text-red-300 hover:text-red-200 border border-red-500/20 hover:border-red-400/40 shadow-[0_0_8px_rgba(239,68,68,0.1)] hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm',
+    primary: 'bg-[#00D9FF] hover:shadow-[0_0_35px_rgba(0,217,255,0.6)] text-[#000000] font-semibold disabled:bg-[#1A1A1A] disabled:cursor-not-allowed disabled:shadow-none disabled:opacity-50 disabled:text-[#666666]',
+    secondary: 'bg-[#1A1A1A] hover:bg-[#222222] text-[#FFFFFF] border border-[#2A2A2A] hover:border-[#00D9FF] hover:shadow-[0_0_20px_rgba(0,217,255,0.4)] disabled:opacity-50 disabled:cursor-not-allowed',
+    outline: 'border border-[#2A2A2A] text-[#A0A0A0] hover:text-[#FFFFFF] hover:bg-[#1A1A1A] hover:border-[#00D9FF] hover:shadow-[0_0_20px_rgba(0,217,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed',
+    ghost: 'text-[#A0A0A0] hover:bg-[#1A1A1A] hover:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-not-allowed',
+    danger: 'bg-[#FF3366] hover:shadow-[0_0_30px_rgba(255,51,102,0.5)] text-[#FFFFFF] font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none',
   };
 
   const sizeClasses = {
@@ -39,12 +40,12 @@ export default function Button({
     <motion.button
       whileHover={{
         scale: isLoading || disabled ? 1 : 1.02,
-        y: isLoading || disabled ? 0 : -1,
-        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.4 }
+        y: isLoading || disabled ? 0 : -2,
+        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.3 }
       }}
       whileTap={{
-        scale: isLoading || disabled ? 1 : 0.98,
-        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.3 }
+        scale: isLoading || disabled ? 1 : 0.95,
+        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.2 }
       }}
       disabled={isLoading || disabled}
       className={`${finalClassName} relative overflow-hidden`}

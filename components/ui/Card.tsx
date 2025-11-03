@@ -4,27 +4,43 @@ import { motion, HTMLMotionProps } from 'framer-motion';
 interface CardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   children: React.ReactNode;
   hoverable?: boolean;
+  glowColor?: 'cyan' | 'green' | 'pink' | 'purple' | 'none';
 }
 
 export default function Card({
   children,
   hoverable = false,
+  glowColor = 'none',
   className = '',
   ...props
 }: CardProps) {
-  const baseClasses = 'bg-slate-900/20 backdrop-blur-md border border-slate-700/20 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.3)] p-6 transition-all duration-300';
-  const hoverClasses = hoverable ? 'hover:border-slate-600/30 hover:shadow-[0_0_20px_rgba(148,163,184,0.06)] cursor-pointer' : '';
+  // Mobile app dark theme: #1A1A1A cards with #2A2A2A borders
+  const baseClasses = 'bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-6 transition-all duration-300';
+  
+  // Cyan glow on hover (matches mobile app)
+  const hoverClasses = hoverable 
+    ? 'hover:border-[#00D9FF] hover:shadow-[0_0_25px_rgba(0,217,255,0.4)] cursor-pointer' 
+    : '';
+
+  // Neon left border indicators (matches mobile KPI cards)
+  const glowBorderClasses = {
+    cyan: 'border-l-4 border-l-[#00D9FF]',
+    green: 'border-l-4 border-l-[#00FF88]',
+    pink: 'border-l-4 border-l-[#FF3366]',
+    purple: 'border-l-4 border-l-[#9D4EDD]',
+    none: '',
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       whileHover={hoverable ? {
-        y: -4,
+        y: -2,
         transition: { type: 'spring', stiffness: 200, damping: 25 }
       } : {}}
-      className={`${baseClasses} ${hoverClasses} ${className}`}
+      className={`${baseClasses} ${hoverClasses} ${glowBorderClasses[glowColor]} ${className}`}
       {...props}
     >
       {children}
