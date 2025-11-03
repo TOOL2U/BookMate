@@ -22,14 +22,6 @@ interface NewBalanceEntry {
   note?: string;
 }
 
-// Available bank accounts (from options.json)
-const AVAILABLE_BANKS = [
-  'Bank Transfer - Bangkok Bank - Shaun Ducker',
-  'Bank Transfer - Bangkok Bank - Maria Ren',
-  'Bank transfer - Krung Thai Bank - Family Account',
-  'Cash',
-];
-
 export default function BalanceAnalyticsPage() {
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,11 +32,25 @@ export default function BalanceAnalyticsPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [reconciliation, setReconciliation] = useState<any>(null);
-  const [selectedBank, setSelectedBank] = useState<string>(''); // Track which bank is selected for update
+  const [selectedBank, setSelectedBank] = useState<string>('');
+  const [availableBanks, setAvailableBanks] = useState<string[]>([]); // Dynamic bank list from API
 
   const fetchBalances = async () => {
     setLoading(true);
     try {
+      // Fetch available bank accounts from API (same as Settings page)
+      // Add cache-busting to ensure fresh data
+      const optionsRes = await fetch(`/api/options?t=${Date.now()}`);
+      const optionsData = await optionsRes.json();
+      
+      if (optionsData.ok && optionsData.data?.typeOfPayments) {
+        // Extract bank names from payment type objects
+        const bankNames = optionsData.data.typeOfPayments.map((payment: any) => 
+          typeof payment === 'string' ? payment : payment.name
+        );
+        setAvailableBanks(bankNames);
+      }
+
       // Use the running balance endpoint that tracks expenses
       const res = await fetch('/api/balance/by-property', {
         method: 'POST',
@@ -71,8 +77,8 @@ export default function BalanceAnalyticsPage() {
       }
 
       // Always initialize newBalances with all available banks
-      if (newBalances.length === 0) {
-        setNewBalances(AVAILABLE_BANKS.map((bankName) => {
+      if (newBalances.length === 0 && optionsData.ok && optionsData.data?.typeOfPayments) {
+        setNewBalances(optionsData.data.typeOfPayments.map((bankName: string) => {
           // Try to find existing balance for this bank
           const existingBalance = data?.propertyBalances?.find((pb: any) => pb.property === bankName);
           return {
@@ -516,7 +522,7 @@ export default function BalanceAnalyticsPage() {
                       className="w-full px-4 py-3 bg-[#0A0A0A] border border-border-card rounded-lg text-text-primary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all"
                     >
                       <option value="">-- Select a bank account --</option>
-                      {AVAILABLE_BANKS.map((bankName, index) => {
+                      {availableBanks.map((bankName, index) => {
                         return (
                           <option key={index} value={bankName}>
                             {bankName}
@@ -596,7 +602,7 @@ export default function BalanceAnalyticsPage() {
                     className="w-full px-4 py-3 bg-[#0A0A0A] border border-border-card rounded-lg text-text-primary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all"
                   >
                     <option value="">-- Select a bank account --</option>
-                    {AVAILABLE_BANKS.map((bankName, index) => {
+                    {availableBanks.map((bankName, index) => {
                       return (
                         <option key={index} value={bankName}>
                           {bankName}
