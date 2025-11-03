@@ -30,8 +30,51 @@ export default function ReviewPage() {
 
   const handleCloseToast = () => setShowToast(false);
 
-  // Get dropdown options
-  const options = getOptions();
+  // Get dropdown options from Google Sheets (real-time)
+  const [options, setOptions] = useState<{
+    properties: string[];
+    typeOfOperation: string[];
+    typeOfPayment: string[];
+  }>({
+    properties: [],
+    typeOfOperation: [],
+    typeOfPayment: [],
+  });
+
+  // Fetch options from Google Sheets on component mount
+  useEffect(() => {
+    async function fetchOptions() {
+      try {
+        const response = await fetch('/api/categories/all');
+        const result = await response.json();
+        
+        if (result.ok) {
+          setOptions({
+            properties: result.data.properties || [],
+            typeOfOperation: result.data.typeOfOperation || [],
+            typeOfPayment: result.data.typeOfPayment || [],
+          });
+          console.log('[REVIEW] Loaded dropdown options from Google Sheets:', {
+            properties: result.data.properties?.length,
+            typeOfOperation: result.data.typeOfOperation?.length,
+            typeOfPayment: result.data.typeOfPayment?.length,
+          });
+        } else {
+          // Fallback to hardcoded options if API fails
+          const fallback = getOptions();
+          setOptions(fallback);
+          console.warn('[REVIEW] API failed, using fallback options');
+        }
+      } catch (error) {
+        console.error('[REVIEW] Error fetching options:', error);
+        // Fallback to hardcoded options
+        const fallback = getOptions();
+        setOptions(fallback);
+      }
+    }
+    
+    fetchOptions();
+  }, []);
 
   // Filter categories based on search
   const filteredCategories = options.typeOfOperation

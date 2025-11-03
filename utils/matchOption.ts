@@ -150,12 +150,14 @@ export function matchProperty(input: string, comment?: string): MatchResult {
     }
   }
 
-  // Try keyword matching with improved scoring
-  const keywords = options.keywords.properties as Record<string, string[]>;
-  for (const [property, propertyKeywords] of Object.entries(keywords)) {
-    const score = matchKeywords(searchText, propertyKeywords);
-    if (score > bestMatch.confidence) {
-      bestMatch = { value: property, confidence: score, matched: score >= 0.8 };
+  // Try keyword matching with improved scoring (if keywords exist)
+  const keywords = (options.keywords as any)?.properties as Record<string, string[]> | undefined;
+  if (keywords) {
+    for (const [property, propertyKeywords] of Object.entries(keywords)) {
+      const score = matchKeywords(searchText, propertyKeywords);
+      if (score > bestMatch.confidence) {
+        bestMatch = { value: property, confidence: score, matched: score >= 0.8 };
+      }
     }
   }
 
@@ -193,12 +195,14 @@ export function matchTypeOfOperation(input: string, comment?: string): MatchResu
     }
   }
 
-  // Try keyword matching
-  const keywords = options.keywords.typeOfOperation as Record<string, string[]>;
-  for (const [operation, operationKeywords] of Object.entries(keywords)) {
-    const score = matchKeywords(searchText, operationKeywords);
-    if (score > bestMatch.confidence) {
-      bestMatch = { value: operation, confidence: score, matched: score >= 0.8 };
+  // Try keyword matching (if keywords exist)
+  const keywords = (options.keywords as any)?.typeOfOperation as Record<string, string[]> | undefined;
+  if (keywords) {
+    for (const [operation, operationKeywords] of Object.entries(keywords)) {
+      const score = matchKeywords(searchText, operationKeywords);
+      if (score > bestMatch.confidence) {
+        bestMatch = { value: operation, confidence: score, matched: score >= 0.8 };
+      }
     }
   }
 
@@ -231,12 +235,14 @@ export function matchTypeOfPayment(input: string, comment?: string): MatchResult
     }
   }
 
-  // Try keyword matching
-  const keywords = options.keywords.typeOfPayment as Record<string, string[]>;
-  for (const [payment, paymentKeywords] of Object.entries(keywords)) {
-    const score = matchKeywords(searchText, paymentKeywords);
-    if (score > bestMatch.confidence) {
-      bestMatch = { value: payment, confidence: score, matched: score >= 0.8 };
+  // Try keyword matching (if keywords exist)
+  const keywords = (options.keywords as any)?.typeOfPayment as Record<string, string[]> | undefined;
+  if (keywords) {
+    for (const [payment, paymentKeywords] of Object.entries(keywords)) {
+      const score = matchKeywords(searchText, paymentKeywords);
+      if (score > bestMatch.confidence) {
+        bestMatch = { value: payment, confidence: score, matched: score >= 0.8 };
+      }
     }
   }
 
@@ -282,6 +288,11 @@ export function normalizeDropdownFields(
 
 /**
  * Get all available options for dropdowns
+ * 
+ * IMPORTANT: This function returns data from the hardcoded options.json file.
+ * For real-time data from Google Sheets, use the /api/categories/all endpoint instead.
+ * 
+ * This is kept for backward compatibility and SSR contexts where fetch is not available.
  */
 export function getOptions() {
   return {
@@ -289,5 +300,45 @@ export function getOptions() {
     typeOfOperation: options.typeOfOperation,
     typeOfPayment: options.typeOfPayment,
   };
+}
+
+/**
+ * Fetch all dropdown options from Google Sheets in real-time
+ * This replaces the hardcoded options.json approach
+ */
+export async function getOptionsFromSheets(): Promise<{
+  properties: string[];
+  typeOfOperation: string[];
+  typeOfPayment: string[];
+  revenues: string[];
+  month: string[];
+}> {
+  try {
+    const response = await fetch('/api/categories/all', {
+      cache: 'no-store', // Always get fresh data
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch options: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.ok) {
+      throw new Error(result.error || 'Failed to fetch options from API');
+    }
+
+    return {
+      properties: result.data.properties || [],
+      typeOfOperation: result.data.typeOfOperation || [],
+      typeOfPayment: result.data.typeOfPayment || [],
+      revenues: result.data.revenues || [],
+      month: result.data.month || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    };
+  } catch (error) {
+    console.error('[getOptionsFromSheets] Error:', error);
+    // Fallback to hardcoded options if API fails
+    return getOptions() as any;
+  }
 }
 

@@ -32,30 +32,16 @@ function getCredentials() {
   // Try environment variable first (for Vercel production)
   const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
   
-  if (serviceAccountKey) {
-    console.log('[PROPERTIES] Using credentials from GOOGLE_SERVICE_ACCOUNT_KEY');
-    try {
-      return JSON.parse(serviceAccountKey);
-    } catch (error) {
-      throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY as JSON');
-    }
+  if (!serviceAccountKey) {
+    throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY environment variable is not set');
   }
 
-  // Try config file (for local development)
+  console.log('[PROPERTIES] Using credentials from GOOGLE_SERVICE_ACCOUNT_KEY');
   try {
-    const credentials = require('../../../../config/google-credentials.json');
-    console.log('[PROPERTIES] Using credentials from config/google-credentials.json');
-    return credentials;
+    return JSON.parse(serviceAccountKey);
   } catch (error) {
-    // Config file doesn't exist
+    throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY as JSON');
   }
-
-  throw new Error(
-    'Google credentials not found.\n' +
-    'For production: Set GOOGLE_SERVICE_ACCOUNT_KEY environment variable.\n' +
-    'For local dev: Create config/google-credentials.json file.\n' +
-    'See DEPLOYMENT_SETUP.md for setup instructions.'
-  );
 }
 
 // ============================================================================

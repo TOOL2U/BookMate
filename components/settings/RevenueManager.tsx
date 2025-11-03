@@ -3,47 +3,46 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Edit2, Trash2, Plus, Check, X, AlertCircle, Info } from 'lucide-react';
 
-export default function PaymentTypeManager() {
-  const [paymentTypes, setPaymentTypes] = useState<string[]>([]);
+export default function RevenueManager() {
+  const [revenues, setRevenues] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [newValue, setNewValue] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 5000);
+    setTimeout(() => setToast(null), 3000);
   };
 
-  const fetchPaymentTypes = async () => {
+  const fetchRevenues = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/categories/payments');
-      const result = await res.json();
-
-      if (result.ok && result.data) {
-        setPaymentTypes(result.data.paymentTypes || []);
+      const res = await fetch('/api/categories/revenues');
+      const data = await res.json();
+      if (data.ok) {
+        setRevenues(data.data.revenues);
       } else {
-        throw new Error(result.error || 'Failed to load paymentTypes');
+        showToast(data.error || 'Failed to fetch revenue items', 'error');
       }
     } catch (error) {
-      console.error('Error fetching paymentTypes:', error);
-      showToast(error instanceof Error ? error.message : 'Failed to load paymentTypes', 'error');
+      console.error('Error fetching revenue items:', error);
+      showToast('Failed to load revenue items', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPaymentTypes();
+    fetchRevenues();
   }, []);
 
-  const handleStartEdit = (index: number, currentValue: string) => {
+  const handleStartEdit = (index: number, value: string) => {
     setEditingIndex(index);
-    setEditValue(currentValue);
+    setEditValue(value);
     setIsAdding(false);
   };
 
@@ -53,16 +52,21 @@ export default function PaymentTypeManager() {
   };
 
   const handleSaveEdit = async (oldValue: string) => {
-    if (!editValue.trim() || editValue.trim() === oldValue) {
+    if (!editValue.trim()) {
+      showToast('Revenue item name cannot be empty', 'error');
+      return;
+    }
+
+    if (editValue === oldValue) {
       handleCancelEdit();
       return;
     }
 
     try {
       setIsUpdating(true);
-      showToast('Updating payment type...', 'info');
+      showToast('Updating revenue item...', 'info');
 
-      const res = await fetch('/api/categories/payments', {
+      const res = await fetch('/api/categories/revenues', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -76,15 +80,15 @@ export default function PaymentTypeManager() {
       const result = await res.json();
 
       if (!res.ok || !result.ok) {
-        throw new Error(result.error || 'Failed to update payment type');
+        throw new Error(result.error || 'Failed to update revenue item');
       }
 
-      setPaymentTypes(result.data.paymentTypes);
-      showToast('Payment Type updated successfully', 'success');
+      setRevenues(result.data.revenues);
+      showToast('Revenue item updated successfully', 'success');
       handleCancelEdit();
     } catch (error) {
-      console.error('Error updating payment type:', error);
-      showToast(error instanceof Error ? error.message : 'Failed to update payment type', 'error');
+      console.error('Error updating revenue item:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to update revenue item', 'error');
     } finally {
       setIsUpdating(false);
     }
@@ -97,9 +101,9 @@ export default function PaymentTypeManager() {
 
     try {
       setIsUpdating(true);
-      showToast('Deleting payment type...', 'info');
+      showToast('Deleting revenue item...', 'info');
 
-      const res = await fetch('/api/categories/payments', {
+      const res = await fetch('/api/categories/revenues', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,14 +116,14 @@ export default function PaymentTypeManager() {
       const result = await res.json();
 
       if (!res.ok || !result.ok) {
-        throw new Error(result.error || 'Failed to delete payment type');
+        throw new Error(result.error || 'Failed to delete revenue item');
       }
 
-      setPaymentTypes(result.data.paymentTypes);
-      showToast('Payment Type deleted successfully', 'success');
+      setRevenues(result.data.revenues);
+      showToast('Revenue item deleted successfully', 'success');
     } catch (error) {
-      console.error('Error deleting payment type:', error);
-      showToast(error instanceof Error ? error.message : 'Failed to delete payment type', 'error');
+      console.error('Error deleting revenue item:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to delete revenue item', 'error');
     } finally {
       setIsUpdating(false);
     }
@@ -138,15 +142,15 @@ export default function PaymentTypeManager() {
 
   const handleSaveAdd = async () => {
     if (!newValue.trim()) {
-      showToast('Payment Type name cannot be empty', 'error');
+      showToast('Revenue item name cannot be empty', 'error');
       return;
     }
 
     try {
       setIsUpdating(true);
-      showToast('Adding payment type...', 'info');
+      showToast('Adding revenue item...', 'info');
 
-      const res = await fetch('/api/categories/payments', {
+      const res = await fetch('/api/categories/revenues', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -158,15 +162,15 @@ export default function PaymentTypeManager() {
       const result = await res.json();
 
       if (!res.ok || !result.ok) {
-        throw new Error(result.error || 'Failed to add payment type');
+        throw new Error(result.error || 'Failed to add revenue item');
       }
 
-      setPaymentTypes(result.data.paymentTypes);
-      showToast('Payment Type added successfully', 'success');
+      setRevenues(result.data.revenues);
+      showToast('Revenue item added successfully', 'success');
       handleCancelAdd();
     } catch (error) {
-      console.error('Error adding payment type:', error);
-      showToast(error instanceof Error ? error.message : 'Failed to add payment type', 'error');
+      console.error('Error adding revenue item:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to add revenue item', 'error');
     } finally {
       setIsUpdating(false);
     }
@@ -179,10 +183,10 @@ export default function PaymentTypeManager() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-white mb-1">
-              💳 Payment Type Management
+              💰 Revenue Management
             </h2>
             <p className="text-sm text-slate-400">
-              Manage paymentTypes from Google Sheets • {paymentTypes.length} {paymentTypes.length === 1 ? 'payment type' : 'paymentTypes'}
+              Manage revenue items from Google Sheets • {revenues.length} {revenues.length === 1 ? 'item' : 'items'}
             </p>
           </div>
           <button
@@ -191,7 +195,7 @@ export default function PaymentTypeManager() {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Payment Type
+            Add Revenue Item
           </button>
         </div>
       </div>
@@ -205,7 +209,7 @@ export default function PaymentTypeManager() {
               Real-Time Google Sheets Integration
             </h3>
             <p className="text-slate-300 text-xs">
-              Payment Types are stored in <strong>Data sheet (Column D)</strong>. Changes automatically update the <strong>P&L sheet</strong> via Apps Script.
+              Revenue items are stored in <strong>Data sheet (Column A)</strong>. Changes automatically update the <strong>P&L sheet</strong> via Apps Script.
               All formulas, totals, and formatting are managed automatically.
             </p>
           </div>
@@ -227,7 +231,7 @@ export default function PaymentTypeManager() {
                     #
                   </th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Payment Type Name
+                    Revenue Item
                   </th>
                   <th className="text-right px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Actions
@@ -250,7 +254,7 @@ export default function PaymentTypeManager() {
                           if (e.key === 'Enter') handleSaveAdd();
                           if (e.key === 'Escape') handleCancelAdd();
                         }}
-                        placeholder="e.g., Downtown Office"
+                        placeholder="e.g., REV - Rental Income"
                         autoFocus
                         disabled={isUpdating}
                         className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
@@ -283,8 +287,8 @@ export default function PaymentTypeManager() {
                   </tr>
                 )}
 
-                {/* Existing paymentTypes */}
-                {paymentTypes.map((item, idx) => (
+                {/* Existing revenue items */}
+                {revenues.map((item, idx) => (
                   <tr
                     key={idx}
                     className="hover:bg-slate-800/30 transition-colors"
@@ -358,11 +362,11 @@ export default function PaymentTypeManager() {
                   </tr>
                 ))}
 
-                {paymentTypes.length === 0 && !isAdding && (
+                {revenues.length === 0 && !isAdding && (
                   <tr>
                     <td colSpan={3} className="px-6 py-12 text-center">
-                      <p className="text-slate-400">No paymentTypes found</p>
-                      <p className="text-sm text-slate-500 mt-1">Click &quot;Add Payment Type&quot; to create your first payment type</p>
+                      <p className="text-slate-400">No revenue items found</p>
+                      <p className="text-sm text-slate-500 mt-1">Click &quot;Add Revenue Item&quot; to create your first item</p>
                     </td>
                   </tr>
                 )}

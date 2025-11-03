@@ -6,6 +6,7 @@ import CategoryTable from '@/components/settings/CategoryTable';
 import ExpenseCategoryManager from '@/components/settings/ExpenseCategoryManager';
 import PropertyManager from '@/components/settings/PropertyManager';
 import PaymentTypeManager from '@/components/settings/PaymentTypeManager';
+import RevenueManager from '@/components/settings/RevenueManager';
 import { Settings as SettingsIcon, RefreshCw, Cloud, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface OptionsData {
@@ -223,50 +224,17 @@ export default function SettingsPage() {
 
         {/* Category Tables */}
         <div className="space-y-6">
+          {/* NEW: Revenue Management (Google Sheets Integration) */}
+          <RevenueManager />
+
           {/* NEW: Expense Categories (Google Sheets Integration) */}
           <ExpenseCategoryManager onUpdate={fetchOptions} />
 
           {/* NEW: Property Management (Google Sheets Integration) */}
           <PropertyManager />
 
-          {/* Properties */}
-          <CategoryTable
-            title="Properties"
-            description="Locations and properties in your business"
-            items={data?.properties || []}
-            loading={loading}
-            icon="🏠"
-            categoryType="property"
-            onUpdate={handleUpdate}
-            isUpdating={isUpdating}
-          />
-
-          {/* Type of Operations */}
-          <CategoryTable
-            title="Type of Operations"
-            description="Revenue and expense categories"
-            items={data?.typeOfOperations || []}
-            loading={loading}
-            icon="💼"
-            categoryType="typeOfOperation"
-            onUpdate={handleUpdate}
-            isUpdating={isUpdating}
-          />
-
           {/* NEW: Payment Type Management (Google Sheets Integration) */}
           <PaymentTypeManager />
-
-          {/* Type of Payments */}
-          <CategoryTable
-            title="Type of Payments"
-            description="Payment methods and accounts"
-            items={data?.typeOfPayments || []}
-            loading={loading}
-            icon="💳"
-            categoryType="typeOfPayment"
-            onUpdate={handleUpdate}
-            isUpdating={isUpdating}
-          />
         </div>
 
         {/* Toast Notification */}
