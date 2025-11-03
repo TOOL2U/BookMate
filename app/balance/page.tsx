@@ -78,7 +78,8 @@ export default function BalanceAnalyticsPage() {
 
       // Always initialize newBalances with all available banks
       if (newBalances.length === 0 && optionsData.ok && optionsData.data?.typeOfPayments) {
-        setNewBalances(optionsData.data.typeOfPayments.map((bankName: string) => {
+        setNewBalances(optionsData.data.typeOfPayments.map((payment: any) => {
+          const bankName = typeof payment === 'string' ? payment : payment.name;
           // Try to find existing balance for this bank
           const existingBalance = data?.propertyBalances?.find((pb: any) => pb.property === bankName);
           return {
