@@ -12,21 +12,17 @@ function getCredentials() {
   return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
 }
 
-async function getAuthClient() {
-  const credentials = getCredentials();
-  const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
-  return auth.getClient();
-}
-
 export async function GET() {
   try {
     console.log('[REVENUES] Fetching revenue items from Google Sheets...');
     
-    const authClient = await getAuthClient();
-    const sheets = google.sheets({ version: 'v4', auth: authClient });
+    const credentials = getCredentials();
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    
+    const sheets = google.sheets({ version: 'v4', auth });
 
     const range = `Data!A${DATA_REVENUE_START_ROW}:A`;
     
@@ -67,8 +63,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action, newValue, oldValue, index } = body;
 
-    const authClient = await getAuthClient();
-    const sheets = google.sheets({ version: 'v4', auth: authClient });
+    const credentials = getCredentials();
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    
+    const sheets = google.sheets({ version: 'v4', auth });
 
     // Get current revenues
     const getResponse = await sheets.spreadsheets.values.get({
