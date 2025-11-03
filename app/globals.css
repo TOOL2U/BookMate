@@ -1,21 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-:root {
-  --color-bg-app: 0 0 0;
-  --color-bg-card: 26 26 26;
-  --color-border-card: 42 42 42;
-  --color-text-primary: 255 255 255;
-  --color-text-secondary: 160 160 160;
-  --color-text-tertiary: 102 102 102;
-  --color-accent: 0 217 255;
-  --color-accent-purple: 157 78 221;
-  --color-success: 0 255 136;
-  --color-error: 255 51 102;
-  --color-warning: 255 215 0;
-  --color-info: 157 78 221;
-  --color-border-light: 42 42 42;
-  --color-border-medium: 255 255 255;
+@theme {
+  /* Colors */
+  --color-bg-app: #000000;
+  --color-bg-card: #1a1a1a;
+  --color-border-card: #2a2a2a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a0a0a0;
+  --color-text-tertiary: #666666;
+  --color-accent: #00d9ff;
+  --color-accent-purple: #9d4edd;
+  --color-success: #00ff88;
+  --color-error: #ff3366;
+  --color-warning: #ffd700;
+  --color-info: #9d4edd;
 }
 
 * {
@@ -29,8 +28,8 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: rgb(var(--color-bg-app));
-  color: rgb(var(--color-text-primary));
+  background-color: var(--color-bg-app);
+  color: var(--color-text-primary);
   position: relative;
   overflow-x: hidden;
 }

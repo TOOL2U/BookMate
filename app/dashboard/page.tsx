@@ -61,8 +61,8 @@ export default function DashboardPage() {
       const pnlRes = await fetch('/api/pnl');
       const pnlData = await pnlRes.json();
 
-      // Fetch balances
-      const balanceRes = await fetch('/api/balance/get', {
+      // Fetch balances - USE RUNNING BALANCE ENDPOINT (same as Balance page)
+      const balanceRes = await fetch('/api/balance/by-property', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
@@ -73,12 +73,14 @@ export default function DashboardPage() {
       const inboxRes = await fetch('/api/inbox');
       const inboxData = await inboxRes.json();
 
-      // Process balance data
+      // Process balance data - Map from propertyBalances to Balance format
       let balancesArray: Balance[] = [];
-      if (balanceData.ok && balanceData.allBalances) {
-        balancesArray = Object.values(balanceData.allBalances).filter(
-          (b: any) => b.bankName !== 'Bank Name ' && b.balance !== 'Balance'
-        ) as Balance[];
+      if (balanceData.ok && balanceData.propertyBalances) {
+        balancesArray = balanceData.propertyBalances.map((pb: any) => ({
+          bankName: pb.property,
+          balance: pb.balance, // Use calculated running balance (uploaded + revenue - expenses)
+          timestamp: pb.uploadedDate
+        }));
       }
 
       setData({
@@ -132,7 +134,7 @@ export default function DashboardPage() {
           <button
             onClick={fetchDashboardData}
             disabled={loading}
-            className="p-3 bg-bg-card hover:bg-bg-card/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
+            className="p-3 bg-[#0A0A0A] hover:bg-[#0A0A0A]/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
             aria-label="Refresh data"
           >
             <RefreshCw className={`w-5 h-5 text-text-secondary ${loading ? 'animate-spin' : ''}`} />
@@ -168,7 +170,7 @@ export default function DashboardPage() {
       {/* Error Toast */}
       {error && (
         <div className="fixed bottom-8 right-8 max-w-md z-50 animate-slide-in-right">
-          <div className="bg-bg-card backdrop-blur-sm border border-error/40 rounded-xl p-4 flex items-start gap-3 shadow-[0_12px_48px_rgba(0,0,0,0.5)]">
+          <div className="bg-[#0A0A0A] backdrop-blur-sm border border-error/40 rounded-xl p-4 flex items-start gap-3 shadow-[0_12px_48px_rgba(0,0,0,0.5)]">
             <AlertCircle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-text-primary font-medium mb-1">
@@ -180,7 +182,7 @@ export default function DashboardPage() {
             </div>
             <button
               onClick={fetchDashboardData}
-              className="flex-shrink-0 px-3 py-1.5 bg-gradient-to-r from-accent to-accent-purple text-text-primary text-xs font-medium rounded-lg transition-all duration-300 shadow-[0_0_16px_rgba(0,217,255,0.4)] hover:shadow-[0_0_20px_rgba(0,217,255,0.45)]"
+              className="flex-shrink-0 px-3 py-1.5 bg-gradient-to-r from-accent to-accent-blue text-text-primary text-xs font-medium rounded-lg transition-all duration-300 shadow-[0_0_16px_rgba(0,217,255,0.4)] hover:shadow-[0_0_20px_rgba(0,217,255,0.45)]"
             >
               Retry
             </button>

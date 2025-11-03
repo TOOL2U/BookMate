@@ -24,9 +24,9 @@ export default function Select({
       )}
       <select
         className={`
-          w-full px-4 py-2.5 bg-bg-card border border-border-card rounded-xl
+          w-full px-4 py-2.5 bg-[#0A0A0A] border border-border-card rounded-xl
           text-text-primary
-          focus:outline-none focus:border-accent focus:shadow-glow-cyan-sm focus:bg-bg-card/80
+          focus:outline-none focus:border-accent focus:shadow-glow-cyan-sm focus:bg-[#0A0A0A]/80
           transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm
           ${error ? 'border-error/40 focus:border-error focus:shadow-[0_0_12px_rgba(255,51,102,0.4)]' : ''}
           ${className}

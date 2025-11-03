@@ -173,9 +173,9 @@ export default function PaymentTypeManager() {
   };
 
   return (
-    <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl overflow-hidden backdrop-blur-sm">
+    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden backdrop-blur-sm">
       {/* Header */}
-      <div className="border-b border-[#2A2A2A] p-6">
+      <div className="border-b border-slate-700/50 p-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-[#FFFFFF] mb-1">
@@ -222,7 +222,7 @@ export default function PaymentTypeManager() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-[#1A1A1A]">
+                <tr className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm">
                   <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                     #
                   </th>
@@ -253,7 +253,7 @@ export default function PaymentTypeManager() {
                         placeholder="e.g., Downtown Office"
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                       />
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -273,7 +273,7 @@ export default function PaymentTypeManager() {
                         <button
                           onClick={handleCancelAdd}
                           disabled={isUpdating}
-                          className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-slate-600 hover:bg-slate-800/60 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Cancel"
                         >
                           <X className="w-4 h-4 text-[#FFFFFF]" />
@@ -287,7 +287,7 @@ export default function PaymentTypeManager() {
                 {paymentTypes.map((item, idx) => (
                   <tr
                     key={idx}
-                    className="hover:bg-[#1A1A1A] transition-colors"
+                    className="hover:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm transition-colors"
                   >
                     <td className="px-6 py-4 text-sm text-[#A0A0A0]">
                       {idx + 1}
@@ -304,7 +304,7 @@ export default function PaymentTypeManager() {
                           }}
                           autoFocus
                           disabled={isUpdating}
-                          className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                         />
                       ) : (
                         <span className="text-[#FFFFFF] font-medium">{item}</span>
@@ -328,7 +328,7 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={handleCancelEdit}
                             disabled={isUpdating}
-                            className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-slate-600 hover:bg-slate-800/60 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Cancel"
                           >
                             <X className="w-4 h-4 text-[#FFFFFF]" />

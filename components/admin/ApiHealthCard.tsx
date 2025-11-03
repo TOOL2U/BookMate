@@ -16,7 +16,7 @@ interface ApiHealthCardProps {
 
 export default function ApiHealthCard({ apiHealth, onCheck }: ApiHealthCardProps) {
   return (
-    <div className="bg-bg-card border border-border-card rounded-xl p-6">
+    <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-gradient-to-br from-success/20 to-info/20 rounded-xl">
           <Activity className="w-6 h-6 text-success" />
@@ -40,7 +40,7 @@ export default function ApiHealthCard({ apiHealth, onCheck }: ApiHealthCardProps
           {apiHealth.map((check, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-3 bg-bg-card border border-border-card rounded-lg"
+              className="flex items-center justify-between p-3 bg-[#0A0A0A] border border-border-card rounded-lg"
             >
               <div className="flex items-center gap-2">
                 {check.status === 'checking' && (

@@ -235,12 +235,12 @@ export default function AdminPage() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
         <div className="relative z-10 w-full max-w-md">
-          <div className="bg-bg-card border border-border-card rounded-xl p-8">
+          <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-8">
             {/* Lock Icon */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-accent via-accent-purple to-accent rounded-full blur-xl opacity-50" />
-                <div className="relative bg-gradient-to-br from-accent to-accent-purple p-5 rounded-2xl shadow-lg">
+                <div className="absolute inset-0 bg-gradient-to-r from-accent via-accent-blue to-accent rounded-full blur-xl opacity-50" />
+                <div className="relative bg-gradient-to-br from-accent to-accent-blue p-5 rounded-2xl shadow-lg">
                   <Shield className="w-10 h-10 text-text-primary" />
                 </div>
               </div>
@@ -273,7 +273,7 @@ export default function AdminPage() {
                   autoFocus
                   className={`
                     w-full px-6 py-4 text-center text-2xl font-bold tracking-[0.5em]
-                    bg-bg-card border-2 rounded-xl
+                    bg-[#0A0A0A] border-2 rounded-xl
                     text-text-primary placeholder-slate-600
                     focus:outline-none focus:ring-2 focus:ring-accent/40
                     transition-all duration-200
@@ -287,7 +287,7 @@ export default function AdminPage() {
               <button
                 type="submit"
                 disabled={pin.length !== 4}
-                className="w-full px-4 py-3 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 bg-gradient-to-r from-accent to-accent-blue hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <CheckCircle className="w-5 h-5" />
                 Unlock
@@ -406,11 +406,11 @@ export default function AdminPage() {
 
         {/* Named Ranges Display */}
         {showNamedRanges && namedRanges.length > 0 && (
-          <div className="bg-bg-card border border-border-card rounded-xl p-6">
+          <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-6">
             <h3 className="text-lg font-bold text-text-primary mb-4">P&L Named Ranges ({namedRanges.length})</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               {namedRanges.map((range, index) => (
-                <div key={index} className="px-3 py-2 bg-bg-card border border-border-card rounded-lg text-sm text-text-primary">
+                <div key={index} className="px-3 py-2 bg-[#0A0A0A] border border-border-card rounded-lg text-sm text-text-primary">
                   {range.name}
                 </div>
               ))}
@@ -463,7 +463,7 @@ function ToolCard({ icon: Icon, title, description, color, isLoading, onClick, b
   const [gradientClass, iconColorClass] = colorClasses[color].split(' text-');
 
   return (
-    <div className="bg-bg-card border border-border-card rounded-xl p-6">
+    <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className={`p-3 bg-gradient-to-br ${gradientClass} rounded-xl`}>
           <Icon className={`w-6 h-6 text-${iconColorClass}`} />

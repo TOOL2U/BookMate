@@ -91,9 +91,9 @@ export default function CategoryTable({
     }
   };
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl overflow-hidden">
+    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-[#2A2A2A]">
+      <div className="p-6 border-b border-slate-700/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{icon}</span>
@@ -122,7 +122,7 @@ export default function CategoryTable({
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="bg-[#1A1A1A]">
+              <tr className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm">
                 <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                   #
                 </th>
@@ -153,7 +153,7 @@ export default function CategoryTable({
                       placeholder="Enter new category name..."
                       autoFocus
                       disabled={isUpdating}
-                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                      className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     />
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -173,7 +173,7 @@ export default function CategoryTable({
                       <button
                         onClick={handleCancelAdd}
                         disabled={isUpdating}
-                        className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                        className="p-2 bg-slate-600 hover:bg-slate-800/60 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                         title="Cancel"
                       >
                         <X className="w-4 h-4 text-[#FFFFFF]" />
@@ -187,7 +187,7 @@ export default function CategoryTable({
               {items.map((item, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-[#1A1A1A] transition-colors"
+                  className="hover:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm transition-colors"
                 >
                   <td className="px-6 py-4 text-sm text-[#A0A0A0]">
                     {idx + 1}
@@ -204,7 +204,7 @@ export default function CategoryTable({
                         }}
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                       />
                     ) : (
                       <span className="text-[#FFFFFF] font-medium">{item}</span>
@@ -228,7 +228,7 @@ export default function CategoryTable({
                         <button
                           onClick={handleCancelEdit}
                           disabled={isUpdating}
-                          className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-slate-600 hover:bg-slate-800/60 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Cancel"
                         >
                           <X className="w-4 h-4 text-[#FFFFFF]" />

@@ -121,7 +121,7 @@ export default function InboxPage() {
             <button
               onClick={() => fetchReceipts(true)}
               disabled={isRefreshing}
-              className="p-2 bg-bg-card hover:bg-bg-card/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
+              className="p-2 bg-[#0A0A0A] hover:bg-[#0A0A0A]/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
             >
               <RefreshCw className={`w-5 h-5 text-text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
@@ -172,7 +172,7 @@ export default function InboxPage() {
 
       {/* Desktop Table View */}
       {!isLoading && receipts.length > 0 && (
-        <div className="hidden sm:block bg-bg-card border border-border-card rounded-2xl overflow-x-auto">
+        <div className="hidden sm:block bg-[#0A0A0A] border border-border-card rounded-2xl overflow-x-auto">
           <table className="w-full divide-y divide-border-card">
             <thead className="bg-bg-app">
               <tr>
@@ -208,7 +208,7 @@ export default function InboxPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ delay: index * 0.03 }}
-                    className="hover:bg-bg-card/70 transition-colors group"
+                    className="hover:bg-[#0A0A0A]/70 transition-colors group"
                   >
                     <td className="px-4 py-4">
                       <div className="text-sm font-medium text-text-primary max-w-[280px] truncate">

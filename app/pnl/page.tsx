@@ -293,7 +293,7 @@ export default function PnLPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 ${
                   period === 'month'
                     ? 'bg-gradient-to-r from-[#00D9FF] to-[#9D4EDD] text-[#FFFFFF] shadow-[0_0_16px_rgba(0,217,255,0.5)]'
-                    : 'bg-[#2A2A2A] text-[#A0A0A0] hover:bg-[#333333]'
+                    : 'bg-slate-700/40 text-[#A0A0A0] hover:bg-slate-700/50'
                 }`}
               >
                 Month View
@@ -303,7 +303,7 @@ export default function PnLPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 ${
                   period === 'year'
                     ? 'bg-gradient-to-r from-[#00D9FF] to-[#9D4EDD] text-[#FFFFFF] shadow-[0_0_16px_rgba(0,217,255,0.5)]'
-                    : 'bg-[#2A2A2A] text-[#A0A0A0] hover:bg-[#333333]'
+                    : 'bg-slate-700/40 text-[#A0A0A0] hover:bg-slate-700/50'
                 }`}
               >
                 Year View

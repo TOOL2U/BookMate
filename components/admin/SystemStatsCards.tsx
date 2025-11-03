@@ -61,7 +61,7 @@ export default function SystemStatsCards({ stats, isLoading }: SystemStatsCardsP
         return (
           <div
             key={index}
-            className="bg-bg-card border border-border-card rounded-xl p-6 relative overflow-hidden"
+            className="bg-[#0A0A0A] border border-border-card rounded-xl p-6 relative overflow-hidden"
           >
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${card.gradient} rounded-full blur-2xl`} />
             <div className="relative">

@@ -10,7 +10,7 @@ interface WebhookTestCardProps {
 
 export default function WebhookTestCard({ isLoading, response, onTest }: WebhookTestCardProps) {
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
+    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl">
           <Zap className="w-6 h-6 text-[#00D9FF]" />
@@ -44,7 +44,7 @@ export default function WebhookTestCard({ isLoading, response, onTest }: Webhook
           <label className="block text-sm font-medium text-[#A0A0A0] mb-2">
             Response:
           </label>
-          <pre className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg p-4 text-xs text-[#FFFFFF] font-mono overflow-x-auto max-h-64">
+          <pre className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg p-4 text-xs text-[#FFFFFF] font-mono overflow-x-auto max-h-64">
             {response}
           </pre>
         </div>

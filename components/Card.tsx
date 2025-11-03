@@ -34,7 +34,7 @@ export default function Card({
   return (
     <div
       className={`
-        bg-bg-card border border-border-card rounded-2xl
+        bg-[#0A0A0A] border border-border-card rounded-2xl
         ${hover ? 'hover:border-accent hover:shadow-[0_0_25px_rgba(0,217,255,0.4)] transition-all duration-300 cursor-pointer' : ''}
         ${paddingClasses[padding]}
         ${glowClasses[glow]}

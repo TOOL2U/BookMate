@@ -95,8 +95,8 @@ export default function OverlayDropdownPortal({
             transition={{ duration: isMobile ? 0.3 : 0.15, ease: isMobile ? [0.32, 0.72, 0, 1] : 'easeOut' }}
             className={`fixed z-9999 overflow-hidden bg-slate-900 shadow-elev-3 ${
               isMobile
-                ? 'bottom-0 left-0 right-0 rounded-t-3xl border-t border-[#2A2A2A] max-h-[70vh]'
-                : 'rounded-xl border border-[#2A2A2A] backdrop-blur-md max-h-64'
+                ? 'bottom-0 left-0 right-0 rounded-t-3xl border-t border-slate-700/50 max-h-[70vh]'
+                : 'rounded-xl border border-slate-700/50 backdrop-blur-md max-h-64'
             }`}
             style={
               isMobile
@@ -110,7 +110,7 @@ export default function OverlayDropdownPortal({
           >
             {/* Mobile header with close button and drag handle */}
             {isMobile && (
-              <div className="sticky top-0 z-10 bg-slate-900 border-b border-[#2A2A2A] px-4 py-3 flex items-center justify-between">
+              <div className="sticky top-0 z-10 bg-slate-900 border-b border-slate-700/50 px-4 py-3 flex items-center justify-between">
                 <div className="flex-1">
                   <div className="w-12 h-1 bg-slate-600 rounded-full mx-auto mb-2" />
                   <h3 className="text-sm font-medium text-[#FFFFFF] text-center">
@@ -137,7 +137,7 @@ export default function OverlayDropdownPortal({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.02 }}
                     onClick={() => onSelect(item)}
-                    className={`w-full px-4 text-left text-[#FFFFFF] hover:bg-[#1A1A1A] active:bg-slate-800 focus:bg-[#1A1A1A] focus:outline-none transition-colors border-b border-[#2A2A2A] last:border-b-0 ${
+                    className={`w-full px-4 text-left text-[#FFFFFF] hover:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm active:bg-slate-800 focus:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm focus:outline-none transition-colors border-b border-slate-700/50 last:border-b-0 ${
                       isMobile ? 'py-4 text-base' : 'py-3 text-sm first:rounded-t-xl last:rounded-b-xl'
                     }`}
                   >

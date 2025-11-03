@@ -20,9 +20,9 @@ export default function Button({
   const baseClasses = 'font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap';
 
   const variantClasses = {
-    primaryAccent: 'bg-gradient-to-r from-accent to-accent-purple text-text-primary shadow-[0_0_16px_rgba(0,217,255,0.5)] hover:shadow-[0_0_25px_rgba(0,217,255,0.6)] disabled:opacity-50 disabled:cursor-not-allowed',
-    secondary: 'bg-transparent border border-border-card text-text-primary hover:bg-bg-card disabled:opacity-50 disabled:cursor-not-allowed',
-    ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-bg-card disabled:opacity-50 disabled:cursor-not-allowed',
+    primaryAccent: 'bg-gradient-to-r from-accent to-accent-blue text-text-primary shadow-[0_0_16px_rgba(0,217,255,0.5)] hover:shadow-[0_0_25px_rgba(0,217,255,0.6)] disabled:opacity-50 disabled:cursor-not-allowed',
+    secondary: 'bg-transparent border border-border-card text-text-primary hover:bg-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed',
+    ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed',
     dangerGhost: 'bg-transparent border border-error/40 text-error hover:bg-error/10 disabled:opacity-50 disabled:cursor-not-allowed',
   };
 

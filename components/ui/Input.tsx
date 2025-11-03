@@ -22,7 +22,7 @@ export default function Input({
       )}
       <input
         className={`
-          w-full px-4 py-2.5 bg-bg-card border border-border-card rounded-xl
+          w-full px-4 py-2.5 bg-[#0A0A0A] border border-border-card rounded-xl
           text-text-primary placeholder:text-text-tertiary
           focus:outline-none focus:border-accent focus:shadow-glow-cyan-sm
           transition-all duration-300

@@ -175,7 +175,7 @@ export default function SettingsPage() {
               <button
                 onClick={fetchOptions}
                 disabled={loading}
-                className="p-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] rounded-lg transition-colors disabled:opacity-50 border border-[#2A2A2A]"
+                className="p-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm hover:bg-slate-700/40 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
                 aria-label="Refresh data"
               >
                 <RefreshCw className={`w-5 h-5 text-[#A0A0A0] ${loading ? 'animate-spin' : ''}`} />
@@ -194,8 +194,8 @@ export default function SettingsPage() {
         {syncStatus && (
           <div className={`backdrop-blur-sm border rounded-xl p-4 ${
             syncStatus.needsSync
-              ? 'bg-[#1A1A1A] border-[#FFD700]/30'
-              : 'bg-[#1A1A1A] border-[#00FF88]/30'
+              ? 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border-[#FFD700]/30'
+              : 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border-[#00FF88]/30'
           }`}>
             <div className="flex items-start gap-3">
               {syncStatus.needsSync ? (

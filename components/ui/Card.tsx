@@ -15,7 +15,7 @@ export default function Card({
   ...props
 }: CardProps) {
   // Mobile app dark theme: #1A1A1A cards with #2A2A2A borders
-  const baseClasses = 'bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-6 transition-all duration-300';
+  const baseClasses = 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 transition-all duration-300';
   
   // Cyan glow on hover (matches mobile app)
   const hoverClasses = hoverable 

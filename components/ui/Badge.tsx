@@ -18,7 +18,7 @@ export default function Badge({
     warning: 'bg-warning/10 text-warning border border-warning/40',
     danger: 'bg-error/10 text-error border border-error/40',
     info: 'bg-info/10 text-info border border-info/40',
-    default: 'bg-bg-card text-text-secondary border border-border-card',
+    default: 'bg-[#0A0A0A] text-text-secondary border border-border-card',
   };
 
   const sizeClasses = {
