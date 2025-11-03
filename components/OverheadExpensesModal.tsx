@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface OverheadExpenseItem {
@@ -9,42 +9,53 @@ interface OverheadExpenseItem {
   percentage: number;
 }
 
+interface CategoryRow {
+  name: string;
+  monthly: number[];
+  yearTotal: number;
+}
+
 interface OverheadExpensesModalProps {
   isOpen: boolean;
   onClose: () => void;
   period: 'month' | 'year';
   totalExpense: number;
+  overheadData?: CategoryRow[];
 }
 
-export default function OverheadExpensesModal({ isOpen, onClose, period, totalExpense }: OverheadExpensesModalProps) {
-  const [data, setData] = useState<OverheadExpenseItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function OverheadExpensesModal({ 
+  isOpen, 
+  onClose, 
+  period, 
+  totalExpense,
+  overheadData = []
+}: OverheadExpensesModalProps) {
+  // Get current month index (0-11)
+  const currentMonthIndex = useMemo(() => new Date().getMonth(), []);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchOverheadExpensesData();
-    }
-  }, [isOpen, period]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Transform overhead data to expense items (showing ALL categories)
+  const data = useMemo(() => {
+    if (!overheadData || overheadData.length === 0) return [];
 
-  const fetchOverheadExpensesData = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`/api/pnl/overhead-expenses?period=${period}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch overhead expenses data');
-      }
-      
-      const result = await response.json();
-      setData(result.data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const items: OverheadExpenseItem[] = overheadData
+      .map(cat => {
+        const expense = period === 'month' 
+          ? cat.monthly[currentMonthIndex] || 0
+          : cat.yearTotal || 0;
+        
+        return {
+          name: cat.name,
+          expense,
+          percentage: totalExpense > 0 ? (expense / totalExpense) * 100 : 0
+        };
+      })
+      .sort((a, b) => b.expense - a.expense); // Sort by highest expense first
+
+    return items;
+  }, [overheadData, period, currentMonthIndex, totalExpense]);
+
+  const loading = false;
+  const error = null;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('th-TH', {
@@ -132,12 +143,6 @@ export default function OverheadExpensesModal({ isOpen, onClose, period, totalEx
                     <div className="text-4xl mb-2">❌</div>
                     <p className="text-text-secondary text-sm mb-1">Error loading data</p>
                     <p className="text-text-tertiary text-xs mb-4">{error}</p>
-                    <button
-                      onClick={fetchOverheadExpensesData}
-                      className="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white rounded-lg transition-colors text-sm"
-                    >
-                      Try Again
-                    </button>
                   </div>
                 )}
 

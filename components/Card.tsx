@@ -24,18 +24,18 @@ export default function Card({
   };
 
   const glowClasses = {
-    cyan: 'border-l-4 border-l-[#00D9FF]',
-    green: 'border-l-4 border-l-[#00FF88]',
-    pink: 'border-l-4 border-l-[#FF3366]',
-    purple: 'border-l-4 border-l-[#9D4EDD]',
+    cyan: 'border-l-4 border-l-accent',
+    green: 'border-l-4 border-l-success',
+    pink: 'border-l-4 border-l-error',
+    purple: 'border-l-4 border-l-info',
     none: '',
   };
 
   return (
     <div
       className={`
-        bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl
-        ${hover ? 'hover:border-[#00D9FF] hover:shadow-glow-cyan transition-all duration-300' : ''}
+        bg-bg-card border border-border-card rounded-2xl
+        ${hover ? 'hover:border-accent hover:shadow-[0_0_25px_rgba(0,217,255,0.4)] transition-all duration-300 cursor-pointer' : ''}
         ${paddingClasses[padding]}
         ${glowClasses[glow]}
         ${className}
@@ -46,4 +46,3 @@ export default function Card({
     </div>
   );
 }
-

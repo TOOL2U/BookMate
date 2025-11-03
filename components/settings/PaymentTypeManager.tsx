@@ -173,22 +173,22 @@ export default function PaymentTypeManager() {
   };
 
   return (
-    <div className="bg-slate-900/50 border border-slate-700/50 rounded-2xl overflow-hidden backdrop-blur-sm">
+    <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl overflow-hidden backdrop-blur-sm">
       {/* Header */}
-      <div className="border-b border-slate-700/30 p-6">
+      <div className="border-b border-[#2A2A2A] p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white mb-1">
+            <h2 className="text-xl font-bold text-[#FFFFFF] mb-1">
               💳 Payment Type Management
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-[#A0A0A0]">
               Manage paymentTypes from Google Sheets • {paymentTypes.length} {paymentTypes.length === 1 ? 'payment type' : 'paymentTypes'}
             </p>
           </div>
           <button
             onClick={handleStartAdd}
             disabled={isUpdating || isAdding}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#00D9FF] hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-[#FFFFFF] font-medium transition-colors"
           >
             <Plus className="w-4 h-4" />
             Add Payment Type
@@ -199,12 +199,12 @@ export default function PaymentTypeManager() {
       {/* Info Banner */}
       <div className="bg-blue-900/20 border-b border-blue-700/30 p-4">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-[#00D9FF] shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="text-white font-semibold text-sm mb-1">
+            <h3 className="text-[#FFFFFF] font-semibold text-sm mb-1">
               Real-Time Google Sheets Integration
             </h3>
-            <p className="text-slate-300 text-xs">
+            <p className="text-[#FFFFFF] text-xs">
               Payment Types are stored in <strong>Data sheet (Column D)</strong>. Changes automatically update the <strong>P&L sheet</strong> via Apps Script.
               All formulas, totals, and formatting are managed automatically.
             </p>
@@ -216,20 +216,20 @@ export default function PaymentTypeManager() {
       <div className="p-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#00D9FF] animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-slate-900/50">
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                <tr className="bg-[#1A1A1A]">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                     #
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                     Payment Type Name
                   </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="text-right px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -238,8 +238,8 @@ export default function PaymentTypeManager() {
                 {/* Add new row */}
                 {isAdding && (
                   <tr className="bg-blue-900/10">
-                    <td className="px-6 py-4 text-sm text-slate-500">
-                      <Plus className="w-4 h-4 text-blue-500" />
+                    <td className="px-6 py-4 text-sm text-[#A0A0A0]">
+                      <Plus className="w-4 h-4 text-[#00D9FF]" />
                     </td>
                     <td className="px-6 py-4">
                       <input
@@ -253,7 +253,7 @@ export default function PaymentTypeManager() {
                         placeholder="e.g., Downtown Office"
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                       />
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -265,18 +265,18 @@ export default function PaymentTypeManager() {
                           title="Save"
                         >
                           {isUpdating ? (
-                            <Loader2 className="w-4 h-4 text-white animate-spin" />
+                            <Loader2 className="w-4 h-4 text-[#FFFFFF] animate-spin" />
                           ) : (
-                            <Check className="w-4 h-4 text-white" />
+                            <Check className="w-4 h-4 text-[#FFFFFF]" />
                           )}
                         </button>
                         <button
                           onClick={handleCancelAdd}
                           disabled={isUpdating}
-                          className="p-2 bg-slate-600 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Cancel"
                         >
-                          <X className="w-4 h-4 text-white" />
+                          <X className="w-4 h-4 text-[#FFFFFF]" />
                         </button>
                       </div>
                     </td>
@@ -287,9 +287,9 @@ export default function PaymentTypeManager() {
                 {paymentTypes.map((item, idx) => (
                   <tr
                     key={idx}
-                    className="hover:bg-slate-800/30 transition-colors"
+                    className="hover:bg-[#1A1A1A] transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm text-slate-500">
+                    <td className="px-6 py-4 text-sm text-[#A0A0A0]">
                       {idx + 1}
                     </td>
                     <td className="px-6 py-4">
@@ -304,10 +304,10 @@ export default function PaymentTypeManager() {
                           }}
                           autoFocus
                           disabled={isUpdating}
-                          className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                         />
                       ) : (
-                        <span className="text-white font-medium">{item}</span>
+                        <span className="text-[#FFFFFF] font-medium">{item}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -320,18 +320,18 @@ export default function PaymentTypeManager() {
                             title="Save"
                           >
                             {isUpdating ? (
-                              <Loader2 className="w-4 h-4 text-white animate-spin" />
+                              <Loader2 className="w-4 h-4 text-[#FFFFFF] animate-spin" />
                             ) : (
-                              <Check className="w-4 h-4 text-white" />
+                              <Check className="w-4 h-4 text-[#FFFFFF]" />
                             )}
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             disabled={isUpdating}
-                            className="p-2 bg-slate-600 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Cancel"
                           >
-                            <X className="w-4 h-4 text-white" />
+                            <X className="w-4 h-4 text-[#FFFFFF]" />
                           </button>
                         </div>
                       ) : (
@@ -339,10 +339,10 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={() => handleStartEdit(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-[#00D9FF] hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Edit"
                           >
-                            <Edit2 className="w-4 h-4 text-white" />
+                            <Edit2 className="w-4 h-4 text-[#FFFFFF]" />
                           </button>
                           <button
                             onClick={() => handleDelete(idx, item)}
@@ -350,7 +350,7 @@ export default function PaymentTypeManager() {
                             className="p-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Delete"
                           >
-                            <Trash2 className="w-4 h-4 text-white" />
+                            <Trash2 className="w-4 h-4 text-[#FFFFFF]" />
                           </button>
                         </div>
                       )}
@@ -361,8 +361,8 @@ export default function PaymentTypeManager() {
                 {paymentTypes.length === 0 && !isAdding && (
                   <tr>
                     <td colSpan={3} className="px-6 py-12 text-center">
-                      <p className="text-slate-400">No paymentTypes found</p>
-                      <p className="text-sm text-slate-500 mt-1">Click &quot;Add Payment Type&quot; to create your first payment type</p>
+                      <p className="text-[#A0A0A0]">No paymentTypes found</p>
+                      <p className="text-sm text-[#A0A0A0] mt-1">Click &quot;Add Payment Type&quot; to create your first payment type</p>
                     </td>
                   </tr>
                 )}
@@ -379,7 +379,7 @@ export default function PaymentTypeManager() {
             toast.type === 'success'
               ? 'bg-green-900/90 border-green-700/50 text-green-100'
               : toast.type === 'error'
-              ? 'bg-red-900/90 border-red-700/50 text-red-100'
+              ? 'bg-[#FF3366]/90 border-red-700/50 text-red-100'
               : 'bg-blue-900/90 border-blue-700/50 text-blue-100'
           }`}>
             <div className="flex items-center gap-3">

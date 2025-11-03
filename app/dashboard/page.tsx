@@ -126,16 +126,16 @@ export default function DashboardPage() {
         {/* Page header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-            <p className="text-slate-400 mt-1">Comprehensive overview of your business performance</p>
+            <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
+            <p className="text-text-secondary mt-1">Comprehensive overview of your business performance</p>
           </div>
           <button
             onClick={fetchDashboardData}
             disabled={loading}
-            className="p-3 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
+            className="p-3 bg-bg-card hover:bg-bg-card/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
             aria-label="Refresh data"
           >
-            <RefreshCw className={`w-5 h-5 text-slate-400 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 text-text-secondary ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
@@ -168,19 +168,19 @@ export default function DashboardPage() {
       {/* Error Toast */}
       {error && (
         <div className="fixed bottom-8 right-8 max-w-md z-50 animate-slide-in-right">
-          <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-sm border border-red-500/30 rounded-xl p-4 flex items-start gap-3 shadow-xl">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+          <div className="bg-bg-card backdrop-blur-sm border border-error/40 rounded-xl p-4 flex items-start gap-3 shadow-[0_12px_48px_rgba(0,0,0,0.5)]">
+            <AlertCircle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-white font-medium mb-1">
+              <p className="text-sm text-text-primary font-medium mb-1">
                 Failed to load dashboard data
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-text-secondary">
                 {error}
               </p>
             </div>
             <button
               onClick={fetchDashboardData}
-              className="flex-shrink-0 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors"
+              className="flex-shrink-0 px-3 py-1.5 bg-gradient-to-r from-accent to-accent-purple text-text-primary text-xs font-medium rounded-lg transition-all duration-300 shadow-[0_0_16px_rgba(0,217,255,0.4)] hover:shadow-[0_0_20px_rgba(0,217,255,0.45)]"
             >
               Retry
             </button>
@@ -190,4 +190,3 @@ export default function DashboardPage() {
     </AdminShell>
   );
 }
-

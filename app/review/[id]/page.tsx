@@ -377,7 +377,7 @@ export default function ReviewPage() {
                 Property
               </label>
               {confidence.property < 0.8 && (
-                <Badge variant="warning">⚠️ Needs review</Badge>
+                <Badge variant="warning">Needs review</Badge>
               )}
               {confidence.property >= 0.8 && (
                 <Badge variant="info">AI: {(confidence.property * 100).toFixed(0)}%</Badge>
@@ -407,7 +407,7 @@ export default function ReviewPage() {
                 Type of Operation {categoryError && <span className="text-red-500">*</span>}
               </label>
               {confidence.typeOfOperation < 0.8 && (
-                <Badge variant="warning">⚠️ Needs review</Badge>
+                <Badge variant="warning">Needs review</Badge>
               )}
               {confidence.typeOfOperation >= 0.8 && (
                 <Badge variant="info">AI: {(confidence.typeOfOperation * 100).toFixed(0)}%</Badge>
@@ -495,8 +495,8 @@ export default function ReviewPage() {
             )}
 
             {categoryError && (
-              <p className="mt-2 text-sm text-red-600 font-medium">
-                ⚠️ Please select a specific category from the dropdown (not a header like &quot;EXPENSES&quot;)
+              <p className="mt-2 text-sm text-[#FF3366] font-medium">
+                Please select a specific category from the dropdown (not a header like &quot;EXPENSES&quot;)
               </p>
             )}
           </div>
@@ -549,7 +549,7 @@ export default function ReviewPage() {
           {/* Debit and Credit Fields */}
           <div>
             <SectionHeading
-              icon="💰"
+              icon="DollarSign"
               title="Amount"
               subtitle="Enter debit (expense) or credit (income)"
             />
@@ -583,19 +583,19 @@ export default function ReviewPage() {
           <div className="flex gap-4 pt-4">
             <Button
               type="button"
-              variant="outline"
-              onClick={() => router.push('/upload')}
+              variant="secondary"
+              onClick={() => router.push('/dashboard')}
               className="flex-1"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="primaryAccent"
               isLoading={isSending}
               className="flex-1"
             >
-              {isSending ? 'Sending...' : 'Send'}
+              {isSending ? 'Sending...' : 'Send to Sheet'}
             </Button>
           </div>
         </form>

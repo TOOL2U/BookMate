@@ -38,7 +38,7 @@ export default function AdminShell({ children }: AdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-bg-app text-text-primary">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -50,26 +50,25 @@ export default function AdminShell({ children }: AdminShellProps) {
       {/* Sidebar */}
       <aside className={`
         fixed top-0 left-0 z-50 h-screen w-64
-        bg-gradient-to-b from-slate-900 to-slate-950
-        border-r border-slate-800/50
+        bg-bg-card border-r border-border-card
         transform transition-transform duration-300 ease-in-out
         lg:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Logo / Brand */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800/50">
+        <div className="h-16 flex items-center justify-between px-6 border-b border-border-card">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AB</span>
+            <div className="w-8 h-8 rounded-lg bg-bg-card border border-border-card flex items-center justify-center">
+              <span className="text-text-primary font-bold text-sm">AB</span>
             </div>
             <div>
-              <h1 className="text-white font-semibold text-sm">BookMate</h1>
-              <p className="text-slate-400 text-xs">Dashboard</p>
+              <h1 className="text-text-primary font-semibold text-sm">BookMate</h1>
+              <p className="text-text-secondary text-xs">Dashboard</p>
             </div>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-slate-400 hover:text-white"
+            className="lg:hidden text-text-secondary hover:text-text-primary"
           >
             <X className="w-5 h-5" />
           </button>
@@ -90,8 +89,8 @@ export default function AdminShell({ children }: AdminShellProps) {
                   flex items-center gap-3 px-4 py-3 rounded-lg
                   transition-all duration-200
                   ${isActive
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                    ? 'bg-gradient-to-r from-accent to-accent-purple text-text-primary shadow-[0_0_16px_rgba(0,217,255,0.35)]'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-card'
                   }
                 `}
               >
@@ -103,8 +102,8 @@ export default function AdminShell({ children }: AdminShellProps) {
         </nav>
 
         {/* Footer info */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800/50">
-          <div className="text-xs text-slate-500">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border-card">
+          <div className="text-xs text-text-secondary">
             <p>Desktop Analytics Console</p>
             <p className="mt-1">Use mobile app for data entry</p>
           </div>
@@ -116,7 +115,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         {/* Mobile menu button - floating */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden fixed top-4 left-4 z-30 p-3 bg-slate-900/90 backdrop-blur-sm border border-slate-700/50 rounded-lg text-slate-400 hover:text-white shadow-lg"
+          className="lg:hidden fixed top-4 left-4 z-30 p-3 bg-bg-card/90 backdrop-blur-sm border border-border-card rounded-lg text-text-secondary hover:text-text-primary shadow-lg"
         >
           <Menu className="w-6 h-6" />
         </button>
@@ -129,4 +128,3 @@ export default function AdminShell({ children }: AdminShellProps) {
     </div>
   );
 }
-

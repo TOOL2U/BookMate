@@ -440,7 +440,7 @@ export default function UploadPage() {
 
             {/* Icon container */}
             <div className="relative bg-gradient-to-br from-brand-primary to-status-info p-4 rounded-2xl shadow-elev-3">
-              <Sparkles className="w-8 h-8 md:w-10 md:h-10 text-white" />
+              <Sparkles className="w-8 h-8 md:w-10 md:h-10 text-[#FFFFFF]" />
             </div>
           </div>
         </motion.div>
@@ -499,7 +499,7 @@ export default function UploadPage() {
               }}
               className="p-2 bg-gradient-to-br from-brand-primary to-status-info rounded-xl"
             >
-              <Zap className="w-5 h-5 text-white" />
+              <Zap className="w-5 h-5 text-[#FFFFFF]" />
             </motion.div>
             <div>
               <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
@@ -712,10 +712,10 @@ export default function UploadPage() {
               disabled={isManualProcessing || !manualCommand.trim()}
               isLoading={false}
               size="md"
-              className="w-full mt-4 bg-gradient-to-r from-brand-primary to-status-info hover:from-brand-primary/90 hover:to-status-info/90 shadow-lg shadow-brand-primary/25 text-white"
+              className="w-full mt-4 bg-gradient-to-r from-brand-primary to-status-info hover:from-brand-primary/90 hover:to-status-info/90 shadow-lg shadow-brand-primary/25 text-[#FFFFFF]"
             >
               {isManualProcessing ? (
-                <span className="flex items-center gap-2 text-white">
+                <span className="flex items-center gap-2 text-[#FFFFFF]">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}

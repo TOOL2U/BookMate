@@ -91,21 +91,21 @@ export default function CategoryTable({
     }
   };
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl overflow-hidden">
+    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-slate-700/50">
+      <div className="p-6 border-b border-[#2A2A2A]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{icon}</span>
             <div>
-              <h2 className="text-xl font-semibold text-white">{title}</h2>
-              <p className="text-sm text-slate-400">{description}</p>
+              <h2 className="text-xl font-semibold text-[#FFFFFF]">{title}</h2>
+              <p className="text-sm text-[#A0A0A0]">{description}</p>
             </div>
           </div>
           <button
             onClick={handleStartAdd}
             disabled={loading || isUpdating || isAdding}
-            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium transition-all duration-200 flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add New
@@ -117,19 +117,19 @@ export default function CategoryTable({
       <div className="p-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#00D9FF] animate-spin" />
           </div>
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-900/50">
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+              <tr className="bg-[#1A1A1A]">
+                <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                   #
                 </th>
-                <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                   Name
                 </th>
-                <th className="text-right px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                <th className="text-right px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -138,8 +138,8 @@ export default function CategoryTable({
               {/* Add new row */}
               {isAdding && (
                 <tr className="bg-blue-900/10">
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    <Plus className="w-4 h-4 text-blue-500" />
+                  <td className="px-6 py-4 text-sm text-[#A0A0A0]">
+                    <Plus className="w-4 h-4 text-[#00D9FF]" />
                   </td>
                   <td className="px-6 py-4">
                     <input
@@ -153,7 +153,7 @@ export default function CategoryTable({
                       placeholder="Enter new category name..."
                       autoFocus
                       disabled={isUpdating}
-                      className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     />
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -165,18 +165,18 @@ export default function CategoryTable({
                         title="Save"
                       >
                         {isUpdating ? (
-                          <Loader2 className="w-4 h-4 text-white animate-spin" />
+                          <Loader2 className="w-4 h-4 text-[#FFFFFF] animate-spin" />
                         ) : (
-                          <Check className="w-4 h-4 text-white" />
+                          <Check className="w-4 h-4 text-[#FFFFFF]" />
                         )}
                       </button>
                       <button
                         onClick={handleCancelAdd}
                         disabled={isUpdating}
-                        className="p-2 bg-slate-600 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                        className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                         title="Cancel"
                       >
-                        <X className="w-4 h-4 text-white" />
+                        <X className="w-4 h-4 text-[#FFFFFF]" />
                       </button>
                     </div>
                   </td>
@@ -187,9 +187,9 @@ export default function CategoryTable({
               {items.map((item, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-slate-800/30 transition-colors"
+                  className="hover:bg-[#1A1A1A] transition-colors"
                 >
-                  <td className="px-6 py-4 text-sm text-slate-500">
+                  <td className="px-6 py-4 text-sm text-[#A0A0A0]">
                     {idx + 1}
                   </td>
                   <td className="px-6 py-4">
@@ -204,10 +204,10 @@ export default function CategoryTable({
                         }}
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                       />
                     ) : (
-                      <span className="text-white font-medium">{item}</span>
+                      <span className="text-[#FFFFFF] font-medium">{item}</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -220,18 +220,18 @@ export default function CategoryTable({
                           title="Save"
                         >
                           {isUpdating ? (
-                            <Loader2 className="w-4 h-4 text-white animate-spin" />
+                            <Loader2 className="w-4 h-4 text-[#FFFFFF] animate-spin" />
                           ) : (
-                            <Check className="w-4 h-4 text-white" />
+                            <Check className="w-4 h-4 text-[#FFFFFF]" />
                           )}
                         </button>
                         <button
                           onClick={handleCancelEdit}
                           disabled={isUpdating}
-                          className="p-2 bg-slate-600 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-slate-600 hover:bg-[#222222] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Cancel"
                         >
-                          <X className="w-4 h-4 text-white" />
+                          <X className="w-4 h-4 text-[#FFFFFF]" />
                         </button>
                       </div>
                     ) : (
@@ -239,10 +239,10 @@ export default function CategoryTable({
                         <button
                           onClick={() => handleStartEdit(idx, item)}
                           disabled={isUpdating || isAdding}
-                          className="p-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-[#00D9FF] hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Edit"
                         >
-                          <Edit2 className="w-4 h-4 text-white" />
+                          <Edit2 className="w-4 h-4 text-[#FFFFFF]" />
                         </button>
                         <button
                           onClick={() => handleDelete(idx, item)}
@@ -250,7 +250,7 @@ export default function CategoryTable({
                           className="p-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Delete"
                         >
-                          <Trash2 className="w-4 h-4 text-white" />
+                          <Trash2 className="w-4 h-4 text-[#FFFFFF]" />
                         </button>
                       </div>
                     )}
@@ -261,8 +261,8 @@ export default function CategoryTable({
               {items.length === 0 && !isAdding && (
                 <tr>
                   <td colSpan={3} className="px-6 py-12 text-center">
-                    <p className="text-slate-400">No items found</p>
-                    <p className="text-sm text-slate-500 mt-1">Click &quot;Add New&quot; to create your first category</p>
+                    <p className="text-[#A0A0A0]">No items found</p>
+                    <p className="text-sm text-[#A0A0A0] mt-1">Click &quot;Add New&quot; to create your first category</p>
                   </td>
                 </tr>
               )}

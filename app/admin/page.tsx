@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, Sparkles, Download, Eye, BarChart3, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { Shield, Zap, Download, Eye, BarChart3, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import AdminShell from '@/components/layout/AdminShell';
 import SystemStatsCards from '@/components/admin/SystemStatsCards';
 import ApiHealthCard from '@/components/admin/ApiHealthCard';
@@ -230,18 +230,18 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent-purple/10" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
         <div className="relative z-10 w-full max-w-md">
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8">
+          <div className="bg-bg-card border border-border-card rounded-xl p-8">
             {/* Lock Icon */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-full blur-xl opacity-50" />
-                <div className="relative bg-gradient-to-br from-blue-600 to-purple-600 p-5 rounded-2xl shadow-lg">
-                  <Shield className="w-10 h-10 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-r from-accent via-accent-purple to-accent rounded-full blur-xl opacity-50" />
+                <div className="relative bg-gradient-to-br from-accent to-accent-purple p-5 rounded-2xl shadow-lg">
+                  <Shield className="w-10 h-10 text-text-primary" />
                 </div>
               </div>
             </div>
@@ -249,11 +249,11 @@ export default function AdminPage() {
             {/* Title */}
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-accent via-accent-purple to-accent bg-clip-text text-transparent">
                   Admin Access
                 </span>
               </h1>
-              <p className="text-slate-400 text-sm">
+              <p className="text-text-secondary text-sm">
                 Enter PIN to continue
               </p>
             </div>
@@ -261,7 +261,7 @@ export default function AdminPage() {
             {/* PIN Form */}
             <form onSubmit={handlePinSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-400 mb-3 text-center">
+                <label className="block text-sm font-medium text-text-secondary mb-3 text-center">
                   4-Digit PIN
                 </label>
                 <input
@@ -273,13 +273,13 @@ export default function AdminPage() {
                   autoFocus
                   className={`
                     w-full px-6 py-4 text-center text-2xl font-bold tracking-[0.5em]
-                    bg-slate-900/50 border-2 rounded-xl
-                    text-white placeholder-slate-600
-                    focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                    bg-bg-card border-2 rounded-xl
+                    text-text-primary placeholder-slate-600
+                    focus:outline-none focus:ring-2 focus:ring-accent/40
                     transition-all duration-200
                     ${pinError
-                      ? 'border-red-500 ring-2 ring-red-500/50'
-                      : 'border-slate-700 hover:border-blue-500/50'}
+                      ? 'border-error ring-2 ring-error/50'
+                      : 'border-border-card hover:border-accent/50'}
                   `}
                 />
               </div>
@@ -287,14 +287,14 @@ export default function AdminPage() {
               <button
                 type="submit"
                 disabled={pin.length !== 4}
-                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <CheckCircle className="w-5 h-5" />
                 Unlock
               </button>
             </form>
 
-            <p className="text-center text-xs text-slate-500 mt-6 flex items-center justify-center gap-1">
+            <p className="text-center text-xs text-text-secondary mt-6 flex items-center justify-center gap-1">
               <AlertCircle className="w-3 h-3" />
               Protected area - authorized access only
             </p>
@@ -304,11 +304,10 @@ export default function AdminPage() {
         {/* Toast */}
         {toast && (
           <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-            <div className={`
-              px-6 py-3 rounded-xl shadow-lg flex items-center gap-3
+            <div className={`px-6 py-3 rounded-xl shadow-[0_12px_24px_rgba(0,0,0,0.45)] flex items-center gap-3 border
               ${toast.type === 'success'
-                ? 'bg-green-600 text-white'
-                : 'bg-red-600 text-white'}
+                ? 'bg-success/90 border-success text-text-primary'
+                : 'bg-error/90 border-error text-text-primary'}
             `}>
               {toast.type === 'success' ? (
                 <CheckCircle className="w-5 h-5" />
@@ -328,16 +327,16 @@ export default function AdminPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl mb-4">
-            <Shield className="w-8 h-8 text-blue-500" />
+          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-accent/20 to-accent-purple/20 rounded-xl mb-4">
+            <Shield className="w-8 h-8 text-accent" />
           </div>
           <h1 className="text-4xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-accent via-accent-purple to-accent bg-clip-text text-transparent">
               Admin Panel
             </span>
           </h1>
-          <p className="text-slate-400 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-blue-500" />
+          <p className="text-text-secondary flex items-center justify-center gap-2">
+            <Zap className="w-4 h-4 text-accent" />
             System management and monitoring
           </p>
         </div>
@@ -398,8 +397,8 @@ export default function AdminPage() {
 
         {/* Feature Tests */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-blue-500" />
+          <h2 className="text-2xl font-bold text-text-primary mb-4 flex items-center gap-2">
+            <Zap className="w-6 h-6 text-accent" />
             Feature Tests
           </h2>
           <FeatureTestsGrid onToast={showToast} />
@@ -407,11 +406,11 @@ export default function AdminPage() {
 
         {/* Named Ranges Display */}
         {showNamedRanges && namedRanges.length > 0 && (
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-white mb-4">P&L Named Ranges ({namedRanges.length})</h3>
+          <div className="bg-bg-card border border-border-card rounded-xl p-6">
+            <h3 className="text-lg font-bold text-text-primary mb-4">P&L Named Ranges ({namedRanges.length})</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               {namedRanges.map((range, index) => (
-                <div key={index} className="px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-300">
+                <div key={index} className="px-3 py-2 bg-bg-card border border-border-card rounded-lg text-sm text-text-primary">
                   {range.name}
                 </div>
               ))}
@@ -423,11 +422,10 @@ export default function AdminPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-8 right-8 z-50">
-          <div className={`
-            px-6 py-3 rounded-xl shadow-lg flex items-center gap-3
+          <div className={`px-6 py-3 rounded-xl shadow-[0_12px_24px_rgba(0,0,0,0.45)] flex items-center gap-3 border
             ${toast.type === 'success'
-              ? 'bg-green-600 text-white'
-              : 'bg-red-600 text-white'}
+              ? 'bg-success/90 border-success text-text-primary'
+              : 'bg-error/90 border-error text-text-primary'}
           `}>
             {toast.type === 'success' ? (
               <CheckCircle className="w-5 h-5" />
@@ -456,29 +454,29 @@ interface ToolCardProps {
 
 function ToolCard({ icon: Icon, title, description, color, isLoading, onClick, buttonText, buttonIcon: ButtonIcon }: ToolCardProps) {
   const colorClasses = {
-    blue: 'from-blue-500/20 to-purple-500/20 text-blue-500',
-    green: 'from-green-500/20 to-blue-500/20 text-green-500',
-    orange: 'from-orange-500/20 to-blue-500/20 text-orange-500',
-    purple: 'from-purple-500/20 to-blue-500/20 text-purple-500'
+    blue: 'from-accent/20 to-accent-purple/20 text-accent',
+    green: 'from-success/20 to-accent/20 text-success',
+    orange: 'from-warning/20 to-accent/20 text-warning',
+    purple: 'from-accent-purple/20 to-accent/20 text-info'
   };
 
   const [gradientClass, iconColorClass] = colorClasses[color].split(' text-');
 
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+    <div className="bg-bg-card border border-border-card rounded-xl p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className={`p-3 bg-gradient-to-br ${gradientClass} rounded-xl`}>
           <Icon className={`w-6 h-6 text-${iconColorClass}`} />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-white">{title}</h3>
-          <p className="text-xs text-slate-400">{description}</p>
+          <h3 className="text-lg font-bold text-text-primary">{title}</h3>
+          <p className="text-xs text-text-secondary">{description}</p>
         </div>
       </div>
       <button
         onClick={onClick}
         disabled={isLoading}
-        className="w-full px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-600/50 rounded-lg text-white text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+        className="w-full px-4 py-2 bg-bg-app/40 hover:bg-bg-app/60 disabled:opacity-50 disabled:cursor-not-allowed border border-border-card/60 rounded-lg text-text-primary text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
       >
         {isLoading ? (
           <>
@@ -495,4 +493,3 @@ function ToolCard({ icon: Icon, title, description, color, isLoading, onClick, b
     </div>
   );
 }
-

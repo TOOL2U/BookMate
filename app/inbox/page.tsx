@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Inbox as InboxIcon, Sparkles, Trash2, AlertCircle } from 'lucide-react';
+import { RefreshCw, Inbox as InboxIcon, Zap, Trash2, AlertCircle } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -107,12 +107,12 @@ export default function InboxPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <InboxIcon className="w-8 h-8 text-[#00D9FF]" />
+              <InboxIcon className="w-8 h-8 text-accent" />
               <div>
-                <h1 className="text-3xl font-bold text-[#FFFFFF]">Inbox</h1>
-                <p className="text-[#A0A0A0] text-sm mt-1">
+                <h1 className="text-3xl font-bold text-text-primary">Inbox</h1>
+                <p className="text-text-secondary text-sm mt-1">
                   <span className="inline-flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#00D9FF]" />
+                    <Zap className="w-4 h-4 text-accent" />
                     View and manage your processed entries
                   </span>
                 </p>
@@ -121,9 +121,9 @@ export default function InboxPage() {
             <button
               onClick={() => fetchReceipts(true)}
               disabled={isRefreshing}
-              className="p-2 bg-[#1A1A1A] hover:bg-[#222222] rounded-lg transition-all duration-300 disabled:opacity-50 border border-[#2A2A2A] hover:border-[#00D9FF] hover:shadow-[0_0_20px_rgba(0,217,255,0.4)]"
+              className="p-2 bg-bg-card hover:bg-bg-card/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
             >
-              <RefreshCw className={`w-5 h-5 text-[#A0A0A0] ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-5 h-5 text-text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
@@ -137,12 +137,12 @@ export default function InboxPage() {
             exit={{ opacity: 0, y: -10 }}
             className="mb-6"
           >
-            <Card glowColor="pink" className="bg-[#FF3366]/10">
-              <div className="flex items-center gap-3 text-[#FF3366]">
+            <Card className="border border-error/40 bg-error/10">
+              <div className="flex items-center gap-3 text-error">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Error loading receipts</p>
-                  <p className="text-sm opacity-90">{error}</p>
+                  <p className="text-sm opacity-90 text-text-secondary">{error}</p>
                 </div>
               </div>
             </Card>
@@ -163,7 +163,7 @@ export default function InboxPage() {
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="inline-block mb-4"
             >
-              <RefreshCw className="w-12 h-12 text-brand-primary" />
+              <RefreshCw className="w-12 h-12 text-accent" />
             </motion.div>
             <p className="text-text-secondary">Loading receipts...</p>
           </motion.div>
@@ -172,9 +172,9 @@ export default function InboxPage() {
 
       {/* Desktop Table View */}
       {!isLoading && receipts.length > 0 && (
-        <div className="hidden sm:block bg-surface-1 border border-border-light rounded-2xl shadow-elev-1 overflow-x-auto">
-          <table className="w-full divide-y divide-border-light">
-            <thead className="bg-surface-2">
+        <div className="hidden sm:block bg-bg-card border border-border-card rounded-2xl overflow-x-auto">
+          <table className="w-full divide-y divide-border-card">
+            <thead className="bg-bg-app">
               <tr>
                 <th className="px-4 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[25%]">
                   Detail
@@ -199,7 +199,7 @@ export default function InboxPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-light">
+            <tbody className="divide-y divide-border-card">
               <AnimatePresence>
                 {receipts.map((receipt, index) => (
                   <motion.tr
@@ -208,7 +208,7 @@ export default function InboxPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ delay: index * 0.03 }}
-                    className="hover:bg-surface-2 transition-colors group"
+                    className="hover:bg-bg-card/70 transition-colors group"
                   >
                     <td className="px-4 py-4">
                       <div className="text-sm font-medium text-text-primary max-w-[280px] truncate">
@@ -230,7 +230,7 @@ export default function InboxPage() {
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className={`text-sm font-semibold ${receipt.debit > 0 ? 'text-status-danger' : 'text-status-success'}`}>
+                      <div className={`text-sm font-semibold ${receipt.debit > 0 ? 'text-error' : 'text-success'}`}>
                         {receipt.debit > 0 ? `-${receipt.debit}` : `+${receipt.credit}`} THB
                       </div>
                     </td>
@@ -239,7 +239,7 @@ export default function InboxPage() {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <Badge variant="success">
-                        ✓ Synced
+                        Synced
                       </Badge>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right">
@@ -247,7 +247,7 @@ export default function InboxPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDelete(receipt)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-status-danger hover:bg-status-danger/10 rounded-lg transition-colors duration-200"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-error hover:bg-error/10 rounded-lg transition-colors duration-200"
                       >
                         <Trash2 className="w-4 h-4" />
                         <span className="hidden xl:inline">Delete</span>
@@ -282,7 +282,7 @@ export default function InboxPage() {
                         <p className="text-xs text-text-tertiary">{receipt.property || '-'}</p>
                       </div>
                       <Badge variant="success">
-                        ✓ Synced
+                        Synced
                       </Badge>
                     </div>
 
@@ -298,7 +298,7 @@ export default function InboxPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-text-secondary">Amount:</span>
-                        <span className={`font-bold ${receipt.debit > 0 ? 'text-status-danger' : 'text-status-success'}`}>
+                        <span className={`font-bold ${receipt.debit > 0 ? 'text-error' : 'text-success'}`}>
                           {receipt.debit > 0 ? `-${receipt.debit}` : `+${receipt.credit}`} THB
                         </span>
                       </div>
@@ -318,7 +318,7 @@ export default function InboxPage() {
                     <Button
                       variant="ghost"
                       onClick={() => handleDelete(receipt)}
-                      className="w-full mt-2 hover:bg-status-danger/10 hover:text-status-danger hover:border-status-danger/30"
+                      className="w-full mt-2 hover:bg-error/10 hover:text-error hover:border-error/30"
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
                       Delete Entry
@@ -374,7 +374,7 @@ export default function InboxPage() {
         >
           <Link
             href="/upload"
-            className="text-brand-primary hover:text-status-info font-medium transition-colors duration-200 inline-flex items-center gap-2 group"
+            className="text-accent hover:text-info font-medium transition-colors duration-200 inline-flex items-center gap-2 group"
           >
             <motion.span
               animate={{ x: [0, -4, 0] }}
@@ -390,4 +390,3 @@ export default function InboxPage() {
     </AdminShell>
   );
 }
-

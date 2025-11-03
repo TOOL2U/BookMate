@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import AdminShell from '@/components/layout/AdminShell';
-import { Wallet, TrendingUp, TrendingDown, Clock, AlertTriangle, RefreshCw, Upload, Plus, CheckCircle, XCircle, Sparkles, Edit3, Camera, Banknote, Building2, Save } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Clock, AlertTriangle, RefreshCw, Upload, Plus, CheckCircle, XCircle, Zap, Edit3, Camera, Banknote, Building2, Save } from 'lucide-react';
 
 interface Balance {
   bankName: string;
@@ -133,7 +133,7 @@ export default function BalanceAnalyticsPage() {
           return nb;
         });
         setNewBalances(updatedBalances);
-        alert(`✓ Balance extracted: ฿${data.bankBalance.toLocaleString()} for ${selectedBank}`);
+        alert(`Balance extracted: ฿${data.bankBalance.toLocaleString()} for ${selectedBank}`);
       } else {
         alert('Could not extract balance from image. Please try manual entry.');
       }
@@ -261,11 +261,11 @@ export default function BalanceAnalyticsPage() {
         {/* Page header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Cash & Bank Balances</h1>
-            <p className="text-slate-400 mt-1">Monitor your cash flow and bank accounts</p>
+            <h1 className="text-3xl font-bold text-text-primary">Cash & Bank Balances</h1>
+            <p className="text-text-secondary mt-1">Monitor your cash flow and bank accounts</p>
             {lastUpdated && (
-              <p className="text-xs text-slate-500 mt-2 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
+              <p className="text-xs text-text-secondary mt-2 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-text-tertiary" />
                 Last updated: {lastUpdated}
               </p>
             )}
@@ -273,30 +273,30 @@ export default function BalanceAnalyticsPage() {
           <button
             onClick={fetchBalances}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
+            className="flex items-center gap-2 px-4 py-2 bg-bg-card hover:bg-bg-card/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
             aria-label="Refresh balances"
           >
-            <RefreshCw className={`w-4 h-4 text-slate-400 ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-slate-300 text-sm">Refresh</span>
+            <RefreshCw className={`w-4 h-4 text-text-secondary ${loading ? 'animate-spin' : ''}`} />
+            <span className="text-text-primary text-sm">Refresh</span>
           </button>
         </div>
 
         {/* Total Balance Card */}
-        <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl p-8 shadow-xl">
+        <div className="bg-bg-card border border-border-card rounded-xl p-8 shadow-[0_12px_48px_rgba(0,0,0,0.4)]">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
-              <Wallet className="w-7 h-7 text-white" />
+            <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
+              <Wallet className="w-7 h-7 text-accent" />
             </div>
-            <span className="text-white/80 text-sm">Total Available</span>
+            <span className="text-text-secondary text-sm">Total Available</span>
           </div>
           {loading ? (
-            <div className="h-12 w-48 bg-white/20 animate-pulse rounded" />
+            <div className="h-12 w-48 bg-border-card/60 animate-pulse rounded" />
           ) : (
             <div>
-              <p className="text-5xl font-bold text-white mb-2">
+              <p className="text-5xl font-bold text-text-primary mb-2">
                 ฿{totalBalance.toLocaleString()}
               </p>
-              <p className="text-white/80 text-sm">
+              <p className="text-text-secondary text-sm">
                 Cash + Bank Accounts
               </p>
             </div>
@@ -306,40 +306,40 @@ export default function BalanceAnalyticsPage() {
         {/* Cash vs Bank Breakdown */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Cash Card */}
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-bg-card border border-border-card rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <Wallet className="w-6 h-6 text-green-500" />
+              <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
+                <Wallet className="w-6 h-6 text-success" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Cash in Hand</p>
-                <p className="text-xs text-slate-500">Physical currency</p>
+                <p className="text-sm text-text-secondary">Cash in Hand</p>
+                <p className="text-xs text-text-tertiary">Physical currency</p>
               </div>
             </div>
             {loading ? (
-              <div className="h-10 w-32 bg-slate-700/50 animate-pulse rounded" />
+              <div className="h-10 w-32 bg-border-card/60 animate-pulse rounded" />
             ) : (
-              <p className="text-3xl font-bold text-white">
+              <p className="text-3xl font-bold text-text-primary">
                 ฿{cashBalance.toLocaleString()}
               </p>
             )}
           </div>
 
           {/* Bank Card */}
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+          <div className="bg-bg-card border border-border-card rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-blue-500" />
+              <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Bank Accounts</p>
-                <p className="text-xs text-slate-500">Total in all banks</p>
+                <p className="text-sm text-text-secondary">Bank Accounts</p>
+                <p className="text-xs text-text-tertiary">Total in all banks</p>
               </div>
             </div>
             {loading ? (
-              <div className="h-10 w-32 bg-slate-700/50 animate-pulse rounded" />
+              <div className="h-10 w-32 bg-border-card/60 animate-pulse rounded" />
             ) : (
-              <p className="text-3xl font-bold text-white">
+              <p className="text-3xl font-bold text-text-primary">
                 ฿{bankBalance.toLocaleString()}
               </p>
             )}
@@ -347,13 +347,13 @@ export default function BalanceAnalyticsPage() {
         </div>
 
         {/* Individual Account Balances */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-6">Account Details</h2>
+        <div className="bg-bg-card border border-border-card rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-text-primary mb-6">Account Details</h2>
           
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-20 bg-slate-700/50 animate-pulse rounded-lg" />
+                <div key={i} className="h-20 bg-border-card/60 animate-pulse rounded-lg" />
               ))}
             </div>
           ) : balances.length > 0 ? (
@@ -361,29 +361,34 @@ export default function BalanceAnalyticsPage() {
               {balances.map((balance, idx) => (
                 <div 
                   key={idx}
-                  className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-slate-700/30 hover:border-slate-600/50 transition-colors"
+                  className="flex items-center justify-between p-4 bg-bg-card rounded-lg border border-border-card hover:border-accent/30 transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                       balance.bankName === 'Cash' 
-                        ? 'bg-green-500/10' 
-                        : 'bg-blue-500/10'
+                        ? 'bg-success/10' 
+                        : 'bg-accent/10'
                     }`}>
                       <Wallet className={`w-5 h-5 ${
                         balance.bankName === 'Cash' 
-                          ? 'text-green-500' 
-                          : 'text-blue-500'
+                          ? 'text-success' 
+                          : 'text-accent'
                       }`} />
                     </div>
                     <div>
-                      <p className="text-white font-medium">{balance.bankName}</p>
+                      <p className="text-text-primary font-medium">{balance.bankName}</p>
                       {balance.timestamp && (
-                        <p className="text-xs text-slate-500 mt-1">
-                          Updated: {new Date(balance.timestamp).toLocaleDateString()}
+                        <p className="text-xs text-text-secondary mt-1">
+                          Last updated {new Date(balance.timestamp).toLocaleString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </p>
                       )}
                       {balance.transactionCount !== undefined && balance.transactionCount > 0 && (
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-text-secondary mt-1">
                           {balance.transactionCount} transaction{balance.transactionCount !== 1 ? 's' : ''} 
                           {balance.totalExpense! > 0 && ` • -฿${balance.totalExpense!.toLocaleString()} expenses`}
                           {balance.totalRevenue! > 0 && ` • +฿${balance.totalRevenue!.toLocaleString()} revenue`}
@@ -392,7 +397,7 @@ export default function BalanceAnalyticsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-text-primary">
                       ฿{balance.balance.toLocaleString()}
                     </p>
                   </div>
@@ -401,72 +406,72 @@ export default function BalanceAnalyticsPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <AlertTriangle className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400">No balance data available</p>
-              <p className="text-sm text-slate-500 mt-1">Use the mobile app to upload balances</p>
+              <AlertTriangle className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
+              <p className="text-text-secondary">No balance data available</p>
+              <p className="text-sm text-text-secondary mt-1">Use the mobile app to upload balances</p>
             </div>
           )}
         </div>
 
         {/* Balance History Preview (Placeholder for future) */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Balance Trend</h2>
+        <div className="bg-bg-card border border-border-card rounded-xl p-6">
+          <h2 className="text-xl font-semibold text-text-primary mb-4">Balance Trend</h2>
           <div className="text-center py-12">
-            <TrendingUp className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400">Historical trend coming soon</p>
-            <p className="text-sm text-slate-500 mt-1">
+            <TrendingUp className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
+            <p className="text-text-secondary">Historical trend coming soon</p>
+            <p className="text-sm text-text-secondary mt-1">
               Track balance changes over time
             </p>
           </div>
         </div>
 
         {/* Update Balances Section */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+        <div className="bg-bg-card border border-border-card rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <Edit3 className="w-6 h-6 text-blue-400" />
+              <h2 className="text-xl font-semibold text-text-primary flex items-center gap-2">
+                <Edit3 className="w-6 h-6 text-accent" />
                 Update Monthly Balances
               </h2>
-              <p className="text-sm text-slate-400 mt-1">Upload screenshots or manually enter new bank balances</p>
+              <p className="text-sm text-text-secondary mt-1">Upload screenshots or manually enter new bank balances</p>
             </div>
             {!showUploadModal && (
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="group relative flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-all duration-200 shadow-lg hover:shadow-blue-500/50"
+                className="group relative flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 rounded-lg transition-all duration-200 shadow-lg hover:shadow-[0_0_25px_rgba(0,217,255,0.45)]"
               >
-                <Sparkles className="w-5 h-5 text-white group-hover:rotate-12 transition-transform" />
-                <span className="text-white font-medium">Update Balances</span>
+                <Zap className="w-5 h-5 text-text-primary group-hover:text-accent transition-colors" />
+                <span className="text-text-primary font-medium">Update Balances</span>
               </button>
             )}
           </div>
 
           {showUploadModal && (
-            <div className="space-y-6 border-t border-slate-700/50 pt-6">
+            <div className="space-y-6 border-t border-border-card pt-6">
               {/* Method Selection */}
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setUploadMethod('manual')}
                   className={`group relative p-6 rounded-xl border-2 transition-all duration-200 ${
                     uploadMethod === 'manual'
-                      ? 'border-blue-500 bg-gradient-to-br from-blue-500/20 to-purple-500/10 shadow-lg shadow-blue-500/20'
-                      : 'border-slate-700 bg-slate-900/50 hover:border-slate-600 hover:bg-slate-800/50'
+                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-purple/10 shadow-lg shadow-[0_0_20px_rgba(0,217,255,0.35)]'
+                      : 'border-border-card bg-bg-card hover:border-border-card hover:bg-bg-card'
                   }`}
                 >
                   <div className="text-center">
                     <div className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center ${
                       uploadMethod === 'manual'
-                        ? 'bg-gradient-to-br from-blue-500 to-purple-600'
-                        : 'bg-slate-800'
+                        ? 'bg-gradient-to-br from-accent to-accent-purple'
+                        : 'bg-bg-card'
                     }`}>
-                      <Edit3 className={`w-8 h-8 ${uploadMethod === 'manual' ? 'text-white' : 'text-slate-400'}`} />
+                      <Edit3 className={`w-8 h-8 ${uploadMethod === 'manual' ? 'text-text-primary' : 'text-text-secondary'}`} />
                     </div>
-                    <p className="text-white font-semibold text-lg">Manual Entry</p>
-                    <p className="text-xs text-slate-400 mt-2">Type in balances manually</p>
+                    <p className="text-text-primary font-semibold text-lg">Manual Entry</p>
+                    <p className="text-xs text-text-secondary mt-2">Type in balances manually</p>
                   </div>
                   {uploadMethod === 'manual' && (
                     <div className="absolute top-3 right-3">
-                      <CheckCircle className="w-5 h-5 text-blue-400" />
+                      <CheckCircle className="w-5 h-5 text-accent" />
                     </div>
                   )}
                 </button>
@@ -474,24 +479,24 @@ export default function BalanceAnalyticsPage() {
                   onClick={() => setUploadMethod('ocr')}
                   className={`group relative p-6 rounded-xl border-2 transition-all duration-200 ${
                     uploadMethod === 'ocr'
-                      ? 'border-blue-500 bg-gradient-to-br from-blue-500/20 to-purple-500/10 shadow-lg shadow-blue-500/20'
-                      : 'border-slate-700 bg-slate-900/50 hover:border-slate-600 hover:bg-slate-800/50'
+                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-purple/10 shadow-lg shadow-[0_0_20px_rgba(0,217,255,0.35)]'
+                      : 'border-border-card bg-bg-card hover:border-border-card hover:bg-bg-card'
                   }`}
                 >
                   <div className="text-center">
                     <div className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center ${
                       uploadMethod === 'ocr'
-                        ? 'bg-gradient-to-br from-blue-500 to-purple-600'
-                        : 'bg-slate-800'
+                        ? 'bg-gradient-to-br from-accent to-accent-purple'
+                        : 'bg-bg-card'
                     }`}>
-                      <Camera className={`w-8 h-8 ${uploadMethod === 'ocr' ? 'text-white' : 'text-slate-400'}`} />
+                      <Camera className={`w-8 h-8 ${uploadMethod === 'ocr' ? 'text-text-primary' : 'text-text-secondary'}`} />
                     </div>
-                    <p className="text-white font-semibold text-lg">Upload Screenshot</p>
-                    <p className="text-xs text-slate-400 mt-2">Auto-extract from image</p>
+                    <p className="text-text-primary font-semibold text-lg">Upload Screenshot</p>
+                    <p className="text-xs text-text-secondary mt-2">Auto-extract from image</p>
                   </div>
                   {uploadMethod === 'ocr' && (
                     <div className="absolute top-3 right-3">
-                      <CheckCircle className="w-5 h-5 text-blue-400" />
+                      <CheckCircle className="w-5 h-5 text-accent" />
                     </div>
                   )}
                 </button>
@@ -501,37 +506,37 @@ export default function BalanceAnalyticsPage() {
               {uploadMethod === 'ocr' && (
                 <div className="space-y-4">
                   {/* Bank Selection for OCR */}
-                  <div className="bg-slate-900/30 rounded-lg p-4 border border-slate-700/50">
-                    <label className="block text-sm font-semibold text-white mb-3">
+                  <div className="bg-bg-card rounded-lg p-4 border border-border-card">
+                    <label className="block text-sm font-semibold text-text-primary mb-3">
                       Select Bank Account for this Statement
                     </label>
                     <select
                       value={selectedBank}
                       onChange={(e) => setSelectedBank(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
+                      className="w-full px-4 py-3 bg-bg-card border border-border-card rounded-lg text-text-primary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all"
                     >
                       <option value="">-- Select a bank account --</option>
                       {AVAILABLE_BANKS.map((bankName, index) => {
-                        const isCash = bankName.toLowerCase().includes('cash');
                         return (
                           <option key={index} value={bankName}>
-                            {isCash ? '💵' : '🏦'} {bankName}
+                            {bankName}
                           </option>
                         );
                       })}
                     </select>
                     {selectedBank && (
-                      <p className="text-xs text-blue-400 mt-2">
-                        ✓ Selected: {selectedBank}
+                      <p className="text-xs text-accent mt-2 inline-flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        <span>Selected: {selectedBank}</span>
                       </p>
                     )}
                   </div>
 
                   {/* Upload Area */}
-                  <div className="relative border-2 border-dashed border-blue-500/30 rounded-xl p-10 bg-gradient-to-br from-blue-500/5 to-purple-500/5 hover:border-blue-500/50 transition-all duration-200">
+                  <div className="relative border-2 border-dashed border-accent/30 rounded-xl p-10 bg-gradient-to-br from-accent/10 to-accent-purple/10 hover:border-accent/50 transition-all duration-200">
                     <div className="text-center">
-                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <Camera className="w-10 h-10 text-white" />
+                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-purple flex items-center justify-center">
+                        <Camera className="w-10 h-10 text-text-primary" />
                       </div>
                       <input
                         type="file"
@@ -543,33 +548,33 @@ export default function BalanceAnalyticsPage() {
                       />
                       <label
                         htmlFor="balance-upload"
-                        className={`inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg cursor-pointer transition-all duration-200 shadow-lg hover:shadow-blue-500/50 ${
+                        className={`inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 rounded-lg cursor-pointer transition-all duration-200 shadow-lg hover:shadow-[0_0_25px_rgba(0,217,255,0.45)] ${
                           uploading || !selectedBank ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
                         {uploading ? (
                           <>
-                            <RefreshCw className="w-5 h-5 text-white animate-spin" />
-                            <span className="text-white font-semibold">Processing Image...</span>
+                            <RefreshCw className="w-5 h-5 text-text-primary animate-spin" />
+                            <span className="text-text-primary font-semibold">Processing Image...</span>
                           </>
                         ) : (
                           <>
-                            <Upload className="w-5 h-5 text-white" />
-                            <span className="text-white font-semibold">
+                            <Upload className="w-5 h-5 text-text-primary" />
+                            <span className="text-text-primary font-semibold">
                               {selectedFile ? selectedFile.name : 'Choose Bank Statement'}
                             </span>
                           </>
                         )}
                       </label>
                       {!selectedBank && (
-                        <p className="text-sm text-yellow-400 mt-4">
-                          ⚠️ Please select a bank account first
+                        <p className="text-sm text-warning mt-4">
+                          Please select a bank account first
                         </p>
                       )}
-                      <p className="text-sm text-slate-400 mt-4">
+                      <p className="text-sm text-text-secondary mt-4">
                         Upload a screenshot of your bank statement or balance
                       </p>
-                      <p className="text-xs text-slate-500 mt-2">
+                      <p className="text-xs text-text-secondary mt-2">
                         Supports JPG, PNG • AI will auto-extract balance amounts
                       </p>
                     </div>
@@ -581,28 +586,28 @@ export default function BalanceAnalyticsPage() {
               {uploadMethod === 'manual' && (
                 <div className="space-y-4">
                 {/* Bank Selection Dropdown */}
-                <div className="bg-slate-900/30 rounded-lg p-4 border border-slate-700/50">
-                  <label className="block text-sm font-semibold text-white mb-3">
+                <div className="bg-bg-card rounded-lg p-4 border border-border-card">
+                  <label className="block text-sm font-semibold text-text-primary mb-3">
                     Select Bank Account to Update
                   </label>
                   <select
                     value={selectedBank}
                     onChange={(e) => setSelectedBank(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
+                    className="w-full px-4 py-3 bg-bg-card border border-border-card rounded-lg text-text-primary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all"
                   >
                     <option value="">-- Select a bank account --</option>
                     {AVAILABLE_BANKS.map((bankName, index) => {
-                      const isCash = bankName.toLowerCase().includes('cash');
                       return (
                         <option key={index} value={bankName}>
-                          {isCash ? '💵' : '🏦'} {bankName}
+                          {bankName}
                         </option>
                       );
                     })}
                   </select>
                   {selectedBank && (
-                    <p className="text-xs text-blue-400 mt-2">
-                      ✓ Selected: {selectedBank}
+                    <p className="text-xs text-accent mt-2 inline-flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      <span>Selected: {selectedBank}</span>
                     </p>
                   )}
                 </div>
@@ -616,41 +621,41 @@ export default function BalanceAnalyticsPage() {
                   const hasChanged = entry.balance > 0 && entry.balance !== previousBalance;
 
                   return (
-                    <div className="bg-slate-900/30 rounded-lg p-6 border border-slate-700/50 space-y-4">
+                    <div className="bg-bg-card rounded-lg p-6 border border-border-card space-y-4">
                       {/* Bank Info Header */}
-                      <div className="flex items-center gap-3 pb-4 border-b border-slate-700/50">
+                      <div className="flex items-center gap-3 pb-4 border-b border-border-card">
                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                           isCash
-                            ? 'bg-gradient-to-br from-green-500 to-emerald-600'
-                            : 'bg-gradient-to-br from-blue-500 to-purple-600'
+                            ? 'bg-success/10'
+                            : 'bg-accent/10'
                         }`}>
                           {isCash ? (
-                            <Banknote className="w-6 h-6 text-white" />
+                            <Banknote className="w-6 h-6 text-success" />
                           ) : (
-                            <Building2 className="w-6 h-6 text-white" />
+                            <Building2 className="w-6 h-6 text-accent" />
                           )}
                         </div>
                         <div className="flex-1">
-                          <p className="text-white text-base font-semibold">{selectedBank}</p>
-                          <p className="text-xs text-slate-400">{isCash ? 'Cash Account' : 'Bank Account'}</p>
+                          <p className="text-text-primary text-base font-semibold">{selectedBank}</p>
+                          <p className="text-xs text-text-secondary">{isCash ? 'Cash Account' : 'Bank Account'}</p>
                         </div>
                       </div>
 
                       {/* Previous Balance */}
-                      <div className="bg-slate-800/50 rounded-lg p-4">
-                        <label className="block text-xs text-slate-400 mb-1">Previous Balance</label>
-                        <p className="text-slate-300 text-lg font-medium">
+                      <div className="bg-bg-card rounded-lg p-4">
+                        <label className="block text-xs text-text-secondary mb-1">Previous Balance</label>
+                        <p className="text-text-primary text-lg font-medium">
                           ฿{previousBalance.toLocaleString()}
                         </p>
                       </div>
 
                       {/* New Balance Input */}
                       <div>
-                        <label className="block text-sm font-semibold text-white mb-2">
-                          New Balance <span className="text-red-400">*</span>
+                        <label className="block text-sm font-semibold text-text-primary mb-2">
+                          New Balance <span className="text-error">*</span>
                         </label>
                         <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base">฿</span>
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-base">฿</span>
                           <input
                             type="number"
                             value={entry.balance || ''}
@@ -664,24 +669,25 @@ export default function BalanceAnalyticsPage() {
                                 setNewBalances([...newBalances, newEntry]);
                               }
                             }}
-                            className={`w-full pl-10 pr-4 py-3.5 rounded-lg text-white text-base font-medium focus:outline-none focus:ring-2 transition-all ${
+                            className={`w-full pl-10 pr-4 py-3.5 rounded-lg text-text-primary text-base font-medium focus:outline-none focus:ring-2 transition-all ${
                               hasChanged
-                                ? 'bg-blue-900/30 border-2 border-blue-500 focus:ring-blue-500/50'
-                                : 'bg-slate-900 border border-slate-600 focus:border-blue-500 focus:ring-blue-500/30'
+                                ? 'bg-accent/10 border-2 border-accent focus:ring-accent/40'
+                                : 'bg-bg-app border border-border-card focus:border-accent focus:ring-accent/30'
                             }`}
                             placeholder="Enter new balance amount"
                           />
                         </div>
                         {hasChanged && (
-                          <p className="text-xs text-blue-400 mt-2">
-                            ✓ Balance changed by ฿{Math.abs(entry.balance - previousBalance).toLocaleString()}
+                          <p className="text-xs text-accent mt-2 inline-flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            <span>Balance changed by ฿{Math.abs(entry.balance - previousBalance).toLocaleString()}</span>
                           </p>
                         )}
                       </div>
 
                       {/* Note Input */}
                       <div>
-                        <label className="block text-sm font-semibold text-white mb-2">
+                        <label className="block text-sm font-semibold text-text-primary mb-2">
                           Note (Optional)
                         </label>
                         <input
@@ -696,7 +702,7 @@ export default function BalanceAnalyticsPage() {
                               setNewBalances([...newBalances, newEntry]);
                             }
                           }}
-                          className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
+                          className="w-full px-4 py-3 bg-bg-app border border-border-card rounded-lg text-text-primary text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all"
                           placeholder="Add a note about this balance update..."
                         />
                       </div>
@@ -706,9 +712,9 @@ export default function BalanceAnalyticsPage() {
 
                 {/* Message when no bank selected */}
                 {!selectedBank && (
-                  <div className="bg-slate-800/30 rounded-lg p-8 border border-slate-700/50 text-center">
-                    <Wallet className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400 text-sm">
+                  <div className="bg-bg-card rounded-lg p-8 border border-border-card text-center">
+                    <Wallet className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
+                    <p className="text-text-secondary text-sm">
                       Please select a bank account from the dropdown above to update its balance
                     </p>
                   </div>
@@ -718,9 +724,9 @@ export default function BalanceAnalyticsPage() {
 
               {/* Reconciliation Summary */}
               {newBalances.some(b => b.balance > 0) && (
-                <div className="border border-slate-700 rounded-lg p-4 bg-slate-900/50">
-                  <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-blue-400" />
+                <div className="border border-border-card rounded-lg p-4 bg-bg-card">
+                  <h3 className="text-text-primary font-semibold mb-3 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-accent" />
                     Money Tracking Reconciliation
                   </h3>
                   {(() => {
@@ -728,27 +734,27 @@ export default function BalanceAnalyticsPage() {
                     return (
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Previous Total:</span>
-                          <span className="text-white font-medium">฿{recon.oldTotal.toLocaleString()}</span>
+                          <span className="text-text-secondary">Previous Total:</span>
+                          <span className="text-text-primary font-medium">฿{recon.oldTotal.toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between text-green-400">
+                        <div className="flex justify-between text-success">
                           <span>+ Revenue:</span>
                           <span className="font-medium">฿{recon.totalRevenue.toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between text-red-400">
+                        <div className="flex justify-between text-error">
                           <span>- Expenses:</span>
                           <span className="font-medium">฿{recon.totalExpenses.toLocaleString()}</span>
                         </div>
-                        <div className="border-t border-slate-700 my-2 pt-2 flex justify-between">
-                          <span className="text-slate-400">Expected New Total:</span>
-                          <span className="text-white font-medium">฿{recon.expectedNew.toLocaleString()}</span>
+                        <div className="border-t border-border-card my-2 pt-2 flex justify-between">
+                          <span className="text-text-secondary">Expected New Total:</span>
+                          <span className="text-text-primary font-medium">฿{recon.expectedNew.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-400">Actual New Total:</span>
-                          <span className="text-white font-medium">฿{recon.newTotal.toLocaleString()}</span>
+                          <span className="text-text-secondary">Actual New Total:</span>
+                          <span className="text-text-primary font-medium">฿{recon.newTotal.toLocaleString()}</span>
                         </div>
                         <div className={`flex justify-between font-bold ${
-                          recon.accountedFor ? 'text-green-400' : 'text-yellow-400'
+                          recon.accountedFor ? 'text-success' : 'text-warning'
                         }`}>
                           <span>Difference:</span>
                           <span className="flex items-center gap-2">
@@ -760,17 +766,23 @@ export default function BalanceAnalyticsPage() {
                             ฿{Math.abs(recon.difference).toLocaleString()}
                           </span>
                         </div>
-                        <div className="text-center mt-3 p-3 rounded-lg bg-slate-800/50">
+                        <div className="text-center mt-3 p-3 rounded-lg bg-bg-card">
                           <p className={`text-lg font-bold ${
-                            recon.accountedFor ? 'text-green-400' : 'text-yellow-400'
+                            recon.accountedFor ? 'text-success' : 'text-warning'
                           }`}>
                             {recon.accountedFor ? (
-                              <>✓ 100% Money Tracked!</>
+                              <span className="inline-flex items-center gap-2">
+                                <CheckCircle className="w-5 h-5" />
+                                100% Money Tracked!
+                              </span>
                             ) : (
-                              <>⚠ {recon.percentageTracked}% Tracked</>
+                              <span className="inline-flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5" />
+                                {recon.percentageTracked}% Tracked
+                              </span>
                             )}
                           </p>
-                          <p className="text-xs text-slate-400 mt-1">
+                          <p className="text-xs text-text-secondary mt-1">
                             {recon.accountedFor
                               ? 'All transactions accounted for'
                               : `฿${Math.abs(recon.difference).toLocaleString()} ${recon.difference > 0 ? 'extra' : 'missing'}`
@@ -784,10 +796,10 @@ export default function BalanceAnalyticsPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-4 border-t border-slate-700/50">
+              <div className="flex gap-4 pt-4 border-t border-border-card">
                 <button
                   onClick={() => setShowUploadModal(false)}
-                  className="flex items-center justify-center gap-2 px-8 py-3.5 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-all duration-200 text-white font-medium border border-slate-600"
+                  className="flex items-center justify-center gap-2 px-8 py-3.5 bg-border-card/60 hover:bg-border-card rounded-lg transition-all duration-200 text-text-primary font-medium border border-border-card"
                 >
                   <XCircle className="w-5 h-5" />
                   Cancel
@@ -795,7 +807,7 @@ export default function BalanceAnalyticsPage() {
                 <button
                   onClick={handleSaveBalances}
                   disabled={uploading || !selectedBank}
-                  className="flex-1 flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg transition-all duration-200 text-white font-semibold shadow-lg hover:shadow-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                  className="flex-1 flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 rounded-lg transition-all duration-200 text-text-primary font-semibold shadow-lg hover:shadow-[0_0_25px_rgba(0,217,255,0.45)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
                 >
                   {uploading ? (
                     <>
@@ -815,26 +827,26 @@ export default function BalanceAnalyticsPage() {
         </div>
 
         {/* Warnings Section */}
-        <div className="bg-gradient-to-br from-yellow-900/20 to-orange-900/20 backdrop-blur-sm border border-yellow-700/30 rounded-xl p-6">
+        <div className="bg-bg-card border border-warning/30 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <AlertTriangle className="w-6 h-6 text-yellow-500" />
-            <h2 className="text-xl font-semibold text-white">Alerts & Warnings</h2>
+            <AlertTriangle className="w-6 h-6 text-warning" />
+            <h2 className="text-xl font-semibold text-text-primary">Alerts & Warnings</h2>
           </div>
           <div className="space-y-2">
             {cashBalance < 10000 && (
-              <div className="flex items-center gap-2 text-yellow-400 text-sm">
-                <div className="w-2 h-2 rounded-full bg-yellow-400" />
+              <div className="flex items-center gap-2 text-warning text-sm">
+                <div className="w-2 h-2 rounded-full bg-warning" />
                 <p>Cash balance is below ฿10,000</p>
               </div>
             )}
             {!lastUpdated && (
-              <div className="flex items-center gap-2 text-yellow-400 text-sm">
-                <div className="w-2 h-2 rounded-full bg-yellow-400" />
+              <div className="flex items-center gap-2 text-warning text-sm">
+                <div className="w-2 h-2 rounded-full bg-warning" />
                 <p>No recent balance updates</p>
               </div>
             )}
             {cashBalance >= 10000 && lastUpdated && (
-              <p className="text-slate-400 text-sm">No warnings at this time</p>
+              <p className="text-text-secondary text-sm">No warnings at this time</p>
             )}
           </div>
         </div>
@@ -842,4 +854,3 @@ export default function BalanceAnalyticsPage() {
     </AdminShell>
   );
 }
-

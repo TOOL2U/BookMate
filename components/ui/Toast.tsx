@@ -15,28 +15,28 @@ interface ToastProps {
 
 const variantStyles = {
   success: {
-    bg: 'bg-status-success/90',
-    border: 'border-status-success',
+    bg: 'bg-success/90',
+    border: 'border-success',
     icon: CheckCircle,
-    iconColor: 'text-white',
+    iconColor: 'text-text-primary',
   },
   error: {
-    bg: 'bg-status-danger/90',
-    border: 'border-status-danger',
+    bg: 'bg-error/90',
+    border: 'border-error',
     icon: XCircle,
-    iconColor: 'text-white',
+    iconColor: 'text-text-primary',
   },
   warning: {
-    bg: 'bg-status-warning/90',
-    border: 'border-status-warning',
+    bg: 'bg-warning/90',
+    border: 'border-warning',
     icon: AlertCircle,
-    iconColor: 'text-white',
+    iconColor: 'text-text-primary',
   },
   info: {
-    bg: 'bg-status-info/90',
-    border: 'border-status-info',
+    bg: 'bg-info/90',
+    border: 'border-info',
     icon: Info,
-    iconColor: 'text-white',
+    iconColor: 'text-text-primary',
   },
 };
 
@@ -95,10 +95,10 @@ export default function Toast({
             className={`${style.bg} ${style.border} border backdrop-blur-md rounded-xl shadow-elev-3 p-4 flex items-center gap-3 min-w-[280px]`}
           >
             <Icon className={`w-5 h-5 ${style.iconColor} flex-shrink-0`} />
-            <p className="text-white font-medium flex-1">{message}</p>
+            <p className="text-text-primary font-medium flex-1">{message}</p>
             <button
               onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors flex-shrink-0"
+              className="text-text-primary/80 hover:text-text-primary transition-colors flex-shrink-0"
               aria-label="Close notification"
             >
               <svg
@@ -146,4 +146,3 @@ export function useToast() {
     hideToast,
   };
 }
-

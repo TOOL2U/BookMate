@@ -1,6 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+:root {
+  --color-bg-app: 0 0 0;
+  --color-bg-card: 26 26 26;
+  --color-border-card: 42 42 42;
+  --color-text-primary: 255 255 255;
+  --color-text-secondary: 160 160 160;
+  --color-text-tertiary: 102 102 102;
+  --color-accent: 0 217 255;
+  --color-accent-purple: 157 78 221;
+  --color-success: 0 255 136;
+  --color-error: 255 51 102;
+  --color-warning: 255 215 0;
+  --color-info: 157 78 221;
+  --color-border-light: 42 42 42;
+  --color-border-medium: 255 255 255;
+}
+
 * {
   @apply antialiased;
 }
@@ -12,33 +29,15 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #000000; /* Pure black - matches mobile */
-  color: #FFFFFF; /* Bright white - matches mobile */
+  background-color: rgb(var(--color-bg-app));
+  color: rgb(var(--color-text-primary));
   position: relative;
   overflow-x: hidden;
 }
 
-/* Glass morphism effect - Updated for mobile app style */
-.glass {
-  background: #1A1A1A; /* Dark gray cards - matches mobile */
-  border: 1px solid #2A2A2A; /* Subtle borders - matches mobile */
-  backdrop-filter: blur(12px);
-}
+/* Page-specific backgrounds removed - pure black everywhere */
 
-.glass-hover {
-  background: #1A1A1A;
-  border: 1px solid #2A2A2A;
-  backdrop-filter: blur(12px);
-  transition: all 0.3s ease-in-out;
-}
-
-.glass-hover:hover {
-  background: #222222; /* Slightly lighter on hover */
-  border-color: #00D9FF; /* Cyan border on hover */
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.4); /* Cyan glow */
-}
-
-/* Toast Animations */
+/* Toast Animations - Slowed down */
 @keyframes slide-up {
   from {
     transform: translateY(100%);
@@ -80,22 +79,22 @@ body {
 }
 
 .animate-slide-up {
-  animation: slide-up 0.4s ease-out;
+  animation: slide-up 0.6s ease-out;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.3s ease-in;
+  animation: fade-in 0.5s ease-in;
 }
 
 .animate-fade-out {
-  animation: fade-out 0.3s ease-out;
+  animation: fade-out 0.5s ease-out;
 }
 
 .animate-slide-in-right {
-  animation: slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slide-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Page Transitions */
+/* Page Transitions - Slowed down */
 @keyframes page-fade-in {
   from {
     opacity: 0;
@@ -108,7 +107,7 @@ body {
 }
 
 .page-transition {
-  animation: page-fade-in 0.6s ease-out;
+  animation: page-fade-in 0.8s ease-out;
 }
 
 /* Smooth transitions for interactive elements */
@@ -119,8 +118,15 @@ button, a, input, textarea, select {
 /* Focus ring for accessibility - Cyan accent */
 .focus-ring:focus {
   outline: none;
-  ring: 2px;
-  ring-color: rgba(0, 217, 255, 0.6);
+  box-shadow: 0 0 0 2px rgba(0, 217, 255, 0.6);
+}
+
+/* Accent gradient text (cyan to purple) */
+.gradient-text {
+  background: linear-gradient(to right, #00D9FF, #9D4EDD);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Loading spinner pulse */
@@ -137,98 +143,58 @@ button, a, input, textarea, select {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Cyan Glow Effects - Mobile App Style */
-.glow-button {
-  position: relative;
-  overflow: hidden;
-  background: #1A1A1A;
-  border: 1px solid #2A2A2A;
+/* ===== PROFESSIONAL GLOW EFFECTS ===== */
+
+/* Primary CTA Button - Cyan/Purple gradient with glow */
+.btn-primary-accent {
+  background: linear-gradient(to right, #00D9FF 0%, #9D4EDD 100%);
   color: #FFFFFF;
+  border: none;
+  box-shadow: 0 0 16px rgba(0, 217, 255, 0.5);
   transition: all 0.3s ease;
 }
 
-.glow-button:hover {
-  border-color: #00D9FF;
-  box-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
-  background: #222222;
+.btn-primary-accent:hover {
+  box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
+  transform: translateY(-1px);
 }
 
-.glow-button-active {
-  border-color: #00D9FF;
-  box-shadow: 0 0 40px rgba(0, 217, 255, 0.6);
-  background: #00D9FF;
-  color: #000000;
-}
-
-/* Card with cyan glow on hover */
-.card-glow {
-  position: relative;
-  background: #1A1A1A;
-  border: 1px solid #2A2A2A;
-  transition: all 0.3s ease;
-}
-
-.card-glow:hover {
-  border-color: #00D9FF;
-  box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
-}
-
-/* Input with cyan glow on focus */
+/* Input focus - Cyan glow */
 .input-glow:focus {
-  border-color: #00D9FF;
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
   outline: none;
-}
-
-/* Neon border effects */
-.border-neon-green {
-  border-left: 3px solid #00FF88;
-}
-
-.border-neon-pink {
-  border-left: 3px solid #FF3366;
-}
-
-.border-neon-gold {
-  border-left: 3px solid #FFD700;
-}
-
-.border-neon-purple {
-  border-left: 3px solid #9D4EDD;
-}
-
-.border-neon-cyan {
-  border-left: 3px solid #00D9FF;
-}
-
-/* Text glow effects */
-.text-glow-green {
-  color: #00FF88;
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
-}
-
-.text-glow-pink {
-  color: #FF3366;
-  text-shadow: 0 0 10px rgba(255, 51, 102, 0.4);
-}
-
-.text-glow-cyan {
-  color: #00D9FF;
-  text-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+  border-color: #00D9FF;
+  box-shadow: 0 0 12px rgba(0, 217, 255, 0.4);
 }
 
 /* Cyan glow animation for active states */
 @keyframes cyan-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+    box-shadow: 0 0 16px rgba(0, 217, 255, 0.4);
   }
   50% {
-    box-shadow: 0 0 35px rgba(0, 217, 255, 0.6);
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
   }
 }
 
 .animate-cyan-glow {
-  animation: cyan-glow 2s ease-in-out infinite;
+  animation: cyan-glow 3s ease-in-out infinite;
+}
+
+/* Neon border-left indicators */
+.border-neon-cyan {
+  border-left: 4px solid #00D9FF;
+}
+
+.border-neon-green {
+  border-left: 4px solid #00FF88;
+}
+
+.border-neon-pink {
+  border-left: 4px solid #FF3366;
+}
+
+.border-neon-purple {
+  border-left: 4px solid #9D4EDD;
 }
 
 /* ============================================

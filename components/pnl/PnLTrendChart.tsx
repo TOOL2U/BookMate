@@ -59,12 +59,12 @@ function generatePlaceholderData(monthData: PnLPeriodData | null): any[] {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700/50 rounded-lg p-4 shadow-xl">
-        <p className="text-white font-semibold mb-2">{label}</p>
+      <div className="bg-slate-900/95 backdrop-blur-sm border border-[#2A2A2A] rounded-lg p-4 shadow-xl">
+        <p className="text-[#FFFFFF] font-semibold mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center justify-between gap-4 text-sm">
             <span style={{ color: entry.color }}>{entry.name}:</span>
-            <span className="text-white font-medium">
+            <span className="text-[#FFFFFF] font-medium">
               ฿{entry.value.toLocaleString()}
             </span>
           </div>
@@ -80,23 +80,23 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
         <div className="space-y-4">
-          <div className="h-6 bg-slate-700/50 rounded w-1/3 animate-pulse" />
-          <div className="h-80 bg-slate-700/50 rounded animate-pulse" />
+          <div className="h-6 bg-[#222222] rounded w-1/3 animate-pulse" />
+          <div className="h-80 bg-[#222222] rounded animate-pulse" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white mb-2">Revenue vs Expenses Trend</h2>
-        <p className="text-sm text-slate-400">
+        <h2 className="text-xl font-semibold text-[#FFFFFF] mb-2">Revenue vs Expenses Trend</h2>
+        <p className="text-sm text-[#A0A0A0]">
           Last 6 months performance overview
-          <span className="ml-2 text-xs text-slate-500">(Historical data coming soon)</span>
+          <span className="ml-2 text-xs text-[#A0A0A0]">(Historical data coming soon)</span>
         </p>
       </div>
 
@@ -155,7 +155,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
       </div>
 
       {/* Legend explanation */}
-      <div className="mt-4 flex items-center gap-6 text-xs text-slate-500">
+      <div className="mt-4 flex items-center gap-6 text-xs text-[#A0A0A0]">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-green-500" />
           <span>Revenue (Income)</span>
@@ -165,7 +165,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
           <span>Expenses (Costs)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500" />
+          <div className="w-3 h-3 rounded-full bg-[#00D9FF]" />
           <span>GOP (Profit)</span>
         </div>
       </div>

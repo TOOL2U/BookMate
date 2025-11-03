@@ -149,15 +149,15 @@ export default function SettingsPage() {
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <SettingsIcon className="w-8 h-8 text-blue-500" />
-              <h1 className="text-3xl font-bold text-white">Category Management</h1>
+              <SettingsIcon className="w-8 h-8 text-[#00D9FF]" />
+              <h1 className="text-3xl font-bold text-[#FFFFFF]">Category Management</h1>
             </div>
             <div className="flex items-center gap-2">
               {syncStatus?.needsSync && (
                 <button
                   onClick={handleSyncToSheets}
                   disabled={isSyncing}
-                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium transition-all duration-200 flex items-center gap-2"
+                  className="px-4 py-2 bg-gradient-to-r from-[#00FF88] to-[#00D9FF] hover:shadow-[0_0_16px_rgba(0,255,136,0.5)] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-300 flex items-center gap-2"
                 >
                   {isSyncing ? (
                     <>
@@ -175,16 +175,16 @@ export default function SettingsPage() {
               <button
                 onClick={fetchOptions}
                 disabled={loading}
-                className="p-2 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
+                className="p-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] rounded-lg transition-colors disabled:opacity-50 border border-[#2A2A2A]"
                 aria-label="Refresh data"
               >
-                <RefreshCw className={`w-5 h-5 text-slate-400 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-5 h-5 text-[#A0A0A0] ${loading ? 'animate-spin' : ''}`} />
               </button>
             </div>
           </div>
-          <p className="text-slate-400">Manage business categories and configuration</p>
+          <p className="text-[#A0A0A0]">Manage business categories and configuration</p>
           {lastUpdated && (
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-[#666666] mt-2">
               Last updated: {lastUpdated}
             </p>
           )}
@@ -194,8 +194,8 @@ export default function SettingsPage() {
         {syncStatus && (
           <div className={`backdrop-blur-sm border rounded-xl p-4 ${
             syncStatus.needsSync
-              ? 'bg-gradient-to-r from-orange-900/20 to-yellow-900/20 border-orange-700/30'
-              : 'bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-700/30'
+              ? 'bg-[#1A1A1A] border-[#FFD700]/30'
+              : 'bg-[#1A1A1A] border-[#00FF88]/30'
           }`}>
             <div className="flex items-start gap-3">
               {syncStatus.needsSync ? (

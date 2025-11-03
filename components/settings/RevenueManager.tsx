@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, Edit2, Trash2, Plus, Check, X, AlertCircle, Info } from 'lucide-react';
+import { Loader2, Edit2, Trash2, Plus, Check, X, AlertCircle, Info, Coins } from 'lucide-react';
 
 export default function RevenueManager() {
   const [revenues, setRevenues] = useState<string[]>([]);
@@ -177,22 +177,22 @@ export default function RevenueManager() {
   };
 
   return (
-    <div className="bg-slate-900/50 border border-slate-700/50 rounded-2xl overflow-hidden backdrop-blur-sm">
+    <div className="bg-bg-card border border-border-card rounded-xl overflow-hidden backdrop-blur-sm">
       {/* Header */}
-      <div className="border-b border-slate-700/30 p-6">
+      <div className="border-b border-border-card p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white mb-1">
+            <h2 className="text-xl font-semibold text-text-primary mb-1">
               💰 Revenue Management
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-text-secondary">
               Manage revenue items from Google Sheets • {revenues.length} {revenues.length === 1 ? 'item' : 'items'}
             </p>
           </div>
           <button
             onClick={handleStartAdd}
             disabled={isUpdating || isAdding}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-colors"
           >
             <Plus className="w-4 h-4" />
             Add Revenue Item
@@ -201,14 +201,14 @@ export default function RevenueManager() {
       </div>
 
       {/* Info Banner */}
-      <div className="bg-blue-900/20 border-b border-blue-700/30 p-4">
+      <div className="bg-bg-app/60 border-b border-border-card p-4">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="text-white font-semibold text-sm mb-1">
+            <h3 className="text-text-primary font-semibold text-sm mb-1">
               Real-Time Google Sheets Integration
             </h3>
-            <p className="text-slate-300 text-xs">
+            <p className="text-text-secondary text-xs leading-relaxed">
               Revenue items are stored in <strong>Data sheet (Column A)</strong>. Changes automatically update the <strong>P&L sheet</strong> via Apps Script.
               All formulas, totals, and formatting are managed automatically.
             </p>
@@ -220,7 +220,7 @@ export default function RevenueManager() {
       <div className="p-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-accent animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -238,12 +238,12 @@ export default function RevenueManager() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/30">
+              <tbody className="divide-y divide-border-card/60">
                 {/* Add new row */}
                 {isAdding && (
-                  <tr className="bg-blue-900/10">
-                    <td className="px-6 py-4 text-sm text-slate-500">
-                      <Plus className="w-4 h-4 text-blue-500" />
+                  <tr className="bg-accent/10">
+                    <td className="px-6 py-4 text-sm text-text-secondary">
+                      <Plus className="w-4 h-4 text-accent" />
                     </td>
                     <td className="px-6 py-4">
                       <input
@@ -257,7 +257,7 @@ export default function RevenueManager() {
                         placeholder="e.g., REV - Rental Income"
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50"
                       />
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -265,22 +265,22 @@ export default function RevenueManager() {
                         <button
                           onClick={handleSaveAdd}
                           disabled={isUpdating || !newValue.trim()}
-                          className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Save"
                         >
                           {isUpdating ? (
-                            <Loader2 className="w-4 h-4 text-white animate-spin" />
+                            <Loader2 className="w-4 h-4 text-text-primary animate-spin" />
                           ) : (
-                            <Check className="w-4 h-4 text-white" />
+                            <Check className="w-4 h-4 text-text-primary" />
                           )}
                         </button>
                         <button
                           onClick={handleCancelAdd}
                           disabled={isUpdating}
-                          className="p-2 bg-slate-600 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Cancel"
                         >
-                          <X className="w-4 h-4 text-white" />
+                          <X className="w-4 h-4 text-text-primary" />
                         </button>
                       </div>
                     </td>
@@ -291,9 +291,9 @@ export default function RevenueManager() {
                 {revenues.map((item, idx) => (
                   <tr
                     key={idx}
-                    className="hover:bg-slate-800/30 transition-colors"
+                    className="hover:bg-bg-app/40 transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm text-slate-500">
+                    <td className="px-6 py-4 text-sm text-text-secondary">
                       {idx + 1}
                     </td>
                     <td className="px-6 py-4">
@@ -308,10 +308,10 @@ export default function RevenueManager() {
                           }}
                           autoFocus
                           disabled={isUpdating}
-                          className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50"
                         />
                       ) : (
-                        <span className="text-white font-medium">{item}</span>
+                        <span className="text-text-primary font-medium">{item}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -320,22 +320,22 @@ export default function RevenueManager() {
                           <button
                             onClick={() => handleSaveEdit(item)}
                             disabled={isUpdating || !editValue.trim()}
-                            className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Save"
                           >
                             {isUpdating ? (
-                              <Loader2 className="w-4 h-4 text-white animate-spin" />
+                              <Loader2 className="w-4 h-4 text-text-primary animate-spin" />
                             ) : (
-                              <Check className="w-4 h-4 text-white" />
+                              <Check className="w-4 h-4 text-text-primary" />
                             )}
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             disabled={isUpdating}
-                            className="p-2 bg-slate-600 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Cancel"
                           >
-                            <X className="w-4 h-4 text-white" />
+                            <X className="w-4 h-4 text-text-primary" />
                           </button>
                         </div>
                       ) : (
@@ -343,18 +343,18 @@ export default function RevenueManager() {
                           <button
                             onClick={() => handleStartEdit(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Edit"
                           >
-                            <Edit2 className="w-4 h-4 text-white" />
+                            <Edit2 className="w-4 h-4 text-text-primary" />
                           </button>
                           <button
                             onClick={() => handleDelete(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Delete"
                           >
-                            <Trash2 className="w-4 h-4 text-white" />
+                            <Trash2 className="w-4 h-4 text-text-primary" />
                           </button>
                         </div>
                       )}
@@ -366,7 +366,7 @@ export default function RevenueManager() {
                   <tr>
                     <td colSpan={3} className="px-6 py-12 text-center">
                       <p className="text-slate-400">No revenue items found</p>
-                      <p className="text-sm text-slate-500 mt-1">Click &quot;Add Revenue Item&quot; to create your first item</p>
+                      <p className="text-sm text-text-secondary mt-1">Click &quot;Add Revenue Item&quot; to create your first item</p>
                     </td>
                   </tr>
                 )}
@@ -379,12 +379,12 @@ export default function RevenueManager() {
       {/* Toast Notification */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
-          <div className={`px-6 py-4 rounded-xl shadow-2xl backdrop-blur-sm border ${
+          <div className={`px-6 py-4 rounded-xl shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-sm border ${
             toast.type === 'success'
-              ? 'bg-green-900/90 border-green-700/50 text-green-100'
+              ? 'bg-success/90 border-success text-green-100'
               : toast.type === 'error'
-              ? 'bg-red-900/90 border-red-700/50 text-red-100'
-              : 'bg-blue-900/90 border-blue-700/50 text-blue-100'
+              ? 'bg-error/90 border-error text-red-100'
+              : 'bg-info/90 border-info text-blue-100'
           }`}>
             <div className="flex items-center gap-3">
               {toast.type === 'success' ? (
