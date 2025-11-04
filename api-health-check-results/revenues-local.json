@@ -1,0 +1,10 @@
+{
+  "count": 4,
+  "source": "google_sheets",
+  "revenues": [
+    "Revenue - Commision ",
+    "Revenue - Sales ",
+    "Revenue - Services",
+    "Revenue - Rental Income"
+  ]
+}
