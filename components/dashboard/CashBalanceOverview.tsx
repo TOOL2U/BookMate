@@ -69,9 +69,9 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
       {/* Balance Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Total Balance Card */}
-        <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm border border-blue-500/30 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-black-600/20 to-black-600/20 backdrop-blur-sm border border-black-500/30 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-lg bg-[#00D9FF]/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg bg-black/20 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-[#00D9FF]" />
             </div>
             <div>
@@ -107,7 +107,7 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
       {/* Bank Accounts List */}
       <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
         <div className="flex items-center gap-3 mb-6">
-          <Building2 className="w-5 h-5 text-purple-500" />
+          <Building2 className="w-5 h-5 text-blue-500" />
           <h3 className="text-lg font-semibold text-[#FFFFFF]">Bank Accounts</h3>
         </div>
 
@@ -119,8 +119,8 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
                 className="flex items-center justify-between p-4 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-lg border border-slate-700/50 hover:border-slate-700/50/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                    <Banknote className="w-5 h-5 text-purple-500" />
+                  <div className="w-10 h-10 rounded-lg bg-black-500/10 flex items-center justify-center">
+                    <Banknote className="w-5 h-5 text-white-500" />
                   </div>
                   <div>
                     <p className="text-[#FFFFFF] font-medium">{bank.bankName}</p>
@@ -143,7 +143,7 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
             ))}
 
             {/* Total Bank Balance Summary */}
-            <div className="flex items-center justify-between p-4 bg-purple-500/10 rounded-lg border border-purple-500/30 mt-4">
+            <div className="flex items-center justify-between p-4 bg-black-500/10 rounded-lg border border-black-500/30 mt-4">
               <p className="text-purple-200 font-medium">Total Bank Balance</p>
               <p className="text-2xl font-bold text-purple-100">
                 ฿{formatCurrency(totalBankBalance)}

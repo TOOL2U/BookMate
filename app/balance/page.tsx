@@ -461,14 +461,14 @@ export default function BalanceAnalyticsPage() {
                   onClick={() => setUploadMethod('manual')}
                   className={`group relative p-6 rounded-xl border-2 transition-all duration-200 ${
                     uploadMethod === 'manual'
-                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-purple/10 shadow-lg shadow-[0_0_20px_rgba(0,217,255,0.35)]'
+                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-black/10 shadow-lg shadow-[0_0_20px_rgba(0,217,255,0.35)]'
                       : 'border-border-card bg-black hover:border-border-card hover:bg-[#0A0A0A]'
                   }`}
                 >
                   <div className="text-center">
                     <div className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center ${
                       uploadMethod === 'manual'
-                        ? 'bg-gradient-to-br from-accent to-accent-purple'
+                        ? 'bg-gradient-to-br from-accent to-accent-blue'
                         : 'bg-[#0A0A0A]'
                     }`}>
                       <Edit3 className={`w-8 h-8 ${uploadMethod === 'manual' ? 'text-text-primary' : 'text-text-secondary'}`} />

@@ -232,7 +232,7 @@ export default function AdminPage() {
         {/* Background effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent-purple/10" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-black-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
         <div className="relative z-10 w-full max-w-md">
           <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-8">
