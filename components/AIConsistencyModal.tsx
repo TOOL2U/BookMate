@@ -308,7 +308,7 @@ export default function AIConsistencyModal({ isOpen, onClose }: Props) {
           {!data && !loading && !error && (
             <div className="text-center py-12 text-gray-500">
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p>Select a month and click "Run Check" to begin</p>
+              <p>Select a month and click &ldquo;Run Check&rdquo; to begin</p>
             </div>
           )}
         </div>
