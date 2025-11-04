@@ -95,7 +95,7 @@ export default function AdminShell({ children }: AdminShellProps) {
                   flex items-center gap-3 px-4 py-3 rounded-lg
                   transition-all duration-200
                   ${isActive
-                    ? 'bg-gradient-to-r from-accent to-accent-blue text-text-primary shadow-[0_0_20px_rgba(0,217,255,0.3)]'
+                    ? 'bg-gradient-to-r from-accent/50 to-accent-blue text-text-primary shadow-[0_0_20px_rgba(0,217,255,0.3)]'
                     : 'text-text-secondary hover:text-text-primary hover:bg-bg-app/60'
                   }
                 `}
