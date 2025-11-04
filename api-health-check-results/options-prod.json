@@ -1,12 +1,13 @@
 {
   "properties": 7,
   "operations": 32,
-  "payments": 4,
+  "payments": 5,
   "paymentNames": [
     "Bank Transfer - Bangkok Bank - Shaun Ducker",
     "Bank Transfer - Bangkok Bank - Maria Ren",
     "Bank transfer - Krung Thai Bank - Family Account",
-    "Cash"
+    "Cash - Family",
+    "Cash - Alesia"
   ],
   "source": "google_sheets_lists"
 }

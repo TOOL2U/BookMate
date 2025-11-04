@@ -69,7 +69,7 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
       {/* Balance Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Total Balance Card */}
-        <div className="bg-gradient-to-br from-black-600/20 to-black-600/20 backdrop-blur-sm border border-black-500/30 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-white rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-lg bg-black/20 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-[#00D9FF]" />
@@ -88,7 +88,7 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
         </div>
 
         {/* Cash Balance Card */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-white rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
               <Wallet className="w-6 h-6 text-[#00FF88]" />
