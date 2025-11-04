@@ -231,7 +231,6 @@ export default function PnLExpenseBreakdown({
         onClose={() => setIsOverheadModalOpen(false)}
         period={period}
         totalExpense={overheadsTotal}
-        overheadData={overheadData}
       />
     </>
   );
