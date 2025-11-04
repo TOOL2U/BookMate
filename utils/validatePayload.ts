@@ -2,9 +2,12 @@
  * Validates and sanitizes receipt data payload for Google Sheets
  * Expanded schema to match BookMate P&L 2025 spreadsheet
  * Trims whitespace and converts numeric fields to numbers
+ * 
+ * ⚠️ CRITICAL: This function now fetches live data from /api/options
+ * Do NOT use static config files (options.json, live-dropdowns.json)
  */
 
-import { getOptions } from './matchOption';
+import { NextRequest } from 'next/server';
 
 export interface ReceiptPayload {
   day: string;
@@ -42,8 +45,10 @@ export interface ValidationResult {
  * Validates and sanitizes receipt payload
  * @param payload - Raw receipt data from form
  * @returns Validation result with sanitized data or error message
+ * 
+ * ⚠️ ASYNC: Now fetches live dropdown options from /api/options
  */
-export function validatePayload(payload: ReceiptPayload): ValidationResult {
+export async function validatePayload(payload: ReceiptPayload): Promise<ValidationResult> {
   // Check for required fields (day, month, year, property, typeOfOperation, typeOfPayment, detail)
   // ref is optional, debit and credit can be 0
   if (!payload.day || !payload.month || !payload.year || !payload.property ||
@@ -108,19 +113,58 @@ export function validatePayload(payload: ReceiptPayload): ValidationResult {
     };
   }
 
-  // Validate against live dropdown options
-  const options = getOptions();
-  
-  // Check if property is valid
-  if (!options.properties.includes(property)) {
+  // Fetch live dropdown options from /api/options
+  let validProperties: string[] = [];
+  let validOperations: string[] = [];
+  let validPayments: string[] = [];
+
+  try {
+    // Server-side: use direct import from route handler instead of HTTP fetch
+    // This avoids port/URL issues and is faster
+    const { GET } = await import('../app/api/options/route');
+    const request = new NextRequest('http://localhost/api/options');
+    const response = await GET(request);
+
+    if (!response.ok) {
+      console.error('[VALIDATION] Failed to fetch /api/options:', response.status);
+      return {
+        isValid: false,
+        error: 'Unable to validate dropdown values. Please try again.',
+      };
+    }
+
+    const data = await response.json();
+    
+    // Extract validation arrays from API response (dual format)
+    // Plain arrays are in data.data for backward compatibility
+    validProperties = data.data?.properties || [];
+    validOperations = data.data?.typeOfOperation || [];
+    validPayments = data.data?.typeOfPayment || [];
+
+    console.log('[VALIDATION] Fetched live options:', {
+      properties: validProperties.length,
+      operations: validOperations.length,
+      payments: validPayments.length,
+    });
+
+  } catch (error) {
+    console.error('[VALIDATION] Error fetching /api/options:', error);
     return {
       isValid: false,
-      error: `Invalid property "${property}". Please select from: ${options.properties.join(', ')}`,
+      error: 'Unable to validate dropdown values. Please check your connection and try again.',
+    };
+  }
+
+  // Check if property is valid
+  if (!validProperties.includes(property)) {
+    return {
+      isValid: false,
+      error: `Invalid property "${property}". Please select from: ${validProperties.join(', ')}`,
     };
   }
 
   // Check if typeOfOperation is valid
-  if (!options.typeOfOperation.includes(typeOfOperation)) {
+  if (!validOperations.includes(typeOfOperation)) {
     return {
       isValid: false,
       error: `Invalid operation type "${typeOfOperation}". Please select a valid category from the dropdown.`,
@@ -128,10 +172,10 @@ export function validatePayload(payload: ReceiptPayload): ValidationResult {
   }
 
   // Check if typeOfPayment is valid
-  if (!options.typeOfPayment.includes(typeOfPayment)) {
+  if (!validPayments.includes(typeOfPayment)) {
     return {
       isValid: false,
-      error: `Invalid payment type "${typeOfPayment}". Please select from: ${options.typeOfPayment.join(', ')}`,
+      error: `Invalid payment type "${typeOfPayment}". Please select from: ${validPayments.join(', ')}`,
     };
   }
 

@@ -1,54 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { normalizeDropdownFields } from '@/utils/matchOption';
-import { google } from 'googleapis';
-
-const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID!;
-const DATA_SHEET = 'Data';
-
-// Helper to fetch options from Google Sheets directly (server-side)
-async function getOptionsFromGoogleSheets() {
-  try {
-    const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-    if (!serviceAccountKey) {
-      throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY not set');
-    }
-
-    const credentials = JSON.parse(serviceAccountKey);
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // Fetch all columns in one batch request
-    const response = await sheets.spreadsheets.values.batchGet({
-      spreadsheetId: GOOGLE_SHEET_ID,
-      ranges: [
-        `${DATA_SHEET}!A2:A`,  // Revenues
-        `${DATA_SHEET}!B2:B`,  // Type of Operation (Expenses)
-        `${DATA_SHEET}!C2:C`,  // Properties
-        `${DATA_SHEET}!D2:D`,  // Payment Types
-      ],
-    });
-
-    const valueRanges = response.data.valueRanges || [];
-
-    return {
-      properties: (valueRanges[2]?.values || []).map(row => row[0]).filter(val => val && val.trim() !== ''),
-      typeOfOperation: (valueRanges[1]?.values || []).map(row => row[0]).filter(val => val && val.trim() !== ''),
-      typeOfPayment: (valueRanges[3]?.values || []).map(row => row[0]).filter(val => val && val.trim() !== ''),
-    };
-  } catch (error) {
-    console.error('[EXTRACT] Error fetching options from Google Sheets:', error);
-    // Return empty arrays as fallback
-    return {
-      properties: ['Sia Moon - Land - General'],
-      typeOfOperation: [],
-      typeOfPayment: ['Cash'],
-    };
-  }
-}
+import { normalizeDropdownFields, getOptions } from '@/utils/matchOption';
 
 // OpenAI API configuration
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -148,11 +99,7 @@ export async function POST(request: NextRequest) {
 async function callOpenAI(text: string, comment?: string): Promise<ExtractedData> {
   try {
     const currentDate = new Date();
-    
-    // Fetch real-time options from Google Sheets
-    console.log('[EXTRACT] Fetching dropdown options from Google Sheets...');
-    const options = await getOptionsFromGoogleSheets();
-    console.log(`[EXTRACT] Loaded ${options.properties.length} properties, ${options.typeOfOperation.length} operations, ${options.typeOfPayment.length} payment types`);
+    const options = getOptions();
 
     // Build context with comment if provided
     const contextText = comment
@@ -329,7 +276,7 @@ Return ONLY valid JSON, no additional text.`;
         day: extracted.day || String(currentDate.getDate()),
         month: extracted.month || currentDate.toLocaleString('en', { month: 'short' }),
         year: extracted.year || String(currentDate.getFullYear()),
-        property: extracted.property || 'Sia Moon',
+        property: extracted.property || 'Sia Moon - Land - General',
         typeOfOperation: extracted.typeOfOperation || '',
         typeOfPayment: extracted.typeOfPayment || '',
         detail: extracted.detail || '',

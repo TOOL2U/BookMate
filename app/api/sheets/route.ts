@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Validate and sanitize payload
-    const validation = validatePayload(body);
+    const validation = await validatePayload(body);
 
     if (!validation.isValid || !validation.data) {
       console.error('[✖] Payload validation failed:', validation.error);
@@ -76,15 +76,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Normalize dropdown fields to ensure they match canonical options
-    const normalizedData = {
-      ...validation.data,
-      property: matchProperty(validation.data.property).value,
-      typeOfOperation: matchTypeOfOperation(validation.data.typeOfOperation).value,
-      typeOfPayment: matchTypeOfPayment(validation.data.typeOfPayment).value,
-    };
+    // ✅ FIXED: Use validated data directly (already checked against live /api/options)
+    // ❌ OLD: Was normalizing with static config, causing "Cash - Family" → "Cash"
+    const normalizedData = validation.data;
 
-    console.log('[SHEETS] Normalized dropdown values:', {
+    console.log('[SHEETS] Using validated data (no normalization needed):', {
       property: normalizedData.property,
       typeOfOperation: normalizedData.typeOfOperation,
       typeOfPayment: normalizedData.typeOfPayment,
@@ -164,7 +160,7 @@ export async function POST(request: NextRequest) {
       // Check for success in JSON format
       if (responseData.ok === true || responseData.success) {
         console.log('[✔] Sheets append → status: SUCCESS (JSON format)');
-        console.log('✅ BookMate Receipt Upload Complete — Data appended to Google Sheets');
+        console.log('✅ Accounting Buddy Receipt Upload Complete — Data appended to Google Sheets');
         return NextResponse.json({
           success: true,
           message: 'Receipt added to Google Sheet successfully',
@@ -178,7 +174,7 @@ export async function POST(request: NextRequest) {
     // Check if Apps Script returned success (plain text format)
     if (responseText.includes('Success')) {
       console.log('[✔] Sheets append → status: SUCCESS (text format)');
-      console.log('✅ BookMate Receipt Upload Complete — Data appended to Google Sheets');
+      console.log('✅ Accounting Buddy Receipt Upload Complete — Data appended to Google Sheets');
       return NextResponse.json({
         success: true,
         message: 'Receipt added to Google Sheet successfully',

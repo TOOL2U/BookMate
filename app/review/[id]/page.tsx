@@ -89,7 +89,7 @@ export default function ReviewPage() {
           day: extractedData.day || '',
           month: extractedData.month || '',
           year: extractedData.year || '',
-          property: extractedData.property || 'Sia Moon',
+          property: extractedData.property || 'Sia Moon - Land - General',
           typeOfOperation: extractedData.typeOfOperation || '',
           typeOfPayment: extractedData.typeOfPayment || '',
           detail: extractedData.detail || '',

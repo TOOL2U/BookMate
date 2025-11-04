@@ -335,7 +335,7 @@ function formatDate_(day, month, year) {
 
   // Convert month name to number
   const monthMap = {
-    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 
+    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
     'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
     'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
   };
@@ -353,7 +353,7 @@ function doGet(e) {
       return ContentService
     .createTextOutput(JSON.stringify({
       status: 'ok',
-      message: 'BookMate webhook + Dynamic P&L + Inbox + Balance + Overhead Expenses',
+      message: 'Accounting Buddy webhook + Dynamic P&L + Inbox + Balance + Overhead Expenses',
       version: '7.1 - With Overhead Expenses Modal Support',
       timestamp: new Date().toISOString(),
       endpoints: {
@@ -475,14 +475,6 @@ function handleWebhook(payload) {
       return createErrorResponse('Missing required fields: ' + missingFields.join(', '));
     }
 
-    // Convert numeric month to text format (e.g., 11 -> "Nov")
-    var month = payload.month;
-    if (typeof month === 'number' || !isNaN(month)) {
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      month = monthNames[parseInt(month) - 1] || month;
-      Logger.log('→ Converted numeric month ' + payload.month + ' to ' + month);
-    }
-
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
     if (!sheet) {
       return createErrorResponse('Sheet "' + SHEET_NAME + '" not found');
@@ -491,7 +483,7 @@ function handleWebhook(payload) {
     const rowData = [
       '',
       payload.day || '',
-      month || '',
+      payload.month || '',
       payload.year || '',
       payload.property || '',
       payload.typeOfOperation || '',
@@ -868,15 +860,15 @@ function handleGetPropertyPersonDetails(period) {
 // ============================================================================
 /**
  * Get overhead expenses details for month or year
- * Updated 2025-11-03: Now dynamically reads expense categories from Data sheet
- * and aggregates actual transactions from BookMate P&L 2025 sheet
+ * Extracts 24 expense categories from rows 29-52 of P&L sheet
+ * Updated 2025-10-30: Added row 52 for new expense category
  *
  * @param {string} period - 'month' or 'year'
  * @returns {ContentService.TextOutput} JSON response with expense data
  */
 function handleGetOverheadExpensesDetails(period) {
   try {
-    Logger.log('=== Overhead Expenses Details Request (Dynamic) ===');
+    Logger.log('=== Overhead Expenses Details Request ===');
     Logger.log('Period: ' + period);
 
     if (!period || (period !== 'month' && period !== 'year')) {
@@ -884,120 +876,73 @@ function handleGetOverheadExpensesDetails(period) {
     }
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    
-    // Get expense categories from Data sheet (Column B)
-    const dataSheet = ss.getSheetByName("Data");
-    if (!dataSheet) {
-      return createErrorResponse('Data sheet not found');
+    const sheet = ss.getSheetByName("P&L (DO NOT EDIT)");
+
+    if (!sheet) {
+      return createErrorResponse('P&L sheet not found. Looking for: "P&L (DO NOT EDIT)"');
     }
+
+    // Overhead expenses are in rows 31-58 (28 rows), column A
+    // Updated 2025-10-30: Row range shifted due to P&L structure change
+    const startRow = 31;
+    const endRow = 58;  // Updated from 57 to 58
+    const numRows = endRow - startRow + 1; // 28 rows
     
-    // Read all expense categories from Data!B2:B (skip header in B1)
-    const categoriesRange = dataSheet.getRange("B2:B");
-    const categoriesData = categoriesRange.getValues();
-    const expenseCategories = [];
+    // Get expense names (column A)
+    const namesRange = sheet.getRange("A" + startRow + ":A" + endRow);
+    const names = namesRange.getValues();
     
-    for (let i = 0; i < categoriesData.length; i++) {
-      const category = categoriesData[i][0];
-      if (category && category.toString().trim() !== '') {
-        expenseCategories.push(category.toString().trim());
-      }
-    }
-    
-    Logger.log('✓ Found ' + expenseCategories.length + ' expense categories from Data sheet');
-    
-    // Get transaction data from BookMate P&L 2025 sheet
-    const transactionSheet = ss.getSheetByName(SHEET_NAME);
-    if (!transactionSheet) {
-      return createErrorResponse('Transaction sheet "' + SHEET_NAME + '" not found');
-    }
-    
-    // Get all transaction data (starting from HEADER_ROW)
-    const lastRow = transactionSheet.getLastRow();
-    if (lastRow <= HEADER_ROW) {
-      Logger.log('⚠ No transactions found');
-      // Return all categories with 0 amounts
-      const emptyData = expenseCategories.map(function(cat) {
-        return { name: cat, expense: 0, percentage: 0 };
-      });
+    // Determine which column to use based on period
+    let valueColumn;
+    if (period === 'month') {
+      // Find current month column dynamically
+      const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"];
+      const currentMonth = months[new Date().getMonth()];
+      const headerRow = sheet.getRange("A4:Z4").getValues()[0];
       
-      return ContentService
-        .createTextOutput(JSON.stringify({
-          ok: true,
-          data: emptyData,
-          period: period,
-          totalExpense: 0,
-          count: emptyData.length,
-          timestamp: new Date().toISOString()
-        }))
-        .setMimeType(ContentService.MimeType.JSON);
+      let monthColumnIndex = null;
+      for (let i = 0; i < headerRow.length; i++) {
+        if (headerRow[i] && headerRow[i].toString().toUpperCase().trim() === currentMonth) {
+          monthColumnIndex = i + 1; // Convert to 1-based index
+          break;
+        }
+      }
+      
+      if (!monthColumnIndex) {
+        return createErrorResponse('Could not find current month column');
+      }
+      
+      valueColumn = String.fromCharCode(64 + monthColumnIndex); // Convert to letter
+      Logger.log('Using month column: ' + valueColumn + ' for ' + currentMonth);
+    } else {
+      valueColumn = 'Q'; // Year total column
+      Logger.log('Using year column: Q');
     }
     
-    // Columns: B=day, C=month, D=year, E=property, F=typeOfOperation, G=typeOfPayment, H=detail, I=ref, J=debit, K=credit
-    const dataRange = transactionSheet.getRange(HEADER_ROW + 1, 2, lastRow - HEADER_ROW, 10);
-    const transactions = dataRange.getValues();
+    const valueRange = sheet.getRange(valueColumn + startRow + ":" + valueColumn + endRow);
+    const values = valueRange.getValues();
     
-    Logger.log('✓ Reading ' + transactions.length + ' transactions');
-    
-    // Determine date filter based on period
-    const now = new Date();
-    const currentMonth = now.getMonth() + 1; // 1-12
-    const currentYear = now.getFullYear();
-    
-    // Aggregate expenses by category
-    const categoryTotals = {};
-    expenseCategories.forEach(function(cat) {
-      categoryTotals[cat] = 0;
-    });
-    
+    // Build the data array
+    const data = [];
     let totalExpense = 0;
-    let matchedTransactions = 0;
     
-    for (let i = 0; i < transactions.length; i++) {
-      const row = transactions[i];
-      const month = row[1]; // C column (month)
-      const year = row[2];  // D column (year)
-      const typeOfOperation = row[4]; // F column (typeOfOperation)
-      const debit = parseFloat(row[8]) || 0; // J column (debit)
+    for (let i = 0; i < numRows; i++) {
+      const name = names[i][0];
+      const expense = parseFloat(values[i][0]) || 0;
       
-      // Skip if no typeOfOperation or debit
-      if (!typeOfOperation || debit === 0) continue;
-      
-      const categoryStr = typeOfOperation.toString().trim();
-      
-      // Filter by period
-      let includeTransaction = false;
-      
-      if (period === 'month') {
-        // Match current month and year
-        const monthNum = getMonthNumber_(month);
-        if (monthNum === currentMonth && parseInt(year) === currentYear) {
-          includeTransaction = true;
-        }
-      } else if (period === 'year') {
-        // Include all transactions from current year
-        if (parseInt(year) === currentYear) {
-          includeTransaction = true;
-        }
-      }
-      
-      if (includeTransaction && categoryTotals.hasOwnProperty(categoryStr)) {
-        categoryTotals[categoryStr] += debit;
-        totalExpense += debit;
-        matchedTransactions++;
+      // Only include rows that start with "EXP -"
+      if (name && name.toString().trim().indexOf('EXP -') === 0) {
+        data.push({
+          name: name.toString().trim(),
+          expense: expense
+        });
+        totalExpense += expense;
       }
     }
     
-    Logger.log('✓ Matched ' + matchedTransactions + ' transactions for period: ' + period);
-    Logger.log('✓ Total expense: ' + totalExpense);
-    
-    // Build result array with all categories (even those with $0)
-    const data = expenseCategories.map(function(category) {
-      const expense = categoryTotals[category] || 0;
-      return {
-        name: category,
-        expense: expense,
-        percentage: totalExpense > 0 ? (expense / totalExpense) * 100 : 0
-      };
+    // Calculate percentages
+    data.forEach(function(item) {
+      item.percentage = totalExpense > 0 ? (item.expense / totalExpense) * 100 : 0;
     });
     
     // Sort by expense amount (descending)
@@ -1005,7 +950,7 @@ function handleGetOverheadExpensesDetails(period) {
       return b.expense - a.expense;
     });
     
-    Logger.log('✓ Returning ' + data.length + ' expense categories');
+    Logger.log('✓ Found ' + data.length + ' overhead expense items, total: ' + totalExpense);
 
     return ContentService
       .createTextOutput(JSON.stringify({
@@ -1013,9 +958,9 @@ function handleGetOverheadExpensesDetails(period) {
         data: data,
         period: period,
         totalExpense: totalExpense,
+        column: valueColumn,
         count: data.length,
-        matchedTransactions: matchedTransactions,
-        source: 'Data sheet + ' + SHEET_NAME + ' transactions',
+        range: 'A' + startRow + ':' + valueColumn + endRow,
         timestamp: new Date().toISOString()
       }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -1024,29 +969,6 @@ function handleGetOverheadExpensesDetails(period) {
     Logger.log('ERROR in handleGetOverheadExpensesDetails: ' + error.toString());
     return createErrorResponse('Overhead expenses details error: ' + error.toString());
   }
-}
-
-// Helper function to convert month name to number (1-12)
-function getMonthNumber_(monthStr) {
-  if (!monthStr) return 0;
-  
-  const monthStr2 = monthStr.toString().toLowerCase().trim();
-  const monthMap = {
-    'jan': 1, 'january': 1,
-    'feb': 2, 'february': 2,
-    'mar': 3, 'march': 3,
-    'apr': 4, 'april': 4,
-    'may': 5,
-    'jun': 6, 'june': 6,
-    'jul': 7, 'july': 7,
-    'aug': 8, 'august': 8,
-    'sep': 9, 'sept': 9, 'september': 9,
-    'oct': 10, 'october': 10,
-    'nov': 11, 'november': 11,
-    'dec': 12, 'december': 12
-  };
-  
-  return monthMap[monthStr2] || 0;
 }
 
 // ============================================================================
@@ -1074,7 +996,7 @@ function testWebhook() {
     day: "27",
     month: "Oct",
     year: "2025",
-    property: "Sia Moon",
+    property: "Sia Moon - Land - General",
     typeOfOperation: "EXP - Construction - Materials",
     typeOfPayment: "Cash",
     detail: "Test receipt from Apps Script V6",
