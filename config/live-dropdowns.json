@@ -6,13 +6,15 @@
     "Parents House",
     "Shaun Ducker - Personal",
     "Maria Ren - Personal",
-    "Family"
+    "Family",
+    "3"
   ],
   "typeOfOperation": [
     "Revenue - Commision ",
     "Revenue - Sales ",
     "Revenue - Services",
     "Revenue - Rental Income",
+    "1",
     "EXP - Utilities - Gas",
     "EXP - Utilities - Water",
     "EXP - Utilities  - Electricity",
@@ -40,7 +42,8 @@
     "EXP - Household - Alcohol",
     "EXP - Household - Groceries",
     "EXP - Household - Nappies",
-    "EXP - Household - Toiletries"
+    "EXP - Household - Toiletries",
+    "2"
   ],
   "typeOfPayment": [
     "Bank Transfer - Bangkok Bank - Shaun Ducker",
