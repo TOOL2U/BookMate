@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cacheVendorCategory } from '@/utils/vendorCache';
-import { getOptions } from '@/utils/matchOption';
+import { getOptions, type OptionsData } from '@/utils/getOptions';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -30,54 +30,29 @@ export default function ReviewPage() {
 
   const handleCloseToast = () => setShowToast(false);
 
-  // Get dropdown options from Google Sheets (real-time)
-  const [options, setOptions] = useState<{
-    properties: string[];
-    typeOfOperation: string[];
-    typeOfPayment: string[];
-  }>({
-    properties: [],
-    typeOfOperation: [],
-    typeOfPayment: [],
-  });
+  // Fetch dropdown options from /api/options (async)
+  const [options, setOptions] = useState<OptionsData | null>(null);
+  const [optionsLoading, setOptionsLoading] = useState(true);
 
-  // Fetch options from Google Sheets on component mount
   useEffect(() => {
     async function fetchOptions() {
       try {
-        const response = await fetch('/api/categories/all');
-        const result = await response.json();
-        
-        if (result.ok) {
-          setOptions({
-            properties: result.data.properties || [],
-            typeOfOperation: result.data.typeOfOperation || [],
-            typeOfPayment: result.data.typeOfPayment || [],
-          });
-          console.log('[REVIEW] Loaded dropdown options from Google Sheets:', {
-            properties: result.data.properties?.length,
-            typeOfOperation: result.data.typeOfOperation?.length,
-            typeOfPayment: result.data.typeOfPayment?.length,
-          });
-        } else {
-          // Fallback to hardcoded options if API fails
-          const fallback = getOptions();
-          setOptions(fallback);
-          console.warn('[REVIEW] API failed, using fallback options');
-        }
+        const data = await getOptions();
+        setOptions(data);
       } catch (error) {
-        console.error('[REVIEW] Error fetching options:', error);
-        // Fallback to hardcoded options
-        const fallback = getOptions();
-        setOptions(fallback);
+        console.error('[REVIEW] Failed to fetch options:', error);
+        setToastMessage('Failed to load dropdown options');
+        setToastType('error');
+        setShowToast(true);
+      } finally {
+        setOptionsLoading(false);
       }
     }
-    
     fetchOptions();
   }, []);
 
   // Filter categories based on search
-  const filteredCategories = options.typeOfOperation
+  const filteredCategories = (options?.typeOfOperation || [])
     .filter(op => !['FIXED COSTS', 'Fixed Costs', 'EXPENSES', 'REVENUES', 'Property'].includes(op))
     .filter(op => categorySearch.trim() === '' || op.toLowerCase().includes(categorySearch.toLowerCase()));
 
@@ -123,8 +98,8 @@ export default function ReviewPage() {
           credit: String(extractedData.credit || ''),
         };
         
-        // SAFETY CHECK: Ensure typeOfPayment is a valid option from options.json
-        if (newFormData.typeOfPayment && !options.typeOfPayment.includes(newFormData.typeOfPayment)) {
+        // SAFETY CHECK: Ensure typeOfPayment is a valid option from /api/options
+        if (options && newFormData.typeOfPayment && !options.typeOfPayment.includes(newFormData.typeOfPayment)) {
           console.warn('[REVIEW] Invalid typeOfPayment detected:', newFormData.typeOfPayment);
           console.warn('[REVIEW] Valid options are:', options.typeOfPayment);
           newFormData.typeOfPayment = ''; // Reset to empty to show "Select payment type"
@@ -148,7 +123,7 @@ export default function ReviewPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]); // options is from getOptions() which returns a stable reference
+  }, [searchParams, options]); // Re-run when options are loaded or search params change
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -377,7 +352,7 @@ export default function ReviewPage() {
                 Property
               </label>
               {confidence.property < 0.8 && (
-                <Badge variant="warning">Needs review</Badge>
+                <Badge variant="warning">⚠️ Needs review</Badge>
               )}
               {confidence.property >= 0.8 && (
                 <Badge variant="info">AI: {(confidence.property * 100).toFixed(0)}%</Badge>
@@ -392,7 +367,7 @@ export default function ReviewPage() {
               required
             >
               <option value="">Select property</option>
-              {options.properties.map((property) => (
+              {options?.properties.map((property) => (
                 <option key={property} value={property}>
                   {property}
                 </option>
@@ -407,7 +382,7 @@ export default function ReviewPage() {
                 Type of Operation {categoryError && <span className="text-red-500">*</span>}
               </label>
               {confidence.typeOfOperation < 0.8 && (
-                <Badge variant="warning">Needs review</Badge>
+                <Badge variant="warning">⚠️ Needs review</Badge>
               )}
               {confidence.typeOfOperation >= 0.8 && (
                 <Badge variant="info">AI: {(confidence.typeOfOperation * 100).toFixed(0)}%</Badge>
@@ -495,8 +470,8 @@ export default function ReviewPage() {
             )}
 
             {categoryError && (
-              <p className="mt-2 text-sm text-[#FF3366] font-medium">
-                Please select a specific category from the dropdown (not a header like &quot;EXPENSES&quot;)
+              <p className="mt-2 text-sm text-red-600 font-medium">
+                ⚠️ Please select a specific category from the dropdown (not a header like &quot;EXPENSES&quot;)
               </p>
             )}
           </div>
@@ -549,7 +524,7 @@ export default function ReviewPage() {
           {/* Debit and Credit Fields */}
           <div>
             <SectionHeading
-              icon="DollarSign"
+              icon="💰"
               title="Amount"
               subtitle="Enter debit (expense) or credit (income)"
             />
@@ -584,7 +559,7 @@ export default function ReviewPage() {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/upload')}
               className="flex-1"
             >
               Cancel
@@ -595,7 +570,7 @@ export default function ReviewPage() {
               isLoading={isSending}
               className="flex-1"
             >
-              {isSending ? 'Sending...' : 'Send to Sheet'}
+              {isSending ? 'Sending...' : 'Send'}
             </Button>
           </div>
         </form>

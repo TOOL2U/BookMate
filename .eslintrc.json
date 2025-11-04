@@ -1,4 +1,23 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "no-restricted-imports": ["error", {
+      "paths": [
+        {
+          "name": "@/config/options.json",
+          "message": "❌ DEPRECATED: Static config import blocked. Use getOptions() from '@/utils/getOptions' instead. See /config/README_DEPRECATION.md for migration guide."
+        },
+        {
+          "name": "@/config/live-dropdowns.json",
+          "message": "❌ DEPRECATED: Static config import blocked. Use getOptions() from '@/utils/getOptions' instead. See /config/README_DEPRECATION.md for migration guide."
+        }
+      ],
+      "patterns": [
+        {
+          "group": ["**/config/options.json", "**/config/live-dropdowns.json"],
+          "message": "❌ DEPRECATED: Static config import blocked. Use getOptions() from '@/utils/getOptions' instead."
+        }
+      ]
+    }]
+  }
 }
-

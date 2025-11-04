@@ -1,5 +1,10 @@
+/**
+ * Manual command parser for quick transaction entry
+ * 
+ * @deprecated Static config import - migrating to /api/options
+ */
+
 import { matchProperty, matchTypeOfOperation, matchTypeOfPayment } from './matchOption';
-import options from '@/config/options.json';
 
 /**
  * Parse result with confidence score and extracted data

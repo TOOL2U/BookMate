@@ -9,21 +9,34 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/options
  * 
- * Returns all dropdown options and payment type data.
- * Data is fetched directly from Google Sheets Lists!R:T for payment types with monthly values.
- * Other categories are read from config/live-dropdowns.json.
+ * Single source of truth for all dropdown options and analytics data.
+ * Data is fetched directly from Google Sheets (master Data sheet + Lists rollups).
  * 
- * Note: months are aligned using P&L E4:P4, not entire row 4.
+ * Returns DUAL format for backward compatibility and future analytics:
+ * - Plain string arrays (properties, typeOfOperation, typeOfPayment, revenueCategories) for dropdowns
+ * - Rich objects (propertiesRich, typeOfOperations, typeOfPayments, revenues) with monthly data
+ * 
+ * Month alignment uses P&L (DO NOT EDIT)!E4:P4.
+ * THB values parsed from ฿ 50,000 → 50000.
  * 
  * Response format:
  * {
  *   "ok": true,
  *   "data": {
- *     "properties": [...],
- *     "typeOfOperations": [...],
- *     "typeOfPayments": [{ name, monthly, yearTotal }, ...]
+ *     // Plain arrays for dropdowns (backward compat)
+ *     "properties": string[],
+ *     "typeOfOperation": string[],
+ *     "typeOfPayment": string[],
+ *     "revenueCategories": string[],
+ *     
+ *     // Rich objects for analytics
+ *     "propertiesRich": [{ name, monthly, yearTotal }, ...],
+ *     "typeOfOperations": [{ name, monthly, yearTotal }, ...],
+ *     "typeOfPayments": [{ name, monthly, yearTotal }, ...],
+ *     "revenues": [{ name, monthly, yearTotal }, ...]
  *   },
- *   "updatedAt": "2025-10-30T09:38:11.978Z"
+ *   "updatedAt": "2025-11-04T...",
+ *   "source": "google_sheets_lists+data"
  * }
  */
 export async function GET(request: NextRequest) {
@@ -56,9 +69,14 @@ export async function GET(request: NextRequest) {
     // Extract dropdown options for properties and operations (will be overwritten by Google Sheets if available)
     let properties = config.property || [];
     let typeOfOperations = config.typeOfOperation || [];
+    let normalizedPaymentTypeNames: string[] = [];
+    let normalizedRevenues: string[] = [];
 
     // Fetch payment types from Google Sheets (matching P&L formula structure)
     let typeOfPayments: any[] = [];
+    let propertiesRich: any[] = [];
+    let typeOfOperationsRich: any[] = [];
+    let revenuesRich: any[] = [];
     
     try {
       // Setup Google Sheets API
@@ -224,7 +242,7 @@ export async function GET(request: NextRequest) {
 
         // Normalize, dedupe, preserve order
         const seen = new Set<string>();
-        const normalizedPaymentTypeNames: string[] = [];
+        normalizedPaymentTypeNames = [];
         paymentTypeNames.forEach(n => {
           const name = n.trim();
           if (name && !seen.has(name)) {
@@ -247,7 +265,15 @@ export async function GET(request: NextRequest) {
         console.log(`[OPTIONS] Month headers:`, monthHeaders);
 
         // ========================================
-        // PARSE PAYMENT TYPES from Lists!R:S:T
+        // HELPER: Parse THB value (฿ 50,000 → 50000)
+        // ========================================
+        const parseTHB = (valueStr: any): number => {
+          if (typeof valueStr === 'number') return valueStr;
+          return parseFloat(String(valueStr || '').replace(/[^\d.-]/g, '')) || 0;
+        };
+
+        // ========================================
+        // BUILD RICH OBJECTS: Payments (Lists!R:S:T)
         // ========================================
         const paymentCatRows = listsPaymentCatRange?.values || [];
         const paymentMonthRows = listsPaymentMonthRange?.values || [];
@@ -265,7 +291,7 @@ export async function GET(request: NextRequest) {
         });
         
         // Populate values from Lists columns (R=Category, S=Month, T=Value)
-        const maxRows = Math.max(paymentCatRows.length, paymentMonthRows.length, paymentValueRows.length);
+        let maxRows = Math.max(paymentCatRows.length, paymentMonthRows.length, paymentValueRows.length);
         
         for (let i = 1; i < maxRows; i++) { // Skip header row
           const category = paymentCatRows[i]?.[0];
@@ -274,9 +300,7 @@ export async function GET(request: NextRequest) {
           
           if (!category || !month) continue;
           
-          const value = typeof valueStr === 'number'
-            ? valueStr
-            : parseFloat(String(valueStr || '').replace(/[^\d.-]/g, '')) || 0;
+          const value = parseTHB(valueStr);
           const payment = paymentMap.get(category);
           
           if (payment) {
@@ -297,7 +321,155 @@ export async function GET(request: NextRequest) {
         }
         
         console.log(`[OPTIONS] Built ${typeOfPayments.length} payment types with monthly data`);
-        console.log(`[OPTIONS] Sample:`, typeOfPayments[0]);
+
+        // ========================================
+        // BUILD RICH OBJECTS: Properties (Lists!M:N:O)
+        // ========================================
+        const propertyCatRows = listsPropertyCatRange?.values || [];
+        const propertyMonthRows = listsPropertyMonthRange?.values || [];
+        const propertyValueRows = listsPropertyValueRange?.values || [];
+        
+        const propertyRichMap = new Map<string, { name: string; monthly: number[]; yearTotal: number }>();
+        
+        // Initialize all properties with zero values
+        normalizedProperties.forEach(name => {
+          propertyRichMap.set(name, {
+            name,
+            monthly: new Array(12).fill(0),
+            yearTotal: 0
+          });
+        });
+        
+        maxRows = Math.max(propertyCatRows.length, propertyMonthRows.length, propertyValueRows.length);
+        
+        for (let i = 1; i < maxRows; i++) { // Skip header row
+          const category = propertyCatRows[i]?.[0];
+          const month = propertyMonthRows[i]?.[0];
+          const valueStr = propertyValueRows[i]?.[0];
+          
+          if (!category || !month) continue;
+          
+          const value = parseTHB(valueStr);
+          const property = propertyRichMap.get(category);
+          
+          if (property) {
+            const idx = monthIndexOf(month);
+            if (idx >= 0 && idx < 12) {
+              property.monthly[idx] = value;
+              property.yearTotal += value;
+            }
+          }
+        }
+        
+        propertiesRich = normalizedProperties.map(name => propertyRichMap.get(name)!);
+        console.log(`[OPTIONS] Built ${propertiesRich.length} properties with monthly data`);
+
+        // ========================================
+        // BUILD RICH OBJECTS: Operations (Lists!H:I:J for overhead)
+        // Note: This currently only includes overhead expenses from Lists!H:I:J
+        // Revenue operations would come from Lists!W:X:Y (handled separately below)
+        // ========================================
+        const overheadCatRows = listsOverheadCatRange?.values || [];
+        const overheadMonthRows = listsOverheadMonthRange?.values || [];
+        const overheadValueRows = listsOverheadValueRange?.values || [];
+        
+        const operationRichMap = new Map<string, { name: string; monthly: number[]; yearTotal: number }>();
+        
+        // Initialize all operations with zero values
+        normalizedOperations.forEach(name => {
+          operationRichMap.set(name, {
+            name,
+            monthly: new Array(12).fill(0),
+            yearTotal: 0
+          });
+        });
+        
+        maxRows = Math.max(overheadCatRows.length, overheadMonthRows.length, overheadValueRows.length);
+        
+        for (let i = 1; i < maxRows; i++) { // Skip header row
+          const category = overheadCatRows[i]?.[0];
+          const month = overheadMonthRows[i]?.[0];
+          const valueStr = overheadValueRows[i]?.[0];
+          
+          if (!category || !month) continue;
+          
+          const value = parseTHB(valueStr);
+          const operation = operationRichMap.get(category);
+          
+          if (operation) {
+            const idx = monthIndexOf(month);
+            if (idx >= 0 && idx < 12) {
+              operation.monthly[idx] = value;
+              operation.yearTotal += value;
+            }
+          }
+        }
+        
+        typeOfOperationsRich = normalizedOperations.map(name => operationRichMap.get(name)!);
+        console.log(`[OPTIONS] Built ${typeOfOperationsRich.length} operations with monthly data`);
+
+        // ========================================
+        // BUILD RICH OBJECTS: Revenues (Lists!W:X:Y)
+        // ========================================
+        const revenueCatRows = listsRevenueCatRange?.values || [];
+        const revenueMonthRows = listsRevenueMonthRange?.values || [];
+        const revenueValueRows = listsRevenueValueRange?.values || [];
+        
+        // Extract revenue category names from Data!A2:A
+        const revenueCategoryNames: string[] = [];
+        for (let i = 0; i < revenueRows.length; i++) {
+          const rawValue = revenueRows[i]?.[0];
+          const name = String(rawValue || '').trim();
+          if (name && !['REVENUES', 'Revenue'].includes(name)) {
+            revenueCategoryNames.push(name);
+          }
+        }
+        
+        // Normalize revenue categories
+        const seenRevenues = new Set<string>();
+        normalizedRevenues = [];
+        revenueCategoryNames.forEach(n => {
+          const name = String(n || '').trim();
+          if (name && !seenRevenues.has(name)) {
+            seenRevenues.add(name);
+            normalizedRevenues.push(name);
+          }
+        });
+        
+        const revenueRichMap = new Map<string, { name: string; monthly: number[]; yearTotal: number }>();
+        
+        // Initialize all revenues with zero values
+        normalizedRevenues.forEach(name => {
+          revenueRichMap.set(name, {
+            name,
+            monthly: new Array(12).fill(0),
+            yearTotal: 0
+          });
+        });
+        
+        maxRows = Math.max(revenueCatRows.length, revenueMonthRows.length, revenueValueRows.length);
+        
+        for (let i = 1; i < maxRows; i++) { // Skip header row
+          const category = revenueCatRows[i]?.[0];
+          const month = revenueMonthRows[i]?.[0];
+          const valueStr = revenueValueRows[i]?.[0];
+          
+          if (!category || !month) continue;
+          
+          const value = parseTHB(valueStr);
+          const revenue = revenueRichMap.get(category);
+          
+          if (revenue) {
+            const idx = monthIndexOf(month);
+            if (idx >= 0 && idx < 12) {
+              revenue.monthly[idx] = value;
+              revenue.yearTotal += value;
+            }
+          }
+        }
+        
+        revenuesRich = normalizedRevenues.map(name => revenueRichMap.get(name)!);
+        console.log(`[OPTIONS] Built ${revenuesRich.length} revenues with monthly data`);
       }
     } catch (error) {
       console.error('[OPTIONS] Error fetching payment types from Google Sheets:', error);
@@ -321,13 +493,22 @@ export async function GET(request: NextRequest) {
     // Get the last updated timestamp
     const updatedAt = new Date().toISOString();
 
-    // Build response
+    // Build dual-format response
+    // Plain string arrays for backward compatibility + Rich objects for analytics
     const response = {
       ok: true,
       data: {
+        // Plain string arrays for dropdowns (backward compatibility)
         properties,
-        typeOfOperations,
-        typeOfPayments
+        typeOfOperation: typeOfOperations,
+        typeOfPayment: normalizedPaymentTypeNames || typeOfPayments.map(p => p.name),
+        revenueCategories: normalizedRevenues || [],
+        
+        // Rich objects for analytics (P&L, Balance)
+        propertiesRich,
+        typeOfOperations: typeOfOperationsRich,
+        typeOfPayments,
+        revenues: revenuesRich
       },
       updatedAt,
       cached: false,
@@ -335,12 +516,14 @@ export async function GET(request: NextRequest) {
       metadata: {
         totalProperties: properties.length,
         totalOperations: typeOfOperations.length,
-        totalPayments: typeOfPayments.length
+        totalPayments: typeOfPayments.length,
+        totalRevenues: (normalizedRevenues || []).length
       }
     };
 
-    console.log('[OPTIONS] Successfully returned dropdown options');
-    console.log(`[OPTIONS] Properties: ${properties.length}, Operations: ${typeOfOperations.length}, Payments: ${typeOfPayments.length}`);
+    console.log('[OPTIONS] Successfully returned dropdown options (dual format)');
+    console.log(`[OPTIONS] Plain: Properties=${properties.length}, Operations=${typeOfOperations.length}, Payments=${typeOfPayments.length}, Revenues=${(normalizedRevenues || []).length}`);
+    console.log(`[OPTIONS] Rich: Properties=${propertiesRich.length}, Operations=${typeOfOperationsRich.length}, Payments=${typeOfPayments.length}, Revenues=${revenuesRich.length}`);
 
     return new NextResponse(JSON.stringify(response), {
       status: 200,
