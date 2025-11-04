@@ -144,14 +144,15 @@ export function matchProperty(input: string, comment?: string, options?: MatchOp
   let bestMatch = { value: 'Sia Moon - Land - General', confidence: 0.0, matched: false };
 
   // Priority shortcuts - exact matches for common property names
+  // IMPORTANT: Use FULL property names as they appear in Google Sheets dropdown
   const shortcuts: Record<string, string> = {
     'alesia': 'Alesia House',
     'lanna': 'Lanna House',
     'parents': 'Parents House',
     'sia': 'Sia Moon - Land - General',
     'sia moon': 'Sia Moon - Land - General',
-    'shaun': 'Shaun Ducker',
-    'maria': 'Maria Ren',
+    'shaun': 'Shaun Ducker - Personal',
+    'maria': 'Maria Ren - Personal',
     'family': 'Family'
   };
 

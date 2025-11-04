@@ -142,9 +142,10 @@ function extractProperty(input: string): string | null {
     const words = lowerInput.split(/[\s\-,]+/); // Split by space, dash, or comma
 
     // Check for exact word matches first (highest priority)
+    // IMPORTANT: Use FULL property names as they appear in Google Sheets
     if (words.includes('family')) finalResult = 'Family';
-    else if (words.includes('shaun')) finalResult = 'Shaun Ducker';
-    else if (words.includes('maria')) finalResult = 'Maria Ren';
+    else if (words.includes('shaun')) finalResult = 'Shaun Ducker - Personal';
+    else if (words.includes('maria')) finalResult = 'Maria Ren - Personal';
     else if (words.includes('alesia')) finalResult = 'Alesia House';
     else if (words.includes('lanna')) finalResult = 'Lanna House';
     else if (words.includes('parents') || words.includes('parent')) finalResult = 'Parents House';
