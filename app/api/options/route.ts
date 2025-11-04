@@ -98,6 +98,11 @@ export async function GET(request: NextRequest) {
 
         console.log('[OPTIONS] Fetching all data from Google Sheets...');
         
+        // Add cache-busting timestamp to force fresh data from Google Sheets API
+        // Google Sheets API caches responses for 5-10 minutes, this bypasses that cache
+        const cacheBuster = Date.now();
+        console.log(`[OPTIONS] Cache-bust timestamp: ${cacheBuster}`);
+        
         // Fetch all required ranges in a single batch request
         // This matches the P&L sheet structure and Lists data blocks
         const batchResponse = await sheets.spreadsheets.values.batchGet({
@@ -133,6 +138,13 @@ export async function GET(request: NextRequest) {
             // Month headers from P&L sheet
             "'P&L (DO NOT EDIT)'!E4:P4"  // Only columns E to P on row 4 (month headers)
           ]
+        }, {
+          // Add headers to bypass Google Sheets API cache
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'X-Cache-Bust': cacheBuster.toString(),
+          }
         });
 
         const valueRanges = batchResponse.data.valueRanges || [];
