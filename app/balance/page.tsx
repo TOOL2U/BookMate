@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminShell from '@/components/layout/AdminShell';
 import { Wallet, TrendingUp, TrendingDown, Clock, AlertTriangle, RefreshCw, Upload, Plus, CheckCircle, XCircle, Zap, Edit3, Camera, Banknote, Building2, Save } from 'lucide-react';
 
@@ -22,7 +22,7 @@ interface NewBalanceEntry {
   note?: string;
 }
 
-export default function BalanceAnalyticsPage() {
+function BalanceAnalyticsPage() {
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string>('');
@@ -51,26 +51,24 @@ export default function BalanceAnalyticsPage() {
         setAvailableBanks(bankNames);
       }
 
-      // Use the running balance endpoint that tracks expenses
-      const res = await fetch('/api/balance/by-property', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
+      // 🆕 USE UNIFIED BALANCE API (reads from Balance Summary tab)
+      const res = await fetch('/api/balance?month=ALL');
       const data = await res.json();
 
-      if (data.ok && data.propertyBalances) {
-        // Map propertyBalances to Balance format
-        const balancesArray = data.propertyBalances.map((pb: any) => ({
-          bankName: pb.property,
-          balance: pb.balance || pb.uploadedBalance,
-          uploadedBalance: pb.uploadedBalance,
-          uploadedDate: pb.uploadedDate,
-          totalRevenue: pb.totalRevenue,
-          totalExpense: pb.totalExpense,
-          transactionCount: pb.transactionCount,
-          variance: pb.variance,
-          timestamp: pb.uploadedDate
+      if (data.ok && data.data) {
+        console.log('📊 Balance data source:', data.source); // Will show "BalanceSummary" or "Computed"
+        
+        // Map unified API format to Balance format
+        const balancesArray = data.data.map((account: any) => ({
+          bankName: account.accountName,
+          balance: account.currentBalance,
+          uploadedBalance: account.openingBalance,
+          uploadedDate: account.lastTxnAt || '',
+          totalRevenue: account.inflow,
+          totalExpense: account.outflow,
+          transactionCount: 0, // Not provided by unified API
+          variance: account.netChange,
+          timestamp: account.lastTxnAt || new Date().toISOString()
         }));
         setBalances(balancesArray);
         setLastUpdated(new Date().toLocaleString());
@@ -861,3 +859,5 @@ export default function BalanceAnalyticsPage() {
     </AdminShell>
   );
 }
+
+export default React.memo(BalanceAnalyticsPage);

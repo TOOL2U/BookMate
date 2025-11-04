@@ -1,6 +1,6 @@
 /**
  * Google Apps Script - BookMate Webhook + Dynamic P&L + Inbox + Balance Management
- * Version 8.4 (V8)
+ * Version 8.5 (V8.5)
  *
  * DEPLOYMENT INSTRUCTIONS:
  * 1. Open your Google Sheet → Extensions → Apps Script
@@ -8,9 +8,15 @@
  * 3. COPY this ENTIRE file and PASTE it
  * 4. Click Save (💾)
  * 5. Click Deploy → Manage deployments → Edit → New version
- * 6. Description: "V8 - Fixed balance tracking + P&L sheet name"
+ * 6. Description: "V8.5 - Transfer operation + Property optional for expenses"
  * 7. Click Deploy
  * 8. The URL stays the same - no need to update environment variables!
+ *
+ * NEW IN V8.5 (Phase 5 Mobile Integration):
+ * ✨ Property field now OPTIONAL for expense and transfer transactions
+ * ✨ Property field still REQUIRED for revenue transactions
+ * ✨ Support for "Transfer - Internal" operation type
+ * ✨ Better validation messages for mobile app integration
  *
  * CRITICAL FIXES IN V8:
  * 🐛 Fixed balance tracking bug - balances now save/load correctly (bankName + balance format)
@@ -467,12 +473,19 @@ function handleWebhook(payload) {
   try {
     delete payload.secret;
 
-    const requiredFields = ['day', 'month', 'year', 'property', 'typeOfOperation', 'typeOfPayment', 'detail'];
+    // Make property optional for expenses and transfers (V8.5 change)
+    const requiredFields = ['day', 'month', 'year', 'typeOfOperation', 'typeOfPayment', 'detail'];
     const missingFields = requiredFields.filter(function(field) { return !payload[field]; });
 
     if (missingFields.length > 0) {
       Logger.log('ERROR: Missing fields: ' + missingFields.join(', '));
       return createErrorResponse('Missing required fields: ' + missingFields.join(', '));
+    }
+
+    // Property is required only for revenue transactions
+    if (!payload.property && payload.typeOfOperation && payload.typeOfOperation.indexOf('Revenue') === 0) {
+      Logger.log('ERROR: Property is required for revenue transactions');
+      return createErrorResponse('Property is required for revenue transactions');
     }
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
@@ -860,8 +873,9 @@ function handleGetPropertyPersonDetails(period) {
 // ============================================================================
 /**
  * Get overhead expenses details for month or year
- * Extracts 24 expense categories from rows 29-52 of P&L sheet
- * Updated 2025-10-30: Added row 52 for new expense category
+ * Reads ALL expense categories from Data!B2:B (categories starting with "EXP -")
+ * Matches them with values from P&L sheet for the specified period
+ * Updated 2025-11-04: Now reads from Data sheet to include all 28+ categories
  *
  * @param {string} period - 'month' or 'year'
  * @returns {ContentService.TextOutput} JSON response with expense data
@@ -876,21 +890,30 @@ function handleGetOverheadExpensesDetails(period) {
     }
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName("P&L (DO NOT EDIT)");
+    const pnlSheet = ss.getSheetByName("P&L (DO NOT EDIT)");
+    const dataSheet = ss.getSheetByName("Data");
 
-    if (!sheet) {
+    if (!pnlSheet) {
       return createErrorResponse('P&L sheet not found. Looking for: "P&L (DO NOT EDIT)"');
     }
-
-    // Overhead expenses are in rows 31-58 (28 rows), column A
-    // Updated 2025-10-30: Row range shifted due to P&L structure change
-    const startRow = 31;
-    const endRow = 58;  // Updated from 57 to 58
-    const numRows = endRow - startRow + 1; // 28 rows
     
-    // Get expense names (column A)
-    const namesRange = sheet.getRange("A" + startRow + ":A" + endRow);
-    const names = namesRange.getValues();
+    if (!dataSheet) {
+      return createErrorResponse('Data sheet not found.');
+    }
+
+    // Get ALL expense categories from Data!B2:B (overhead/expense categories)
+    // This ensures we include all categories, not just those in P&L sheet
+    // Updated: Now includes both "EXP -" and "Exp -" (case-insensitive)
+    const dataRange = dataSheet.getRange("B2:B100");  // Read up to row 100
+    const allCategories = dataRange.getValues()
+      .map(function(row) { return row[0]; })
+      .filter(function(val) { 
+        if (!val) return false;
+        const str = val.toString().trim();
+        return str.indexOf('EXP -') === 0 || str.indexOf('Exp -') === 0;
+      });
+    
+    Logger.log('Found ' + allCategories.length + ' expense categories from Data sheet');
     
     // Determine which column to use based on period
     let valueColumn;
@@ -898,7 +921,7 @@ function handleGetOverheadExpensesDetails(period) {
       // Find current month column dynamically
       const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"];
       const currentMonth = months[new Date().getMonth()];
-      const headerRow = sheet.getRange("A4:Z4").getValues()[0];
+      const headerRow = pnlSheet.getRange("A4:Z4").getValues()[0];
       
       let monthColumnIndex = null;
       for (let i = 0; i < headerRow.length; i++) {
@@ -919,25 +942,38 @@ function handleGetOverheadExpensesDetails(period) {
       Logger.log('Using year column: Q');
     }
     
-    const valueRange = sheet.getRange(valueColumn + startRow + ":" + valueColumn + endRow);
-    const values = valueRange.getValues();
+    // Get ALL rows from P&L sheet column A to find matching categories
+    const pnlNamesRange = pnlSheet.getRange("A1:A100");
+    const pnlNames = pnlNamesRange.getValues();
     
-    // Build the data array
+    // Build the data array by matching categories from Data sheet with values from P&L sheet
     const data = [];
     let totalExpense = 0;
     
-    for (let i = 0; i < numRows; i++) {
-      const name = names[i][0];
-      const expense = parseFloat(values[i][0]) || 0;
+    for (let i = 0; i < allCategories.length; i++) {
+      const categoryName = allCategories[i].toString().trim();
       
-      // Only include rows that start with "EXP -"
-      if (name && name.toString().trim().indexOf('EXP -') === 0) {
-        data.push({
-          name: name.toString().trim(),
-          expense: expense
-        });
-        totalExpense += expense;
+      // Find this category in P&L sheet column A
+      let pnlRowIndex = -1;
+      for (let j = 0; j < pnlNames.length; j++) {
+        if (pnlNames[j][0] && pnlNames[j][0].toString().trim() === categoryName) {
+          pnlRowIndex = j + 1; // Convert to 1-based row number
+          break;
+        }
       }
+      
+      // Get the expense value from P&L sheet (or 0 if not found)
+      let expense = 0;
+      if (pnlRowIndex > 0) {
+        const cellValue = pnlSheet.getRange(valueColumn + pnlRowIndex).getValue();
+        expense = parseFloat(cellValue) || 0;
+      }
+      
+      data.push({
+        name: categoryName,
+        expense: expense
+      });
+      totalExpense += expense;
     }
     
     // Calculate percentages
@@ -960,7 +996,7 @@ function handleGetOverheadExpensesDetails(period) {
         totalExpense: totalExpense,
         column: valueColumn,
         count: data.length,
-        range: 'A' + startRow + ':' + valueColumn + endRow,
+        source: 'Data sheet (all EXP - categories)',
         timestamp: new Date().toISOString()
       }))
       .setMimeType(ContentService.MimeType.JSON);

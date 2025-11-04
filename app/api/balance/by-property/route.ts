@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchInboxData } from '@/app/api/inbox/inbox-utils';
 import { google } from 'googleapis';
 import path from 'path';
 
 /**
- * Running Balance Calculation
+ * ⚠️ DEPRECATED - Use /api/balance instead
+ * 
+ * This endpoint is deprecated in favor of the unified balance system.
+ * 
+ * Migration Guide:
+ * - OLD: POST /api/balance/by-property
+ * - NEW: GET /api/balance?month=ALL
+ * 
+ * The new endpoint:
+ * - Reads from Balance Summary tab (auto-updated by Apps Script)
+ * - No manual balance uploads needed
+ * - Supports month filtering
+ * - Returns same data structure
+ * 
+ * This endpoint will be removed in a future version.
+ * 
+ * @deprecated Use GET /api/balance instead
+ */
+
+/**
+ * Running Balance Calculation (LEGACY)
  *
  * This endpoint calculates the current balance for each bank/cash account by:
  * 1. Getting the last uploaded balance from "Bank & Cash Balance" sheet
@@ -57,9 +76,8 @@ const CACHE_TTL = 30 * 1000; // 30 seconds
 
 /**
  * Clear the cache (called when balances are updated)
- * Note: Not exported to comply with Next.js API route requirements
  */
-function clearPropertyBalanceCache() {
+export function clearPropertyBalanceCache() {
   propertyBalanceCache = null;
   console.log('🗑️ Property balance cache cleared');
 }
@@ -125,19 +143,26 @@ async function fetchUploadedBalances(): Promise<Map<string, UploadedBalance>> {
  */
 async function fetchTransactions(): Promise<Transaction[]> {
   try {
-    console.log('  → Fetching transactions directly from inbox module...');
-    
-    // Call the inbox function directly (avoids HTTP overhead and auth issues)
-    const data = await fetchInboxData();
-    
-    console.log('  ✓ Fetched', data?.length || 0, 'transactions');
-    return data || [];
+    // Call the inbox API to get all transactions
+    // Use BASE_URL for server-side API calls (NEXT_PUBLIC_* vars are for client-side only)
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
+    console.log('  → Fetching from URL:', `${baseUrl}/api/inbox`);
+    console.log('  → BASE_URL env var:', process.env.BASE_URL);
+
+    const response = await fetch(`${baseUrl}/api/inbox`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch transactions');
+    }
+
+    const data = await response.json();
+    console.log('  ✓ Fetched', data.data?.length || 0, 'transactions');
+    return data.data || [];
   } catch (error) {
     console.error('Error fetching transactions:', error);
-    if (error instanceof Error) {
-      console.error('  → Error message:', error.message);
-      console.error('  → Error stack:', error.stack);
-    }
     throw error;
   }
 }
@@ -241,6 +266,9 @@ export async function POST(request: NextRequest) {
     const response = {
       ok: true,
       success: true,
+      deprecated: true,
+      deprecationMessage: "⚠️ This endpoint is deprecated. Use GET /api/balance?month=ALL instead.",
+      migrationGuide: "https://github.com/TOOL2U/BookMate/blob/main/WEBAPP_UPDATED_TO_UNIFIED_BALANCE.md",
       propertyBalances,
       summary: {
         totalBalance: totalCurrentBalance,
@@ -251,6 +279,10 @@ export async function POST(request: NextRequest) {
       },
       timestamp: new Date().toISOString(),
     };
+
+    // Log deprecation warning
+    console.warn('⚠️ DEPRECATED: /api/balance/by-property called. Use /api/balance instead.');
+
 
     // Cache the response
     propertyBalanceCache = {

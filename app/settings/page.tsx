@@ -43,7 +43,21 @@ export default function SettingsPage() {
       const result = await res.json();
 
       if (result.ok && result.data) {
-        setData(result.data);
+        // Convert typeOfPayments from objects to strings if needed
+        const typeOfPayments = result.data.typeOfPayments?.map((payment: any) =>
+          typeof payment === 'string' ? payment : payment.name
+        ) || [];
+        
+        // Convert typeOfOperations from objects to strings if needed  
+        const typeOfOperations = result.data.typeOfOperations?.map((operation: any) =>
+          typeof operation === 'string' ? operation : operation.name
+        ) || [];
+        
+        setData({
+          properties: result.data.properties || [],
+          typeOfOperations,
+          typeOfPayments
+        });
         setLastUpdated(result.updatedAt ? new Date(result.updatedAt).toLocaleString() : '');
       }
     } catch (error) {

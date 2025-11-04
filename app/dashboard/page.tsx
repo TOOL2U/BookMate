@@ -61,25 +61,22 @@ export default function DashboardPage() {
       const pnlRes = await fetch('/api/pnl');
       const pnlData = await pnlRes.json();
 
-      // Fetch balances - USE RUNNING BALANCE ENDPOINT (same as Balance page)
-      const balanceRes = await fetch('/api/balance/by-property', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
+      // 🆕 Fetch balances - USE UNIFIED BALANCE API (reads from Balance Summary tab)
+      const balanceRes = await fetch('/api/balance?month=ALL');
       const balanceData = await balanceRes.json();
 
       // Fetch recent inbox items
       const inboxRes = await fetch('/api/inbox');
       const inboxData = await inboxRes.json();
 
-      // Process balance data - Map from propertyBalances to Balance format
+      // Process balance data - Map from unified API to Balance format
       let balancesArray: Balance[] = [];
-      if (balanceData.ok && balanceData.propertyBalances) {
-        balancesArray = balanceData.propertyBalances.map((pb: any) => ({
-          bankName: pb.property,
-          balance: pb.balance, // Use calculated running balance (uploaded + revenue - expenses)
-          timestamp: pb.uploadedDate
+      if (balanceData.ok && balanceData.data) {
+        console.log('📊 Dashboard balance source:', balanceData.source); // Will show "BalanceSummary" or "Computed"
+        balancesArray = balanceData.data.map((account: any) => ({
+          bankName: account.accountName,
+          balance: account.currentBalance,
+          timestamp: account.lastTxnAt || new Date().toISOString()
         }));
       }
 

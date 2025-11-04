@@ -1,7 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * In-memory cache for balance data
+ * ⚠️ DEPRECATED - Use /api/balance i    const data = await response.json();
+
+    if (!data.ok) {
+      return NextResponse.json(
+        { error: data.error || 'Failed to fetch balance' },
+        { status: 500 }
+      );
+    }
+
+    // Add deprecation warning to response
+    const responseData = {
+      ...data,
+      deprecated: true,
+      deprecationMessage: "⚠️ This endpoint is deprecated. Use GET /api/balance?month=ALL instead.",
+      migrationGuide: "https://github.com/TOOL2U/BookMate/blob/main/WEBAPP_UPDATED_TO_UNIFIED_BALANCE.md",
+    };
+
+    // Log deprecation warning
+    console.warn('⚠️ DEPRECATED: /api/balance/get called. Use /api/balance instead.');
+
+    // Cache the response
+    balanceCache = {
+      data: responseData,
+      timestamp: now
+    };
+
+    return NextResponse.json(responseData);is endpoint is deprecated in favor of the unified balance system.
+ * 
+ * Migration Guide:
+ * - OLD: POST /api/balance/get (calls Google Apps Script webhook)
+ * - NEW: GET /api/balance?month=ALL (reads from Balance Summary tab)
+ * 
+ * The new endpoint:
+ * - Reads directly from Balance Summary tab (auto-updated by Apps Script)
+ * - Faster response time (no webhook calls)
+ * - More reliable (no Apps Script HTTP redirects)
+ * - Supports month filtering
+ * 
+ * This endpoint will be removed in a future version.
+ * 
+ * @deprecated Use GET /api/balance instead
+ */
+
+/**
+ * In-memory cache for balance data (LEGACY)
  */
 interface CachedBalance {
   data: any;
@@ -13,9 +57,8 @@ const CACHE_TTL = 30 * 1000; // 30 seconds
 
 /**
  * Clear the cache (called when balances are updated)
- * Note: Not exported because Next.js API routes only allow specific exports
  */
-function clearBalanceGetCache() {
+export function clearBalanceGetCache() {
   balanceCache = null;
   console.log('🗑️ Balance get cache cleared');
 }

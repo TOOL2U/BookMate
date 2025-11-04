@@ -1,0 +1,61 @@
+// Firestore Security Rules - MVP TESTING MODE
+// ============================================================================
+// ⚠️  WARNING: OPEN ACCESS - FOR TESTING ONLY
+// ============================================================================
+// These rules allow ANYONE to read/write ALL documents.
+// This is intentional for MVP testing and mobile team integration.
+// 
+// TODO: Before production, replace with secure rules based on Firebase Auth
+// ============================================================================
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow all read and write operations for testing
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+
+// ============================================================================
+// FUTURE SECURE RULES (commented out for now)
+// ============================================================================
+// Uncomment and customize these when Firebase Auth is implemented
+//
+// rules_version = '2';
+// service cloud.firestore {
+//   match /databases/{database}/documents {
+//     
+//     function isAuthenticated() {
+//       return request.auth != null;
+//     }
+//     
+//     function isAdmin() {
+//       return request.auth != null && 
+//              request.auth.token.admin == true;
+//     }
+//     
+//     match /balances/{accountName} {
+//       allow read: if isAuthenticated();
+//       allow write: if isAdmin();
+//     }
+//     
+//     match /transactions/{txnId} {
+//       allow read: if isAuthenticated();
+//       allow write: if isAdmin();
+//     }
+//     
+//     match /activityLogs/{logId} {
+//       allow read: if isAuthenticated();
+//       allow create: if isAuthenticated();
+//       allow update, delete: if isAdmin();
+//     }
+//     
+//     match /aiChecks/{checkId} {
+//       allow read: if isAuthenticated();
+//       allow write: if isAdmin();
+//     }
+//   }
+// }
