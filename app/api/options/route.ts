@@ -79,12 +79,13 @@ export async function GET(request: NextRequest) {
     let revenuesRich: any[] = [];
     
     try {
-      // Setup Google Sheets API
-      const credentialsPath = path.join(process.cwd(), 'config', 'google-credentials.json');
-      if (!fs.existsSync(credentialsPath)) {
-        console.warn('[OPTIONS] google-credentials.json not found; falling back to config-only for payments');
+      // Setup Google Sheets API using environment variable (works in both local and production)
+      const credentialsJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+      
+      if (!credentialsJson) {
+        console.warn('[OPTIONS] GOOGLE_SERVICE_ACCOUNT_KEY not found; falling back to config-only for payments');
       } else {
-        const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+        const credentials = JSON.parse(credentialsJson);
         const auth = new google.auth.GoogleAuth({
           credentials,
           scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
