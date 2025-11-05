@@ -1,6 +1,4 @@
-// Force Node.js runtime (not Edge)
 export const runtime = 'nodejs';
-
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 
@@ -14,10 +12,9 @@ export async function GET() {
     const sheets = google.sheets({ version: 'v4', auth });
     const res = await sheets.spreadsheets.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      includeGridData: false,
     });
     return NextResponse.json({ ok: true, title: res.data.properties?.title });
   } catch (e: any) {
-    return NextResponse.json({ ok: false, message: e?.message }, { status: 500 });
+    return NextResponse.json({ ok: false, error: e.message }, { status: 500 });
   }
 }
