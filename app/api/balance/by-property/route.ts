@@ -100,6 +100,11 @@ async function fetchUploadedBalances(): Promise<Map<string, UploadedBalance>> {
     }
 
     const credentials = JSON.parse(credentialsJson);
+    
+    // Fix escaped newlines in private_key (\\n -> \n)
+    if (credentials.private_key) {
+      credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+    }
 
     const auth = new google.auth.GoogleAuth({
       credentials,
