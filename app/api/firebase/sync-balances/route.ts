@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     // Fetch balances from webapp API (which gets from Google Sheets)
     const baseUrl = process.env.BASE_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const apiUrl = `${baseUrl}/api/balance/by-property`;
+    const apiUrl = `${baseUrl}/api/balance?month=ALL`;
     
     console.log(`📡 Fetching from: ${apiUrl}`);
 
@@ -39,31 +39,36 @@ export async function POST(request: Request) {
 
     const data = await response.json();
 
-    if (!data.propertyBalances || !Array.isArray(data.propertyBalances)) {
+    if (!data.items || !Array.isArray(data.items)) {
       return NextResponse.json({
         ok: false,
-        error: 'No property balances found in API response'
+        error: 'No balance items found in API response'
       }, { status: 400 });
     }
 
-    console.log(`📊 Found ${data.propertyBalances.length} property balances`);
+    console.log(`📊 Found ${data.items.length} balance accounts`);
 
     // Batch write to Firestore
     const adminDb = getAdminDb();
     const batch = adminDb.batch();
     let updateCount = 0;
 
-    for (const balance of data.propertyBalances) {
-      if (!balance.property) {
-        console.warn('⚠️ Skipping balance with no property name');
+    for (const account of data.items) {
+      if (!account.accountName) {
+        console.warn('⚠️ Skipping account with no name');
         continue;
       }
 
-      const docRef = adminDb.collection('balances').doc(balance.property);
+      const docRef = adminDb.collection('balances').doc(account.accountName);
 
       batch.set(docRef, {
-        accountName: balance.property,
-        currentBalance: balance.balance || 0,
+        accountName: account.accountName,
+        currentBalance: account.currentBalance || 0,
+        openingBalance: account.openingBalance || 0,
+        netChange: account.netChange || 0,
+        inflow: account.inflow || 0,
+        outflow: account.outflow || 0,
+        lastTxnAt: account.lastTxnAt || null,
         currency: 'THB',
         updatedAt: new Date().toISOString(),
         lastSyncedBy: 'api',
