@@ -1,0 +1,114 @@
+# 📱 Phase 2 - Quick Reference Card
+
+## 🎯 What's New?
+
+### Balance Screen
+- 🤖 **AI Check Button** - Run consistency analysis
+- 🏷️ **Drift Badges** - OK/WARN/FAIL on each account
+- 🚨 **Alert Banner** - Red banner for critical drift
+- 📊 **Details Modal** - Tap badge for full breakdown
+
+### Activity Tab (NEW)
+- �� **Activity Feed** - Real-time transaction log
+- 🔍 **Filters** - All/Transfers/Revenue/Expenses
+- ♾️ **Infinite Scroll** - Load more as you scroll
+- 🔄 **Pull to Refresh** - Update the feed
+
+## 🚀 Quick Start
+
+```bash
+# Check server status
+pm2 list
+
+# Get tunnel URL
+pm2 logs 0 --lines 20 | grep "exp://"
+
+# Run quick test
+./test-phase2.sh
+```
+
+## 🧪 Testing (Before API Deploy)
+
+Edit `src/services/api.ts`:
+```typescript
+import { 
+  MOCK_CONSISTENCY_WITH_FAILURES,
+  MOCK_ACTIVITY_PAGE_1 
+} from '../../test-phase2-mock-data';
+
+// In checkBalanceConsistency:
+return MOCK_CONSISTENCY_WITH_FAILURES;
+
+// In getActivityLog:
+return { ok: true, ...MOCK_ACTIVITY_PAGE_1 };
+```
+
+## 📋 Status Indicators
+
+| Badge | Status | Color | Meaning |
+|-------|--------|-------|---------|
+| ✓ | OK | Green | Perfect alignment |
+| ⚠ | WARN | Yellow | Minor drift (<฿100) |
+| ✕ | FAIL | Red | Critical drift (>฿100) |
+
+## 🔑 Feature Flags
+
+In `App.tsx`:
+```typescript
+USE_NEW_BALANCE_SCREEN = true   // Phase 1
+ENABLE_ACTIVITY_FEED = true     // Phase 2
+```
+
+## 📁 Key Files
+
+| File | Purpose |
+|------|---------|
+| `NewBalanceScreen.tsx` | Balance with drift badges |
+| `ActivityScreen.tsx` | Activity feed |
+| `DriftBadge.tsx` | Status badge component |
+| `DriftDetailsModal.tsx` | Drift breakdown |
+| `AlertBanner.tsx` | Alert notifications |
+| `consistencyCache.ts` | Offline caching |
+| `test-phase2-mock-data.js` | Test data |
+
+## 🎨 Color Scheme
+
+```
+Primary:   #00D9FF (Cyan)
+Success:   #00FF88 (Green)
+Warning:   #FFB800 (Yellow)
+Error:     #FF3366 (Red)
+Background: #000000 (Black)
+Card:      #1A1A1A (Dark Gray)
+```
+
+## 🐛 Known Issues
+
+1. **@expo/vector-icons warning** - Harmless TypeScript issue
+2. **APIs not deployed** - Use mock data for now
+3. **Payment validation** - "Cash - Family" may fail
+
+## ✅ Ready When...
+
+- [ ] APIs deployed by webapp team
+- [ ] Tested with mock data
+- [ ] Tested on real device
+- [ ] No console errors
+- [ ] UI looks good
+
+## 📚 Full Docs
+
+- `PHASE_2_COMPLETE.md` - Overview
+- `PHASE_2_TESTING_GUIDE.md` - Testing
+- `INTEGRATION_COMPLETE_SUMMARY.md` - Full details
+
+## 🎯 Current Status
+
+**Implementation:** ✅ 100% Complete  
+**Testing:** ⏳ Awaiting mock testing  
+**APIs:** ⏳ Awaiting deployment  
+**Deployment:** 🚀 Ready when APIs live
+
+---
+
+**Need Help?** See the detailed guides above! 📖
