@@ -86,6 +86,10 @@ export async function GET(request: NextRequest) {
         console.warn('[OPTIONS] GOOGLE_SERVICE_ACCOUNT_KEY not found; falling back to config-only for payments');
       } else {
         const credentials = JSON.parse(credentialsJson);
+        // Fix escaped newlines in private_key (\\n -> \n)
+        if (credentials.private_key) {
+          credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+        }
         const auth = new google.auth.GoogleAuth({
           credentials,
           scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
