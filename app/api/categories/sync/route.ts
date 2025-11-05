@@ -1,3 +1,6 @@
+// Force Node.js runtime for Google Sheets API
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -6,29 +9,9 @@ import { google } from 'googleapis';
 /**
  * POST /api/categories/sync
  * Sync local category changes back to Google Sheets
- * 
- * NOTE: This feature is not available in production (Vercel).
- * Category changes should be made directly in Google Sheets.
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('[SYNC] Category sync requested');
-
-    // Check if we're in a serverless environment (Vercel)
-    const isServerless = !fs.existsSync(path.join(process.cwd(), 'config'));
-
-    if (isServerless) {
-      console.log('[SYNC] Running in serverless environment - sync not available');
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Category sync is not available in production. Please update categories directly in your Google Sheet.',
-          message: 'To update categories:\n1. Open your Google Sheet\n2. Navigate to the FORM LOOKUP sheet\n3. Update the category columns\n4. Changes will be automatically picked up by the app'
-        },
-        { status: 400 }
-      );
-    }
-
     console.log('[SYNC] Starting category sync to Google Sheets...');
 
     // Read current config
@@ -72,46 +55,32 @@ export async function POST(request: NextRequest) {
     const ranges = config.ranges || {};
     const updates: any[] = [];
 
-    // Helper function to calculate dynamic range based on data length
-    const calculateRange = (baseRange: string, itemCount: number) => {
-      // Extract sheet name and starting cell (e.g., "Data!A38:A43" -> "Data", "A38")
-      const [sheet, cellRange] = baseRange.split('!');
-      const [startCell] = cellRange.split(':');
-      const column = startCell.replace(/[0-9]/g, ''); // Extract column letter
-      const startRow = parseInt(startCell.replace(/[A-Z]/g, '')); // Extract starting row
-      const endRow = startRow + itemCount - 1;
-      return `${sheet}!${column}${startRow}:${column}${endRow}`;
-    };
-
     // Prepare updates for each category type
     if (config.property && ranges.property) {
       const propertyValues = config.property.map((item: string) => [item]);
-      const dynamicRange = calculateRange(ranges.property, propertyValues.length);
       updates.push({
-        range: dynamicRange,
+        range: ranges.property,
         values: propertyValues
       });
-      console.log(`[SYNC] Prepared ${propertyValues.length} properties for sync to ${dynamicRange}`);
+      console.log(`[SYNC] Prepared ${propertyValues.length} properties for sync`);
     }
 
     if (config.typeOfOperation && ranges.typeOfOperation) {
       const operationValues = config.typeOfOperation.map((item: string) => [item]);
-      const dynamicRange = calculateRange(ranges.typeOfOperation, operationValues.length);
       updates.push({
-        range: dynamicRange,
+        range: ranges.typeOfOperation,
         values: operationValues
       });
-      console.log(`[SYNC] Prepared ${operationValues.length} operations for sync to ${dynamicRange}`);
+      console.log(`[SYNC] Prepared ${operationValues.length} operations for sync`);
     }
 
     if (config.typeOfPayment && ranges.typeOfPayment) {
       const paymentValues = config.typeOfPayment.map((item: string) => [item]);
-      const dynamicRange = calculateRange(ranges.typeOfPayment, paymentValues.length);
       updates.push({
-        range: dynamicRange,
+        range: ranges.typeOfPayment,
         values: paymentValues
       });
-      console.log(`[SYNC] Prepared ${paymentValues.length} payments for sync to ${dynamicRange}`);
+      console.log(`[SYNC] Prepared ${paymentValues.length} payments for sync`);
     }
 
     if (updates.length === 0) {

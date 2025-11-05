@@ -1,3 +1,6 @@
+// Force Node.js runtime for Google Sheets API
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import path from 'path';

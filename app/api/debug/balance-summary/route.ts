@@ -1,3 +1,6 @@
+// Force Node.js runtime for Google Sheets API
+export const runtime = 'nodejs';
+
 /**
  * GET /api/debug/balance-summary
  * 
