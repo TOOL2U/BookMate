@@ -1,66 +1,85 @@
-# 📱 Mobile App - Balance API Quick Reference Card
+# 📱 Mobile App - Quick Reference Card
 
-**Production URL**: `https://accounting-buddy-74d39irgs-tool2us-projects.vercel.app`
+**Last Updated:** November 5, 2025  
+**Production:** https://accounting.siamoon.com
 
 ---
 
-## 🎯 Balance Endpoint
+## 🚨 CRITICAL CHANGE
 
-```
-POST /api/balance/by-property
+### Balance API Response Structure
+
+**Before:**
+```json
+{ "ok": true, "data": [...] }
 ```
 
-### Request:
+**Now:**
+```json
+{ "ok": true, "items": [...], "totals": {...} }
+```
+
+**Fix:**
 ```javascript
-fetch('https://accounting-buddy-74d39irgs-tool2us-projects.vercel.app/api/balance/by-property', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({})
-})
-```
+// Change this line:
+const accounts = response.data;  // ❌ OLD
 
-### Response:
-```javascript
-{
-  propertyBalances: [
-    {
-      property: "Bank Transfer - Bangkok Bank - Shaun Ducker",
-      balance: 100,              // ← USE THIS
-      uploadedBalance: 200,
-      totalRevenue: 0,
-      totalExpense: 100,
-      transactionCount: 1
-    }
-  ],
-  summary: {
-    totalBalance: 100
-  }
-}
+// To this:
+const accounts = response.items; // ✅ NEW
 ```
 
 ---
 
-## 💡 Key Points
+## 🎯 Main API Endpoints
 
-1. **Use** `balance` field (not `uploadedBalance`)
-2. **Auto-updates** as transactions are added
-3. **Formula**: `balance = uploadedBalance + revenue - expenses`
-4. **Cache**: 30 seconds
-5. **CORS**: Enabled ✅
+### Get Balances
+```
+GET https://accounting.siamoon.com/api/balance?month=ALL
+```
+**Response:** `{ ok, items[], totals, durationMs }`
+
+### Submit Transaction
+```
+POST https://accounting.siamoon.com/api/inbox
+```
+**Body:** `{ property, typeOfOperation, typeOfPayment, detail, amount, date }`
+
+### Get Dropdown Options
+```
+GET https://accounting.siamoon.com/api/options
+```
+**Response:** `{ ok, data: { properties[], typeOfOperation[], typeOfPayments[] } }`
 
 ---
 
-## 🐛 If Balances Are Wrong
+## ✅ Testing
 
-**Check**:
-- Using `balance` field? (not `uploadedBalance`)
-- Calling correct endpoint? (`/api/balance/by-property`)
-- Response format correct? (`data.propertyBalances[i].balance`)
+```bash
+# Test balance API
+curl https://accounting.siamoon.com/api/balance?month=ALL
+
+# Should return in < 1 second
+# Should have "items" field, not "data"
+```
 
 ---
 
-## 📞 Support
+## 📋 Migration Checklist
 
-See: `MOBILE_TEAM_BALANCE_API_UPDATE.md` for full details
+- [ ] Update `response.data` → `response.items`
+- [ ] Add `?month=ALL` to balance endpoint
+- [ ] Test on iOS
+- [ ] Test on Android
+- [ ] Deploy to production
 
-**Questions?** Contact Shaun Ducker
+---
+
+## 🆘 Issues?
+
+1. Check API directly: https://accounting.siamoon.com/api/balance
+2. Should return `{"ok": true}` in < 1 second
+3. Contact webapp team if not working
+
+---
+
+**Full Documentation:** See `MOBILE_APP_TEAM_UPDATE.md`
