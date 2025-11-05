@@ -15,7 +15,7 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 import { db } from '../firebase/client';
-import { adminDb } from '../firebase/admin';
+import { getAdminDb } from '../firebase/admin';
 
 export interface Transaction {
   timestamp: Date | Timestamp;
@@ -103,6 +103,7 @@ export async function getTransactionsByAccount(accountName: string, limitCount =
  * Add transaction using Admin SDK (server-side)
  */
 export async function addTransactionAdmin(transaction: Omit<Transaction, 'timestamp' | 'syncedAt'>): Promise<string> {
+  const adminDb = getAdminDb();
   const docRef = await adminDb.collection('transactions').add({
     ...transaction,
     timestamp: Timestamp.now(),
@@ -118,6 +119,7 @@ export async function syncTransactionFromSheets(
   transaction: Transaction,
   sheetRow: number
 ): Promise<string> {
+  const adminDb = getAdminDb();
   const docRef = await adminDb.collection('transactions').add({
     ...transaction,
     sheetRow,

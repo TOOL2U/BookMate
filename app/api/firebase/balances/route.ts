@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/admin';
+import { getAdminDb } from '@/lib/firebase/admin';
 
 /**
  * Get all balances from Firestore
@@ -30,6 +30,7 @@ export async function GET(request: Request) {
 
     console.log(`📊 Fetching balances from Firestore (limit: ${limit}, orderBy: ${orderByField})`);
 
+    const adminDb = getAdminDb();
     const snapshot = await adminDb
       .collection('balances')
       .orderBy(orderByField, 'desc')
@@ -80,6 +81,7 @@ export async function POST(request: Request) {
 
     console.log(`📊 Fetching balance for: ${accountName}`);
 
+    const adminDb = getAdminDb();
     const docRef = adminDb.collection('balances').doc(accountName);
     const doc = await docRef.get();
 

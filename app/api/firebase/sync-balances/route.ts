@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/admin';
+import { getAdminDb } from '@/lib/firebase/admin';
 
 /**
  * Manual Sync: Google Sheets → Firestore
@@ -49,6 +49,7 @@ export async function POST(request: Request) {
     console.log(`📊 Found ${data.propertyBalances.length} property balances`);
 
     // Batch write to Firestore
+    const adminDb = getAdminDb();
     const batch = adminDb.batch();
     let updateCount = 0;
 
@@ -103,6 +104,7 @@ export async function POST(request: Request) {
 
     // Log error activity
     try {
+      const adminDb = getAdminDb();
       await adminDb.collection('activityLogs').add({
         type: 'balance_sync',
         actor: 'api',
@@ -144,6 +146,7 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     // Get last activity log
+    const adminDb = getAdminDb();
     const snapshot = await adminDb
       .collection('activityLogs')
       .where('type', '==', 'balance_sync')
