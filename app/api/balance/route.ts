@@ -16,6 +16,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getSheetMeta, colIndexToLetter } from '@/utils/sheetMetaDetector';
+import { parseServiceAccountKey } from '@/utils/parseServiceAccountKey';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,24 +50,17 @@ export async function GET(request: NextRequest) {
 
     console.log('[Balance API] Fetching balances for month:', requestedMonth);
 
-    // Setup Google Sheets API
-    const credentialsJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-    if (!credentialsJson) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Missing GOOGLE_SERVICE_ACCOUNT_KEY'
-      }, { status: 500 });
-    }
-
+    // Parse service account credentials
+    const credentials = parseServiceAccountKey();
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    
     if (!spreadsheetId) {
       return NextResponse.json({
         ok: false,
         error: 'Missing GOOGLE_SHEET_ID'
       }, { status: 500 });
     }
-
-    const credentials = JSON.parse(credentialsJson);
+    
     const auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
