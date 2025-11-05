@@ -7,6 +7,10 @@
 
 import { google } from 'googleapis';
 
+// In-memory cache for sheet metadata (5 minute TTL)
+const METADATA_CACHE = new Map<string, { data: SheetMetadata; expiresAt: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 // Header signatures for each tab type
 // Multiple variations to handle different formatting (spaces, case, etc.)
 const TAB_SIGNATURES = {
@@ -216,11 +220,23 @@ function findMonthSelectorCell(
 
 /**
  * Main function: Detect all tabs in a Google Sheet by header signatures
+ * Includes 5-minute in-memory cache to avoid repeated expensive API calls
  */
 export async function getSheetMeta(
   spreadsheetId: string,
   auth: any
 ): Promise<SheetMetadata> {
+  // Check cache first
+  const cached = METADATA_CACHE.get(spreadsheetId);
+  const now = Date.now();
+  
+  if (cached && cached.expiresAt > now) {
+    console.log('[SheetMeta] Using cached metadata (expires in', Math.round((cached.expiresAt - now) / 1000), 'seconds)');
+    return cached.data;
+  }
+  
+  console.log('[SheetMeta] Cache miss or expired, fetching fresh metadata...');
+  
   const sheets = google.sheets({ version: 'v4', auth });
   
   const warnings: string[] = [];
@@ -335,13 +351,23 @@ export async function getSheetMeta(
       }
     }
 
-    return {
+    const metadata: SheetMetadata = {
       sheetId: spreadsheetId,
       detected,
       allSheets,
       warnings,
       detectedAt: new Date().toISOString()
     };
+
+    // Store in cache
+    METADATA_CACHE.set(spreadsheetId, {
+      data: metadata,
+      expiresAt: Date.now() + CACHE_TTL_MS
+    });
+    
+    console.log('[SheetMeta] Cached metadata for 5 minutes');
+
+    return metadata;
 
   } catch (error) {
     console.error('[SheetMetaDetector] Error:', error);
