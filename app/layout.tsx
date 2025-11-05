@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { madeMirage, bebasNeue, aileron } from './fonts/fonts';
 
 export const metadata: Metadata = {
   title: 'BookMate',
@@ -30,9 +31,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-black text-white relative">
-        <main className="min-h-screen relative z-10">
+    <html 
+      lang="en" 
+      className={`dark ${madeMirage.variable} ${bebasNeue.variable} ${aileron.variable}`}
+    >
+      <body className="min-h-screen bg-bg text-fg font-aileron antialiased">
+        <main className="relative z-10 bg-brand-glow">
           {children}
         </main>
       </body>

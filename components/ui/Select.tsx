@@ -18,32 +18,33 @@ export default function Select({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-text-primary mb-2">
+        <label className="block text-xs font-semibold text-muted mb-2 uppercase tracking-wider font-aileron">
           {label}
         </label>
       )}
       <select
         className={`
-          w-full px-4 py-2.5 bg-[#0A0A0A] border border-border-card rounded-xl
-          text-text-primary
-          focus:outline-none focus:border-accent focus:shadow-glow-cyan-sm focus:bg-[#0A0A0A]/80
-          transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm
-          ${error ? 'border-error/40 focus:border-error focus:shadow-[0_0_12px_rgba(255,51,102,0.4)]' : ''}
+          w-full px-3 py-2 bg-[#1b1b1b] border border-border rounded-xl2
+          text-fg font-aileron
+          focus:outline-none focus:ring-2 focus:ring-yellow/50 focus:border-yellow
+          transition-all duration-300 appearance-none cursor-pointer
+          ${error ? 'border-error/40 focus:border-error focus:ring-error/50' : ''}
           ${className}
         `}
+        style={{ fontSize: '16px' }}
         {...props}
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} className="bg-grey-dark">
             {option.label}
           </option>
         ))}
       </select>
       {error && (
-        <p className="mt-1 text-sm text-error">{error}</p>
+        <p className="mt-1 text-sm text-error font-aileron">{error}</p>
       )}
       {helperText && !error && (
-        <p className="mt-1 text-sm text-text-tertiary">{helperText}</p>
+        <p className="mt-1 text-xs text-muted font-aileron">{helperText}</p>
       )}
     </div>
   );

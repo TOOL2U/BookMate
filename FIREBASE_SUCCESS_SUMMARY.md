@@ -151,7 +151,7 @@ const firebaseConfig = {
   projectId: "bookmate-bfd43",
   appId: "1:587404267732:web:71dc5aac898838f5aaab41",
   storageBucket: "bookmate-bfd43.firebasestorage.app",
-  apiKey: "AIzaSyCHwsaPkzH0ZSfZq3VWPa0NJ-IhS3ynzsk",
+  apiKey: "",
   authDomain: "bookmate-bfd43.firebaseapp.com",
   messagingSenderId: "587404267732",
   measurementId: "G-SE3FMGGD4B"

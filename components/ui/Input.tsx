@@ -16,26 +16,27 @@ export default function Input({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-text-primary mb-2">
+        <label className="block text-xs font-semibold text-muted mb-2 uppercase tracking-wider font-aileron">
           {label}
         </label>
       )}
       <input
         className={`
-          w-full px-4 py-2.5 bg-[#0A0A0A] border border-border-card rounded-xl
-          text-text-primary placeholder:text-text-tertiary
-          focus:outline-none focus:border-accent focus:shadow-glow-cyan-sm
+          w-full px-3 py-2 bg-[#1b1b1b] border border-border rounded-xl2
+          text-fg placeholder:text-muted font-aileron
+          focus:outline-none focus:ring-2 focus:ring-yellow/50 focus:border-yellow
           transition-all duration-300
-          ${error ? 'border-error/40 focus:border-error focus:shadow-[0_0_12px_rgba(255,51,102,0.4)]' : ''}
+          ${error ? 'border-error/40 focus:border-error focus:ring-error/50' : ''}
           ${className}
         `}
+        style={{ fontSize: '16px' }}
         {...props}
       />
       {error && (
-        <p className="mt-1 text-sm text-error">{error}</p>
+        <p className="mt-1 text-sm text-error font-aileron">{error}</p>
       )}
       {helperText && !error && (
-        <p className="mt-1 text-sm text-text-tertiary">{helperText}</p>
+        <p className="mt-1 text-xs text-muted font-aileron">{helperText}</p>
       )}
     </div>
   );

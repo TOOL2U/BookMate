@@ -2,14 +2,14 @@ import React from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 
 interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
-  variant?: 'primaryAccent' | 'secondary' | 'ghost' | 'dangerGhost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'dangerGhost' | 'primaryAccent';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   children: React.ReactNode;
 }
 
 export default function Button({
-  variant = 'primaryAccent',
+  variant = 'primary',
   size = 'md',
   isLoading = false,
   disabled = false,
@@ -17,12 +17,13 @@ export default function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseClasses = 'font-medium rounded-xl transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap';
+  const baseClasses = 'font-semibold rounded-xl2 transition-all duration-200 ease-smoother flex items-center justify-center gap-2 whitespace-nowrap font-aileron';
 
   const variantClasses = {
-    primaryAccent: 'bg-gradient-to-r from-accent to-accent-blue text-text-primary shadow-[0_0_16px_rgba(0,217,255,0.5)] hover:shadow-[0_0_25px_rgba(0,217,255,0.6)] disabled:opacity-50 disabled:cursor-not-allowed',
-    secondary: 'bg-transparent border border-border-card text-text-primary hover:bg-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed',
-    ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-[#0A0A0A] disabled:opacity-50 disabled:cursor-not-allowed',
+    primary: 'bg-yellow text-black shadow-glow hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed',
+    primaryAccent: 'bg-yellow text-black shadow-glow hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed', // Alias for compatibility
+    secondary: 'bg-grey-dark text-yellow hover:bg-black border border-yellow/20 disabled:opacity-50 disabled:cursor-not-allowed',
+    ghost: 'bg-transparent text-muted hover:text-fg hover:bg-grey-dark/50 disabled:opacity-50 disabled:cursor-not-allowed',
     dangerGhost: 'bg-transparent border border-error/40 text-error hover:bg-error/10 disabled:opacity-50 disabled:cursor-not-allowed',
   };
 
@@ -37,13 +38,12 @@ export default function Button({
   return (
     <motion.button
       whileHover={{
-        scale: isLoading || disabled ? 1 : 1.02,
-        y: isLoading || disabled ? 0 : -1,
-        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.4 }
+        scale: isLoading || disabled ? 1 : 1.01,
+        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.2 }
       }}
       whileTap={{
-        scale: isLoading || disabled ? 1 : 0.98,
-        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.3 }
+        scale: isLoading || disabled ? 1 : 0.99,
+        transition: { type: 'spring', stiffness: 300, damping: 25, duration: 0.15 }
       }}
       disabled={isLoading || disabled}
       className={`${finalClassName} relative overflow-hidden`}
