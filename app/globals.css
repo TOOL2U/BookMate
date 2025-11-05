@@ -1,275 +1,69 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* ===============================================
    BOOKMATE BRAND KIT
    Fonts loaded via Next.js localFont in layout.tsx
    =============================================== */
 
-/* ===============================================
-   CSS Variables - BookMate Dark Theme
-   =============================================== */
-
-:root {
-  /* Brand colors */
-  --bg: #121212;
-  --fg: #f3f3f3;
-  --muted: #b5b5b5;
-  --border: #2a2a2a;
-  --card: #171717;
-  --card-fg: #ffffff;
-  --accent: #FFF02B;
-
-  /* Legacy compatibility */
-  --color-bg-app: 18, 18, 18;
-  --color-bg-card: 23, 23, 23;
-  --color-border-card: 42, 42, 42;
-  --color-text-primary: 243, 243, 243;
-  --color-text-secondary: 181, 181, 181;
-  --color-text-tertiary: 77, 77, 77;
-  --color-accent: 255, 240, 43;
-  --color-accent-purple: 255, 240, 43;
-  --color-success: 0, 255, 136;
-  --color-error: 255, 51, 102;
-  --color-warning: 255, 240, 43;
-  --color-info: 255, 240, 43;
-  --color-border-light: 42, 42, 42;
-  --color-border-medium: 77, 77, 77;
-}
-
-/* ===============================================
-   Base Styles
-   =============================================== */
-
-html,
-body {
-  background-color: #121212;
-  color: #f3f3f3;
-  font-family: var(--font-aileron), ui-sans-serif, system-ui, sans-serif;
-  scroll-behavior: smooth;
-  touch-action: manipulation;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Tailwind v4 Theme Configuration */
+@theme {
+  /* ===== BOOKMATE BRAND COLORS ===== */
+  
+  /* Primary Brand Yellow */
+  --color-yellow: #FFF02B;
+  --color-accent: #FFF02B;
+  
+  /* Backgrounds */
+  --color-bg-app: #121212;
+  --color-bg-card: #171717;
+  --color-black: #000000;
+  
+  /* Greys */
+  --color-grey: #4D4D4D;
+  --color-grey-dark: #121212;
+  
+  /* Text Colors */
+  --color-text-primary: #f3f3f3;
+  --color-text-secondary: #b5b5b5;
+  --color-text-muted: #4D4D4D;
+  
+  /* Borders */
+  --color-border-card: #2a2a2a;
+  --color-border-light: #2a2a2a;
+  
+  /* Status Colors */
+  --color-success: #00ff88;
+  --color-error: #ff3366;
+  --color-warning: #FFF02B;
+  --color-info: #FFF02B;
+  
+  /* Shadows - Yellow Glow */
+  --shadow-glow: 0 0 24px rgba(255, 240, 43, 0.25);
+  --shadow-glow-sm: 0 0 12px rgba(255, 240, 43, 0.20);
+  --shadow-glow-lg: 0 0 36px rgba(255, 240, 43, 0.30);
 }
 
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -webkit-touch-callout: none;
 }
 
-/* ===============================================
-   Typography System - BookMate Brand
-   =============================================== */
-
-h1,
-.h1 {
-  font-family: var(--font-made-mirage), serif;
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  letter-spacing: -0.025em;
+html {
+  scroll-behavior: smooth;
+  touch-action: manipulation;
 }
 
-@media (min-width: 768px) {
-  h1,
-  .h1 {
-    font-size: 2.25rem;
-    line-height: 2.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  h1,
-  .h1 {
-    font-size: 3rem;
-    line-height: 1;
-  }
-}
-
-h2,
-.h2 {
-  font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-@media (min-width: 768px) {
-  h2,
-  .h2 {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-}
-
-h3,
-.h3 {
-  font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-@media (min-width: 768px) {
-  h3,
-  .h3 {
-    font-size: 1.5rem;
-    line-height: 2rem;
-  }
-}
-
-p,
-.body {
+body {
   font-family: var(--font-aileron), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: rgba(243, 243, 243, 0.9);
-}
-
-@media (min-width: 768px) {
-  p,
-  .body {
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-}
-
-small,
-.small {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  color: #b5b5b5;
-}
-
-.label {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-weight: 600;
-  color: #b5b5b5;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* ===============================================
-   Component Utilities - BookMate Style
-   =============================================== */
-
-.card {
-  background-color: #171717;
-  color: #ffffff;
-  border-radius: 1.25rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
-  border: 1px solid #2a2a2a;
-  position: relative;
-  background-image: radial-gradient(circle at 50% -20%, rgba(255, 240, 43, 0.06), transparent 60%);
-}
-
-.card--glow {
-  box-shadow: 0 0 24px rgba(255, 240, 43, 0.20);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: 1.25rem;
-  font-weight: 600;
-  transition-property: all;
-  transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.btn-primary {
-  background-color: #FFF02B;
-  color: #000000;
-  box-shadow: 0 0 24px rgba(255, 240, 43, 0.20);
-}
-
-.btn-primary:hover {
-  transform: scale(1.01);
-}
-
-.btn-primary:active {
-  transform: scale(0.99);
-}
-
-.btn-secondary {
   background-color: #121212;
-  color: #FFF02B;
-  border: 1px solid rgba(255, 240, 43, 0.2);
-}
-
-.btn-secondary:hover {
-  background-color: #000000;
-}
-
-.input,
-.select,
-.textarea {
-  background-color: #1b1b1b;
-  border: 1px solid #2a2a2a;
-  border-radius: 1.25rem;
-  padding: 0.5rem 0.75rem;
   color: #f3f3f3;
-  transition: all 0.3s ease;
-  font-size: 16px !important; /* Prevent iOS zoom */
+  position: relative;
+  overflow-x: hidden;
 }
 
-.input::placeholder,
-.select::placeholder,
-.textarea::placeholder {
-  color: #b5b5b5;
-}
+/* Page-specific backgrounds removed - pure black everywhere */
 
-.input:focus,
-.select:focus,
-.textarea:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 240, 43, 0.5);
-  border-color: rgba(255, 240, 43, 0.5);
-}
-
-.table {
-  width: 100%;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
-.table thead th {
-  text-align: left;
-  color: #b5b5b5;
-  font-weight: 600;
-  border-bottom: 1px solid #2a2a2a;
-  padding-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-family: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif;
-}
-
-.table tbody td {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(42, 42, 42, 0.6);
-}
-
-/* ===============================================
-   Icon Treatment - White with transparency
-   =============================================== */
-
-.icon {
-  color: white;
-}
-
-/* ===============================================
-   Animations
-   =============================================== */
-
+/* Toast Animations - Slowed down */
 @keyframes slide-up {
   from {
     transform: translateY(100%);
@@ -310,37 +104,6 @@ small,
   }
 }
 
-@keyframes page-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes yellow-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 16px rgba(255, 240, 43, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(255, 240, 43, 0.3);
-  }
-}
-
 .animate-slide-up {
   animation: slide-up 0.6s ease-out;
 }
@@ -357,36 +120,34 @@ small,
   animation: slide-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Page Transitions - Slowed down */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .page-transition {
   animation: page-fade-in 0.8s ease-out;
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.animate-yellow-glow {
-  animation: yellow-glow 3s ease-in-out infinite;
-}
-
-/* ===============================================
-   Focus & Interactive States
-   =============================================== */
-
-button,
-a,
-input,
-textarea,
-select {
+/* Smooth transitions for interactive elements */
+button, a, input, textarea, select {
   transition: all 0.3s ease-in-out;
 }
 
+/* Focus ring for accessibility - Yellow accent */
 .focus-ring:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(255, 240, 43, 0.6);
 }
 
-/* Yellow accent gradient */
+/* Accent gradient text (yellow) */
 .gradient-text {
   background: linear-gradient(to right, #FFF02B, #FFD700);
   -webkit-background-clip: text;
@@ -394,16 +155,30 @@ select {
   background-clip: text;
 }
 
-/* ===============================================
-   Professional Glow Effects
-   =============================================== */
+/* Loading spinner pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
 
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ===== BOOKMATE BRAND GLOW EFFECTS ===== */
+
+/* Primary CTA Button - Yellow gradient with glow */
 .btn-primary-accent {
   background: linear-gradient(to right, #FFF02B 0%, #FFD700 100%);
   color: #000000;
   border: none;
   box-shadow: 0 0 16px rgba(255, 240, 43, 0.3);
   transition: all 0.3s ease;
+  font-weight: 700;
 }
 
 .btn-primary-accent:hover {
@@ -411,43 +186,79 @@ select {
   transform: translateY(-1px);
 }
 
+/* Input focus - Yellow glow */
 .input-glow:focus {
   outline: none;
   border-color: #FFF02B;
   box-shadow: 0 0 12px rgba(255, 240, 43, 0.3);
 }
 
-/* Neon border indicators */
+/* Yellow glow animation for active states */
+@keyframes yellow-glow {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(255, 240, 43, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 240, 43, 0.25);
+  }
+}
+
+.animate-yellow-glow {
+  animation: yellow-glow 3s ease-in-out infinite;
+}
+
+/* Neon border-left indicators */
 .border-neon-yellow {
   border-left: 4px solid #FFF02B;
 }
 
 .border-neon-green {
-  border-left: 4px solid #00ff88;
+  border-left: 4px solid #00FF88;
 }
 
 .border-neon-pink {
-  border-left: 4px solid #ff3366;
+  border-left: 4px solid #FF3366;
 }
 
-/* ===============================================
-   Mobile Optimizations
-   =============================================== */
+/* ============================================
+   Mobile Viewport Fixes - Prevent iOS Zoom
+   ============================================ */
 
+/* Prevent iOS Safari from zooming in on input focus
+   iOS Safari auto-zooms when input font-size < 16px */
 input,
 select,
 textarea,
 button {
   font-size: 16px !important;
+}
+
+/* Ensure inputs maintain proper appearance despite 16px minimum */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+textarea,
+select {
+  font-size: 16px !important;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
+/* Prevent accidental double-tap zoom on buttons */
 button,
 a {
   touch-action: manipulation;
 }
 
+/* Ensure proper mobile touch behavior */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+}
+
+/* Allow text selection for inputs only */
 input,
 textarea,
 select {

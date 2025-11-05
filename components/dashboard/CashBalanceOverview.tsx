@@ -34,7 +34,7 @@ function formatTimestamp(timestamp?: string): string {
 export default function CashBalanceOverview({ balances, isLoading }: CashBalanceOverviewProps) {
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
         <div className="h-6 bg-[#222222] rounded w-1/3 mb-6 animate-pulse" />
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
@@ -69,10 +69,10 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
       {/* Balance Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Total Balance Card */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-white rounded-xl p-6">
+        <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-white rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-lg bg-black/20 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-[#00D9FF]" />
+              <TrendingUp className="w-6 h-6 text-yellow" />
             </div>
             <div>
               <p className="text-sm text-blue-200">Total Balance</p>
@@ -88,7 +88,7 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
         </div>
 
         {/* Cash Balance Card */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-white rounded-xl p-6">
+        <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-white rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
               <Wallet className="w-6 h-6 text-[#00FF88]" />
@@ -105,7 +105,7 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
       </div>
 
       {/* Bank Accounts List */}
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
         <div className="flex items-center gap-3 mb-6">
           <Building2 className="w-5 h-5 text-blue-500" />
           <h3 className="text-lg font-semibold text-[#FFFFFF]">Bank Accounts</h3>
@@ -116,7 +116,7 @@ export default function CashBalanceOverview({ balances, isLoading }: CashBalance
             {bankBalances.map((bank, idx) => (
               <div 
                 key={idx}
-                className="flex items-center justify-between p-4 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-lg border border-slate-700/50 hover:border-slate-700/50/50 transition-colors"
+                className="flex items-center justify-between p-4 bg-gradient-to-br from-bg-card to-black backdrop-blur-sm rounded-lg border border-border-card hover:border-border-card/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-black-500/10 flex items-center justify-center">

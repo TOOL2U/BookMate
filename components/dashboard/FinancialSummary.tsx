@@ -26,7 +26,7 @@ interface FinancialSummaryProps {
 function CustomTooltip({ active, payload }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700/50 rounded-lg p-4 shadow-xl">
+      <div className="bg-black/95 backdrop-blur-sm border border-border-card rounded-lg p-4 shadow-xl">
         <p className="text-white font-semibold mb-2">{payload[0].payload.name}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center justify-between gap-4 text-sm">
@@ -46,14 +46,23 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
-          <div className="h-6 bg-slate-700/50 rounded w-1/3 mb-6 animate-pulse" />
-          <div className="h-80 bg-slate-700/50 rounded animate-pulse" />
+        <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
+          <div className="h-6 bg-border-card rounded w-1/3 mb-6 animate-pulse" />
+          <div className="h-80 bg-border-card rounded animate-pulse" />
         </div>
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
-          <div className="h-6 bg-slate-700/50 rounded w-1/3 mb-6 animate-pulse" />
-          <div className="h-80 bg-slate-700/50 rounded animate-pulse" />
+        <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
+          <div className="h-6 bg-border-card rounded w-1/3 mb-6 animate-pulse" />
+          <div className="h-80 bg-border-card rounded animate-pulse" />
         </div>
+      </div>
+    );
+  }
+
+  // Guard against null pnlData
+  if (!pnlData) {
+    return (
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
+        <p className="text-text-secondary">No P&L data available</p>
       </div>
     );
   }
@@ -67,8 +76,8 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
     },
     {
       name: 'Expenses',
-      Month: (pnlData?.month.overheads || 0) + (pnlData?.month.propertyPersonExpense || 0),
-      Year: (pnlData?.year.overheads || 0) + (pnlData?.year.propertyPersonExpense || 0)
+      Month: pnlData?.month.overheads || 0, // Only overheads, NOT property/person
+      Year: pnlData?.year.overheads || 0 // Only overheads, NOT property/person
     },
     {
       name: 'GOP',
@@ -77,9 +86,11 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
     }
   ];
 
-  // Prepare data for expense breakdown pie chart
+  // Prepare data for expense breakdown pie chart - SEPARATE categories
   const monthOverheads = pnlData?.month.overheads || 0;
   const monthPropertyPerson = pnlData?.month.propertyPersonExpense || 0;
+  // Note: These are shown separately in the pie chart, not added together
+  // totalExpenses is ONLY used for pie chart percentages and display, NOT for KPI calculations
   const totalExpenses = monthOverheads + monthPropertyPerson;
 
   const expenseBreakdownData = [
@@ -94,13 +105,13 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
       {/* Section Header */}
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">Financial Summary</h2>
-        <p className="text-slate-400">Month vs Year comparison and expense breakdown</p>
+        <p className="text-text-secondary">Month vs Year comparison and expense breakdown</p>
       </div>
 
       {/* Two-column grid */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Month vs Year Comparison Chart */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
           <h3 className="text-lg font-semibold text-white mb-6">Month vs Year Comparison</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -128,7 +139,7 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
         </div>
 
         {/* Expense Breakdown Pie Chart */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
           <h3 className="text-lg font-semibold text-white mb-6">Monthly Expense Breakdown</h3>
           <div className="h-80 flex items-center justify-center">
             {totalExpenses > 0 ? (
@@ -160,28 +171,28 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
               </ResponsiveContainer>
             ) : (
               <div className="text-center">
-                <p className="text-slate-400">No expense data available</p>
+                <p className="text-text-secondary">No expense data available</p>
               </div>
             )}
           </div>
 
           {/* Legend */}
           <div className="mt-6 space-y-2">
-            <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-black rounded-lg">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="text-slate-300">Overheads</span>
+                <span className="text-text-primary">Overheads</span>
               </div>
               <span className="text-white font-semibold">฿{monthOverheads.toLocaleString()}</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-black rounded-lg">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
-                <span className="text-slate-300">Property/Person</span>
+                <span className="text-text-primary">Property/Person</span>
               </div>
               <span className="text-white font-semibold">฿{monthPropertyPerson.toLocaleString()}</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg border-t border-slate-700/50 pt-3">
+            <div className="flex items-center justify-between p-3 bg-black rounded-lg border-t border-border-card pt-3">
               <span className="text-white font-medium">Total Expenses</span>
               <span className="text-xl font-bold text-red-400">฿{totalExpenses.toLocaleString()}</span>
             </div>

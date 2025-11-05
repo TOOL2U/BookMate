@@ -263,14 +263,18 @@ function BalanceAnalyticsPage() {
   return (
     <AdminShell>
       <div className="space-y-6">
-        {/* Page header */}
+        {/* Page header - Made Mirage font for title */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-text-primary">Cash & Bank Balances</h1>
-            <p className="text-text-secondary mt-1">Monitor your cash flow and bank accounts</p>
+            <h1 className="text-4xl font-madeMirage font-bold text-text-primary tracking-tight">
+              Balance Overview
+            </h1>
+            <p className="text-text-secondary mt-2 font-aileron">
+              Monitor your cash flow and bank accounts
+            </p>
             {lastUpdated && (
-              <p className="text-xs text-text-secondary mt-2 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-text-tertiary" />
+              <p className="text-xs text-muted mt-2 flex items-center gap-2 font-aileron">
+                <Clock className="w-4 h-4" />
                 Last updated: {lastUpdated}
               </p>
             )}
@@ -278,21 +282,23 @@ function BalanceAnalyticsPage() {
           <button
             onClick={fetchBalances}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-[#0A0A0A] hover:bg-[#0A0A0A]/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
+            className="flex items-center gap-2 px-4 py-2 bg-grey-dark hover:bg-black rounded-xl transition-all disabled:opacity-50 border border-border-card hover:border-yellow/20"
             aria-label="Refresh balances"
           >
-            <RefreshCw className={`w-4 h-4 text-text-secondary ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-text-primary text-sm">Refresh</span>
+            <RefreshCw className={`w-4 h-4 text-muted ${loading ? 'animate-spin' : ''}`} />
+            <span className="text-text-primary text-sm font-aileron font-medium">Refresh</span>
           </button>
         </div>
 
-        {/* Total Balance Card */}
-        <div className=" border border-border-card rounded-xl p-8 shadow-[0_12px_48px_rgba(0,0,0,0.4)] bg-gradient-to-br from-[#000000] to-[#141E21]">
+        {/* Total Balance Card - #171717 bg, proper brand styling */}
+        <div className="bg-bg-card border border-border-card rounded-xl2 p-8 shadow-glow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center">
-              <Wallet className="w-7 h-7 text-accent" />
+            <div className="w-14 h-14 rounded-full bg-yellow/10 flex items-center justify-center">
+              <Wallet className="w-7 h-7 text-yellow" />
             </div>
-            <span className="text-text-secondary text-sm">Total Available</span>
+            <span className="text-muted text-sm font-bebasNeue uppercase tracking-wide">
+              Total Available
+            </span>
           </div>
           {loading ? (
             <div className="h-12 w-48 bg-border-card/60 animate-pulse rounded" />
@@ -443,9 +449,9 @@ function BalanceAnalyticsPage() {
             {!showUploadModal && (
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="group relative flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-accent-blue hover:opacity-95 rounded-lg transition-all duration-200 shadow-lg hover:shadow-[0_0_25px_rgba(0,217,255,0.45)]"
+                className="group relative flex items-center gap-2 px-6 py-3 bg-yellow hover:opacity-95 rounded-lg transition-all duration-200 shadow-glow hover:shadow-glow-lg"
               >
-                <Zap className="w-5 h-5 text-text-primary group-hover:text-accent transition-colors" />
+                <Zap className="w-5 h-5 text-text-primary group-hover:text-black transition-colors" />
                 <span className="text-text-primary font-medium">Update Balances</span>
               </button>
             )}
@@ -459,19 +465,19 @@ function BalanceAnalyticsPage() {
                   onClick={() => setUploadMethod('manual')}
                   className={`group relative p-6 rounded-xl border-2 transition-all duration-200 ${
                     uploadMethod === 'manual'
-                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-black/10 shadow-lg shadow-[0_0_20px_rgba(0,217,255,0.35)]'
+                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-black/10 shadow-lg shadow-glow'
                       : 'border-border-card bg-black hover:border-border-card hover:bg-[#0A0A0A]'
                   }`}
                 >
                   <div className="text-center">
                     <div className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center ${
                       uploadMethod === 'manual'
-                        ? 'bg-gradient-to-br from-accent to-accent-blue'
+                        ? 'bg-yellow'
                         : 'bg-[#0A0A0A]'
                     }`}>
-                      <Edit3 className={`w-8 h-8 ${uploadMethod === 'manual' ? 'text-text-primary' : 'text-text-secondary'}`} />
+                      <Edit3 className={`w-8 h-8 ${uploadMethod === 'manual' ? 'text-yellow' : 'text-text-secondary'}`} />
                     </div>
-                    <p className="text-text-primary font-semibold text-lg">Manual Entry</p>
+                    <p className="text-white font-semibold text-lg">Manual Entry</p>
                     <p className="text-xs text-text-secondary mt-2">Type in balances manually</p>
                   </div>
                   {uploadMethod === 'manual' && (
@@ -484,17 +490,17 @@ function BalanceAnalyticsPage() {
                   onClick={() => setUploadMethod('ocr')}
                   className={`group relative p-6 rounded-xl border-2 transition-all duration-200 ${
                     uploadMethod === 'ocr'
-                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-purple/10 shadow-lg shadow-[0_0_20px_rgba(0,217,255,0.35)]'
+                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-purple/10 shadow-lg shadow-glow'
                       : 'border-border-card bg-[#0A0A0A] hover:border-border-card hover:bg-[#0A0A0A]'
                   }`}
                 >
                   <div className="text-center">
                     <div className={`w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center ${
                       uploadMethod === 'ocr'
-                        ? 'bg-gradient-to-br from-accent to-accent-purple'
+                        ? 'bg-yellow'
                         : 'bg-[#0A0A0A]'
                     }`}>
-                      <Camera className={`w-8 h-8 ${uploadMethod === 'ocr' ? 'text-text-primary' : 'text-text-secondary'}`} />
+                      <Camera className={`w-8 h-8 ${uploadMethod === 'ocr' ? 'text-black' : 'text-text-secondary'}`} />
                     </div>
                     <p className="text-text-primary font-semibold text-lg">Upload Screenshot</p>
                     <p className="text-xs text-text-secondary mt-2">Auto-extract from image</p>
@@ -540,8 +546,8 @@ function BalanceAnalyticsPage() {
                   {/* Upload Area */}
                   <div className="relative border-2 border-dashed border-accent/30 rounded-xl p-10 bg-gradient-to-br from-accent/10 to-accent-purple/10 hover:border-accent/50 transition-all duration-200">
                     <div className="text-center">
-                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-blue flex items-center justify-center">
-                        <Camera className="w-10 h-10 text-text-primary" />
+                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br bg-yellow flex items-center justify-center">
+                        <Camera className="w-10 h-10 text-text-secondary" />
                       </div>
                       <input
                         type="file"
@@ -553,7 +559,7 @@ function BalanceAnalyticsPage() {
                       />
                       <label
                         htmlFor="balance-upload"
-                        className={`inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-accent to-accent-blue hover:opacity-95 rounded-lg cursor-pointer transition-all duration-200 shadow-lg hover:shadow-[0_0_25px_rgba(0,217,255,0.45)] ${
+                        className={`inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r bg-yellow hover:opacity-95 rounded-lg cursor-pointer transition-all duration-200 shadow-lg hover:shadow-glow-lg ${
                           uploading || !selectedBank ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                       >
@@ -812,7 +818,7 @@ function BalanceAnalyticsPage() {
                 <button
                   onClick={handleSaveBalances}
                   disabled={uploading || !selectedBank}
-                  className="flex-1 flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-accent to-accent-blue hover:opacity-95 rounded-lg transition-all duration-200 text-text-primary font-semibold shadow-lg hover:shadow-[0_0_25px_rgba(0,217,255,0.45)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                  className="flex-1 flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r bg-yellow hover:opacity-95 rounded-lg transition-all duration-200 text-black font-semibold shadow-lg hover:shadow-glow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
                 >
                   {uploading ? (
                     <>

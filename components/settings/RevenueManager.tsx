@@ -177,22 +177,27 @@ export default function RevenueManager() {
   };
 
   return (
-    <div className="bg-bg-card border border-border-card rounded-xl overflow-hidden backdrop-blur-sm">
+    <div className="bg-bg-card border border-border-card rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
       {/* Header */}
-      <div className="border-b border-border-card p-6">
+      <div className="border-b border-border-card p-6 bg-bg-app/30">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-text-primary mb-1">
-              💰 Revenue Management
-            </h2>
-            <p className="text-sm text-text-secondary">
-              Manage revenue items from Google Sheets • {revenues.length} {revenues.length === 1 ? 'item' : 'items'}
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+              <span className="text-xl">💰</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-text-primary mb-1">
+                Revenue Management
+              </h2>
+              <p className="text-sm text-text-secondary">
+                Manage revenue items from Google Sheets • {revenues.length} {revenues.length === 1 ? 'item' : 'items'}
+              </p>
+            </div>
           </div>
           <button
             onClick={handleStartAdd}
             disabled={isUpdating || isAdding}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black font-medium transition-all duration-200 shadow-glow"
           >
             <Plus className="w-4 h-4" />
             Add Revenue Item
@@ -226,14 +231,14 @@ export default function RevenueManager() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-slate-900/50">
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                <tr className="bg-bg-app/80">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                     #
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                     Revenue Item
                   </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="text-right px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -280,7 +285,7 @@ export default function RevenueManager() {
                           className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Cancel"
                         >
-                          <X className="w-4 h-4 text-text-primary" />
+                          <X className="w-4 h-4 text-text-secondary" />
                         </button>
                       </div>
                     </td>
@@ -291,7 +296,7 @@ export default function RevenueManager() {
                 {revenues.map((item, idx) => (
                   <tr
                     key={idx}
-                    className="hover:bg-bg-app/40 transition-colors"
+                    className="hover:bg-bg-card/30 transition-colors"
                   >
                     <td className="px-6 py-4 text-sm text-text-secondary">
                       {idx + 1}
@@ -335,7 +340,7 @@ export default function RevenueManager() {
                             className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Cancel"
                           >
-                            <X className="w-4 h-4 text-text-primary" />
+                            <X className="w-4 h-4 text-text-secondary" />
                           </button>
                         </div>
                       ) : (
@@ -343,18 +348,18 @@ export default function RevenueManager() {
                           <button
                             onClick={() => handleStartEdit(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-accent/15 hover:bg-accent/25 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-accent/40"
                             title="Edit"
                           >
-                            <Edit2 className="w-4 h-4 text-text-primary" />
+                            <Edit2 className="w-4 h-4 text-accent" />
                           </button>
                           <button
                             onClick={() => handleDelete(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-error/40"
                             title="Delete"
                           >
-                            <Trash2 className="w-4 h-4 text-text-primary" />
+                            <Trash2 className="w-4 h-4 text-error" />
                           </button>
                         </div>
                       )}
@@ -365,7 +370,7 @@ export default function RevenueManager() {
                 {revenues.length === 0 && !isAdding && (
                   <tr>
                     <td colSpan={3} className="px-6 py-12 text-center">
-                      <p className="text-slate-400">No revenue items found</p>
+                      <p className="text-text-secondary">No revenuesevenue items found</p>
                       <p className="text-sm text-text-secondary mt-1">Click &quot;Add Revenue Item&quot; to create your first item</p>
                     </td>
                   </tr>

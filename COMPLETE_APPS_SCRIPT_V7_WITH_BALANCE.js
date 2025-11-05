@@ -768,7 +768,9 @@ function handleDiscoverRanges() {
 }
 
 // ============================================================================
+// ============================================================================
 // handleGetPropertyPersonDetails - Get individual property/person expenses
+// Updated 2025-11-05: Fixed to read from Data!C column and P&L rows 19-29
 // ============================================================================
 function handleGetPropertyPersonDetails(period) {
   try {
@@ -780,16 +782,30 @@ function handleGetPropertyPersonDetails(period) {
     }
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName("P&L (DO NOT EDIT)");
+    const pnlSheet = ss.getSheetByName("P&L (DO NOT EDIT)");
+    const dataSheet = ss.getSheetByName("Data");
 
-    if (!sheet) {
+    if (!pnlSheet) {
       return createErrorResponse('P&L sheet not found. Looking for: "P&L (DO NOT EDIT)"');
     }
+    
+    if (!dataSheet) {
+      return createErrorResponse('Data sheet not found.');
+    }
 
-    // Property/Person names are in rows 14-20, column A
-    // Property/Person values are in rows 14-20, column N (month) or Q (year)
-    const nameRange = sheet.getRange("A14:A20");
-    const nameValues = nameRange.getValues();
+    // Get ALL property/person names from Data sheet Column C
+    // Properties are in Data!C2:C100
+    const dataRange = dataSheet.getRange("C2:C100");
+    const allProperties = dataRange.getValues()
+      .map(function(row) { return row[0]; })
+      .filter(function(val) { 
+        if (!val) return false;
+        const str = val.toString().trim();
+        // Only return actual property names (non-empty strings)
+        return str !== '';
+      });
+    
+    Logger.log('Found ' + allProperties.length + ' property/person items from Data sheet Column C');
     
     // Determine which column to use based on period
     let valueColumn;
@@ -797,7 +813,7 @@ function handleGetPropertyPersonDetails(period) {
       // Find current month column dynamically
       const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"];
       const currentMonth = months[new Date().getMonth()];
-      const headerRow = sheet.getRange("A4:Z4").getValues()[0];
+      const headerRow = pnlSheet.getRange("A4:Z4").getValues()[0];
       
       let monthColumnIndex = null;
       for (let i = 0; i < headerRow.length; i++) {
@@ -818,24 +834,40 @@ function handleGetPropertyPersonDetails(period) {
       Logger.log('Using year column: Q');
     }
     
-    const valueRange = sheet.getRange(valueColumn + "14:" + valueColumn + "20");
-    const valueValues = valueRange.getValues();
+    // Get property/person names and values from P&L sheet rows 19-29
+    // Property names are in A19:A29, values are in the determined column (e.g., K19:K29 for Nov)
+    const pnlNamesRange = pnlSheet.getRange("A19:A29");
+    const pnlNames = pnlNamesRange.getValues();
+    const pnlValuesRange = pnlSheet.getRange(valueColumn + "19:" + valueColumn + "29");
+    const pnlValues = pnlValuesRange.getValues();
     
-    // Build the data array
+    // Build the data array by matching properties from Data sheet with values from P&L sheet
     const data = [];
     let totalExpense = 0;
     
-    for (let i = 0; i < nameValues.length; i++) {
-      const name = nameValues[i][0];
-      const expense = parseFloat(valueValues[i][0]) || 0;
+    for (let i = 0; i < allProperties.length; i++) {
+      const propertyName = allProperties[i].toString().trim();
       
-      if (name && name.toString().trim() !== '') {
-        data.push({
-          name: name.toString().trim(),
-          expense: expense
-        });
-        totalExpense += expense;
+      // Find this property in P&L sheet names (rows 19-29)
+      let pnlIndex = -1;
+      for (let j = 0; j < pnlNames.length; j++) {
+        if (pnlNames[j][0] && pnlNames[j][0].toString().trim() === propertyName) {
+          pnlIndex = j; // Index in the array (0-based)
+          break;
+        }
       }
+      
+      // Get the expense value from P&L sheet (or 0 if not found)
+      let expense = 0;
+      if (pnlIndex >= 0 && pnlIndex < pnlValues.length) {
+        expense = parseFloat(pnlValues[pnlIndex][0]) || 0;
+      }
+      
+      data.push({
+        name: propertyName,
+        expense: expense
+      });
+      totalExpense += expense;
     }
     
     // Calculate percentages
@@ -856,7 +888,6 @@ function handleGetPropertyPersonDetails(period) {
         data: data,
         period: period,
         totalExpense: totalExpense,
-        column: valueColumn,
         count: data.length,
         timestamp: new Date().toISOString()
       }))

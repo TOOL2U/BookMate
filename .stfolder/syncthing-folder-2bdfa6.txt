@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: ncwrz-hfmnx
+created: 2025-11-05T21:18:42+07:00

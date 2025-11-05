@@ -93,10 +93,10 @@ export default function OverlayDropdownPortal({
             animate={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, y: 0, scale: 1 }}
             exit={isMobile ? { opacity: 0, y: '100%' } : { opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: isMobile ? 0.3 : 0.15, ease: isMobile ? [0.32, 0.72, 0, 1] : 'easeOut' }}
-            className={`fixed z-9999 overflow-hidden bg-slate-900 shadow-elev-3 ${
+            className={`fixed z-9999 overflow-hidden bg-black shadow-elev-3 ${
               isMobile
-                ? 'bottom-0 left-0 right-0 rounded-t-3xl border-t border-slate-700/50 max-h-[70vh]'
-                : 'rounded-xl border border-slate-700/50 backdrop-blur-md max-h-64'
+                ? 'bottom-0 left-0 right-0 rounded-t-3xl border-t border-border-card max-h-[70vh]'
+                : 'rounded-xl border border-border-card backdrop-blur-md max-h-64'
             }`}
             style={
               isMobile
@@ -110,16 +110,16 @@ export default function OverlayDropdownPortal({
           >
             {/* Mobile header with close button and drag handle */}
             {isMobile && (
-              <div className="sticky top-0 z-10 bg-slate-900 border-b border-slate-700/50 px-4 py-3 flex items-center justify-between">
+              <div className="sticky top-0 z-10 bg-black border-b border-border-card px-4 py-3 flex items-center justify-between">
                 <div className="flex-1">
-                  <div className="w-12 h-1 bg-slate-600 rounded-full mx-auto mb-2" />
+                  <div className="w-12 h-1 bg-border-card rounded-full mx-auto mb-2" />
                   <h3 className="text-sm font-medium text-[#FFFFFF] text-center">
                     {items.length > 0 ? `${items.length} options` : 'No results'}
                   </h3>
                 </div>
                 <button
                   onClick={onClose}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-bg-card rounded-lg transition-colors"
                   aria-label="Close"
                 >
                   <X className="w-5 h-5 text-[#A0A0A0]" />
@@ -137,7 +137,7 @@ export default function OverlayDropdownPortal({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.02 }}
                     onClick={() => onSelect(item)}
-                    className={`w-full px-4 text-left text-[#FFFFFF] hover:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm active:bg-slate-800 focus:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm focus:outline-none transition-colors border-b border-slate-700/50 last:border-b-0 ${
+                    className={`w-full px-4 text-left text-[#FFFFFF] hover:bg-gradient-to-br from-bg-card to-black backdrop-blur-sm active:bg-bg-card focus:bg-gradient-to-br from-bg-card to-black backdrop-blur-sm focus:outline-none transition-colors border-b border-border-card last:border-b-0 ${
                       isMobile ? 'py-4 text-base' : 'py-3 text-sm first:rounded-t-xl last:rounded-b-xl'
                     }`}
                   >

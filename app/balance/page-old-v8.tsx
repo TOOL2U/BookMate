@@ -643,7 +643,7 @@ export default function BalanceAnalyticsPage() {
                           )}
                         </div>
                         <div className="flex-1">
-                          <p className="text-text-primary text-base font-semibold">{selectedBank}</p>
+                          <p className="text-text-primary text-base font-semibold text-text-primary">{selectedBank}</p>
                           <p className="text-xs text-text-secondary">{isCash ? 'Cash Account' : 'Bank Account'}</p>
                         </div>
                       </div>

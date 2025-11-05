@@ -239,8 +239,8 @@ export default function AdminPage() {
             {/* Lock Icon */}
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-accent via-accent-blue to-accent rounded-full blur-xl opacity-50" />
-                <div className="relative bg-gradient-to-br from-accent to-accent-blue p-5 rounded-2xl shadow-lg">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow via-yellow to-yellow rounded-full blur-xl opacity-50" />
+                <div className="relative bg-gradient-to-br bg-yellow p-5 rounded-2xl shadow-lg">
                   <Shield className="w-10 h-10 text-text-primary" />
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function AdminPage() {
               <button
                 type="submit"
                 disabled={pin.length !== 4}
-                className="w-full px-4 py-3 bg-gradient-to-r from-accent to-accent-blue hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 bg-gradient-to-r bg-yellow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <CheckCircle className="w-5 h-5" />
                 Unlock

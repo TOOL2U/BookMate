@@ -182,21 +182,21 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
   return (
     <div className="bg-bg-card border border-border-card rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
       {/* Header */}
-      <div className="p-6 border-b border-border-card bg-bg-app/40">
+      <div className="border-b border-border-card p-6 bg-bg-app/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
               <BriefcaseBusiness className="w-6 h-6 text-accent" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-text-primary">Expense Categories</h2>
+              <h2 className="text-xl font-semibold text-text-primary mb-1">Expense Categories</h2>
               <p className="text-sm text-text-secondary">Managed in Google Sheets &mdash; auto-synced to P&amp;L</p>
             </div>
           </div>
           <button
             onClick={handleStartAdd}
             disabled={loading || isUpdating || isAdding}
-            className="px-4 py-2 bg-gradient-to-r from-accent to-accent-purple hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-[0_0_20px_rgba(0,217,255,0.35)]"
+            className="px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-glow"
           >
             <Plus className="w-4 h-4" />
             Add Expense Category
@@ -295,7 +295,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                 {categories.map((item, idx) => (
                   <tr
                     key={idx}
-                    className="hover:bg-bg-app/40 transition-colors"
+                    className="hover:bg-bg-card/30 transition-colors"
                   >
                     <td className="px-6 py-4 text-sm text-text-secondary">
                       {idx + 1}

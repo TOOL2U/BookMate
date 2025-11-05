@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'P&L', href: '/pnl', icon: TrendingUp },
   { name: 'Balances', href: '/balance', icon: Wallet },
-  { name: 'Inbox', href: '/inbox', icon: Inbox },
+  { name: 'Activity', href: '/inbox', icon: Inbox },
   { name: 'Settings', href: '/settings', icon: Settings },
   { name: 'Admin', href: '/admin', icon: Shield },
 ];
@@ -64,7 +64,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         {/* Logo / Brand */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-border-card">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-blue flex items-center justify-center shadow-[0_0_20px_rgba(0,217,255,0.3)]">
+            <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center shadow-glow">
               <span className="text-text-primary font-bold text-sm">BM</span>
             </div>
             <div>
@@ -95,7 +95,7 @@ export default function AdminShell({ children }: AdminShellProps) {
                   flex items-center gap-3 px-4 py-3 rounded-lg
                   transition-all duration-200
                   ${isActive
-                    ? 'bg-gradient-to-r from-accent/60 to-accent-blue text-text-primary shadow-[0_0_20px_rgba(0,217,255,0.3)]'
+                    ? 'bg-yellow/20 text-yellow shadow-glow'
                     : 'text-text-secondary hover:text-text-primary hover:bg-bg-app/60'
                   }
                 `}

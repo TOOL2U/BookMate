@@ -37,7 +37,7 @@ function generatePlaceholderData(monthData: PnLPeriodData | null): any[] {
       data.push({
         month: monthName,
         revenue: monthData.revenue,
-        expenses: monthData.overheads + monthData.propertyPersonExpense,
+        expenses: monthData.overheads, // Only overheads, NOT property/person
         gop: monthData.gop
       });
     } else {
@@ -46,7 +46,7 @@ function generatePlaceholderData(monthData: PnLPeriodData | null): any[] {
       data.push({
         month: monthName,
         revenue: Math.round(monthData.revenue * variance),
-        expenses: Math.round((monthData.overheads + monthData.propertyPersonExpense) * variance),
+        expenses: Math.round(monthData.overheads * variance), // Only overheads, NOT property/person
         gop: Math.round(monthData.gop * variance)
       });
     }
@@ -59,12 +59,12 @@ function generatePlaceholderData(monthData: PnLPeriodData | null): any[] {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900/95 backdrop-blur-sm border border-[#2A2A2A] rounded-lg p-4 shadow-xl">
-        <p className="text-[#FFFFFF] font-semibold mb-2">{label}</p>
+      <div className="bg-black/95 backdrop-blur-sm border border-border-card rounded-lg p-4 shadow-xl">
+        <p className="text-text-primary font-semibold mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center justify-between gap-4 text-sm">
             <span style={{ color: entry.color }}>{entry.name}:</span>
-            <span className="text-[#FFFFFF] font-medium">
+            <span className="text-text-primary font-medium">
               ฿{entry.value.toLocaleString()}
             </span>
           </div>
@@ -80,7 +80,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
         <div className="space-y-4">
           <div className="h-6 bg-[#222222] rounded w-1/3 animate-pulse" />
           <div className="h-80 bg-[#222222] rounded animate-pulse" />
@@ -90,7 +90,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
+    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-[#FFFFFF] mb-2">Revenue vs Expenses Trend</h2>
@@ -165,7 +165,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
           <span>Expenses (Costs)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#00D9FF]" />
+          <div className="w-3 h-3 rounded-full bg-yellow" />
           <span>GOP (Profit)</span>
         </div>
       </div>

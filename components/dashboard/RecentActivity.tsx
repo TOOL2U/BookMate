@@ -28,7 +28,7 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
   const amount = isExpense ? transaction.debit : transaction.credit;
 
   return (
-    <div className="flex items-center gap-4 p-4 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-lg border border-slate-700/50 hover:border-slate-700/50/50 hover:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm transition-all duration-200 group">
+    <div className="flex items-center gap-4 p-4 bg-gradient-to-br from-bg-card to-black backdrop-blur-sm rounded-lg border border-border-card hover:border-border-card/50 hover:bg-gradient-to-br from-bg-card to-black backdrop-blur-sm transition-all duration-200 group">
       {/* Icon */}
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
         isExpense ? 'bg-red-500/10' : 'bg-green-500/10'
@@ -42,7 +42,7 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-[#FFFFFF] font-medium truncate group-hover:text-[#00D9FF] transition-colors">
+        <p className="text-[#FFFFFF] font-medium truncate group-hover:text-yellow transition-colors">
           {transaction.detail || 'No description'}
         </p>
         <div className="flex items-center gap-3 mt-1 text-xs text-[#A0A0A0]">
@@ -74,9 +74,9 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
 export default function RecentActivity({ transactions, isLoading }: RecentActivityProps) {
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
         <div className="flex items-center gap-3 mb-6">
-          <Activity className="w-5 h-5 text-[#00D9FF]" />
+          <Activity className="w-5 h-5 text-yellow" />
           <h2 className="text-xl font-semibold text-[#FFFFFF]">Recent Activity</h2>
         </div>
         <div className="space-y-3">
@@ -97,7 +97,7 @@ export default function RecentActivity({ transactions, isLoading }: RecentActivi
       </div>
 
       {/* Activity List */}
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
         {transactions.length > 0 ? (
           <div className="space-y-3">
             {transactions.map((transaction, idx) => (

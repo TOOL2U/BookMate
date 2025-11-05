@@ -35,8 +35,8 @@ export default function RootLayout({
       lang="en" 
       className={`dark ${madeMirage.variable} ${bebasNeue.variable} ${aileron.variable}`}
     >
-      <body className="min-h-screen bg-bg text-fg font-aileron antialiased">
-        <main className="relative z-10 bg-brand-glow">
+      <body className="min-h-screen bg-black text-fg font-aileron antialiased">
+        <main className="relative z-10 bg-black">
           {children}
         </main>
       </body>

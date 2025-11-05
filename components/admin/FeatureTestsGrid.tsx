@@ -348,12 +348,12 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           type="file"
           accept="image/*"
           onChange={(e) => setOcrFile(e.target.files?.[0] || null)}
-          className="w-full text-sm text-[#A0A0A0] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#00D9FF]/10 file:text-[#00D9FF] hover:file:bg-[#00D9FF]/20 cursor-pointer"
+          className="w-full text-sm text-[#A0A0A0] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-yellow/10 file:text-yellow hover:file:bg-yellow/20 cursor-pointer"
         />
         <button
           onClick={handleTestOCR}
           disabled={isTestingOCR || !ocrFile}
-          className="w-full px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
         >
           {isTestingOCR ? (
             <>
@@ -368,7 +368,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           )}
         </button>
         {ocrResponse && (
-          <pre className="text-xs bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
+          <pre className="text-xs bg-[#1A1A1A] p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
             {ocrResponse}
           </pre>
         )}
@@ -385,12 +385,12 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           value={extractionText}
           onChange={(e) => setExtractionText(e.target.value)}
           placeholder="Paste OCR text here..."
-          className="w-full h-24 px-3 py-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg text-sm text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          className="w-full h-24 px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-sm text-[#FFFFFF] placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         />
         <button
           onClick={handleTestExtraction}
           disabled={isTestingExtraction || !extractionText.trim()}
-          className="w-full px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
         >
           {isTestingExtraction ? (
             <>
@@ -405,7 +405,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           )}
         </button>
         {extractionResponse && (
-          <pre className="text-xs bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
+          <pre className="text-xs bg-[#1A1A1A] p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
             {extractionResponse}
           </pre>
         )}
@@ -422,14 +422,14 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           <button
             onClick={handleTestBalanceSave}
             disabled={isTestingBalance}
-            className="px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200"
+            className="px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200"
           >
             {isTestingBalance ? <RefreshCw className="w-4 h-4 animate-spin mx-auto" /> : 'Save'}
           </button>
           <button
             onClick={handleTestBalanceGet}
             disabled={isTestingBalance}
-            className="px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200"
+            className="px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200"
           >
             {isTestingBalance ? <RefreshCw className="w-4 h-4 animate-spin mx-auto" /> : 'Get'}
           </button>
@@ -441,12 +441,12 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
             type="file"
             accept="image/*"
             onChange={(e) => setBalanceFile(e.target.files?.[0] || null)}
-            className="w-full text-xs text-[#A0A0A0] file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#00D9FF]/10 file:text-[#00D9FF] hover:file:bg-[#00D9FF]/20 cursor-pointer mb-2"
+            className="w-full text-xs text-[#A0A0A0] file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-yellow/10 file:text-yellow hover:file:bg-yellow/20 cursor-pointer mb-2"
           />
           <button
             onClick={handleTestBalanceOCR}
             disabled={isTestingBalance || !balanceFile}
-            className="w-full px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
           >
             {isTestingBalance ? (
               <>
@@ -463,7 +463,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
         </div>
 
         {balanceResponse && (
-          <pre className="text-xs bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
+          <pre className="text-xs bg-[#1A1A1A] p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
             {balanceResponse}
           </pre>
         )}
@@ -479,7 +479,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
         <select
           value={propertyPersonPeriod}
           onChange={(e) => setPropertyPersonPeriod(e.target.value as 'month' | 'year')}
-          className="w-full px-3 py-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         >
           <option value="month">Month</option>
           <option value="year">Year</option>
@@ -487,7 +487,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
         <button
           onClick={handleTestPropertyPerson}
           disabled={isTestingPropertyPerson}
-          className="w-full px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
         >
           {isTestingPropertyPerson ? (
             <>
@@ -502,7 +502,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           )}
         </button>
         {propertyPersonResponse && (
-          <pre className="text-xs bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
+          <pre className="text-xs bg-[#1A1A1A] p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
             {propertyPersonResponse}
           </pre>
         )}
@@ -518,7 +518,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
         <select
           value={overheadPeriod}
           onChange={(e) => setOverheadPeriod(e.target.value as 'month' | 'year')}
-          className="w-full px-3 py-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         >
           <option value="month">Month</option>
           <option value="year">Year</option>
@@ -526,7 +526,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
         <button
           onClick={handleTestOverhead}
           disabled={isTestingOverhead}
-          className="w-full px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
         >
           {isTestingOverhead ? (
             <>
@@ -541,7 +541,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           )}
         </button>
         {overheadResponse && (
-          <pre className="text-xs bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
+          <pre className="text-xs bg-[#1A1A1A] p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
             {overheadResponse}
           </pre>
         )}
@@ -557,7 +557,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
         <button
           onClick={handleTestRunningBalance}
           disabled={isTestingRunningBalance}
-          className="w-full px-4 py-2 bg-[#222222] hover:bg-slate-800/60/70 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700/50/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full px-4 py-2 bg-[#222222] hover:bg-[#222222]/70 disabled:opacity-50 disabled:cursor-not-allowed border border-[#2A2A2A]/50 rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
         >
           {isTestingRunningBalance ? (
             <>
@@ -572,7 +572,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
           )}
         </button>
         {runningBalanceResponse && (
-          <pre className="text-xs bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
+          <pre className="text-xs bg-[#1A1A1A] p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
             {runningBalanceResponse}
           </pre>
         )}
@@ -592,7 +592,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
             onChange={(e) => setDeleteRowNumber(e.target.value)}
             placeholder="Row number (e.g., 10)"
             min="2"
-            className="w-full px-3 py-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg text-sm text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="w-full px-3 py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-sm text-[#FFFFFF] placeholder-muted focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           />
           <button
             onClick={handleTestDelete}
@@ -612,7 +612,7 @@ export default function FeatureTestsGrid({ onToast }: FeatureTestsGridProps) {
             )}
           </button>
           {deleteResponse && (
-            <pre className="text-xs bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
+            <pre className="text-xs bg-[#1A1A1A] p-3 rounded-lg overflow-auto max-h-40 text-[#A0A0A0]">
               {deleteResponse}
             </pre>
           )}
@@ -633,7 +633,7 @@ interface TestCardProps {
 
 function TestCard({ icon: Icon, title, description, color, children }: TestCardProps) {
   const colorClasses = {
-    blue: 'from-blue-500/20 to-purple-500/20 text-[#00D9FF]',
+    blue: 'from-yellow/20 to-yellow/10 text-yellow',
     green: 'from-green-500/20 to-blue-500/20 text-[#00FF88]',
     orange: 'from-orange-500/20 to-blue-500/20 text-orange-500',
     purple: 'from-purple-500/20 to-blue-500/20 text-purple-500',
@@ -643,7 +643,7 @@ function TestCard({ icon: Icon, title, description, color, children }: TestCardP
   const [gradientClass, iconColorClass] = colorClasses[color].split(' text-');
 
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className={`p-3 bg-gradient-to-br ${gradientClass} rounded-xl`}>
           <Icon className={`w-6 h-6 text-${iconColorClass}`} />

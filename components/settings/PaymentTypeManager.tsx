@@ -173,22 +173,27 @@ export default function PaymentTypeManager() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden backdrop-blur-sm">
+    <div className="bg-bg-card border border-border-card rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
       {/* Header */}
-      <div className="border-b border-slate-700/50 p-6">
+      <div className="border-b border-border-card p-6 bg-bg-app/30">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-[#FFFFFF] mb-1">
-              💳 Payment Type Management
-            </h2>
-            <p className="text-sm text-[#A0A0A0]">
-              Manage paymentTypes from Google Sheets • {paymentTypes.length} {paymentTypes.length === 1 ? 'payment type' : 'paymentTypes'}
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+              <span className="text-xl">💳</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-text-primary mb-1">
+                Payment Type Management
+              </h2>
+              <p className="text-sm text-text-secondary">
+                Manage paymentTypes from Google Sheets • {paymentTypes.length} {paymentTypes.length === 1 ? 'payment type' : 'paymentTypes'}
+              </p>
+            </div>
           </div>
           <button
             onClick={handleStartAdd}
             disabled={isUpdating || isAdding}
-            className="flex items-center gap-2 px-4 py-2 bg-[#00D9FF] hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-[#FFFFFF] font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black font-medium transition-all duration-200 shadow-glow"
           >
             <Plus className="w-4 h-4" />
             Add Payment Type
@@ -197,14 +202,14 @@ export default function PaymentTypeManager() {
       </div>
 
       {/* Info Banner */}
-      <div className="bg-blue-900/20 border-b border-blue-700/30 p-4">
+      <div className="bg-bg-app/60 border-b border-border-card p-4">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-[#00D9FF] shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="text-[#FFFFFF] font-semibold text-sm mb-1">
+            <h3 className="text-text-primary font-semibold text-sm mb-1">
               Real-Time Google Sheets Integration
             </h3>
-            <p className="text-[#FFFFFF] text-xs">
+            <p className="text-text-secondary text-xs">
               Payment Types are stored in <strong>Data sheet (Column D)</strong>. Changes automatically update the <strong>P&L sheet</strong> via Apps Script.
               All formulas, totals, and formatting are managed automatically.
             </p>
@@ -216,30 +221,30 @@ export default function PaymentTypeManager() {
       <div className="p-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-[#00D9FF] animate-spin" />
+            <Loader2 className="w-8 h-8 text-accent animate-spin" />
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm">
-                  <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
+                <tr className="bg-bg-app/80">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                     #
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                     Payment Type Name
                   </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
+                  <th className="text-right px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/30">
+              <tbody className="divide-y divide-border-card/60">
                 {/* Add new row */}
                 {isAdding && (
-                  <tr className="bg-blue-900/10">
-                    <td className="px-6 py-4 text-sm text-[#A0A0A0]">
-                      <Plus className="w-4 h-4 text-[#00D9FF]" />
+                  <tr className="bg-accent/10">
+                    <td className="px-6 py-4 text-sm text-text-secondary">
+                      <Plus className="w-4 h-4 text-accent" />
                     </td>
                     <td className="px-6 py-4">
                       <input
@@ -253,7 +258,7 @@ export default function PaymentTypeManager() {
                         placeholder="e.g., Downtown Office"
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 text-[#FFFFFF] placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent disabled:opacity-50"
                       />
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -261,22 +266,22 @@ export default function PaymentTypeManager() {
                         <button
                           onClick={handleSaveAdd}
                           disabled={isUpdating || !newValue.trim()}
-                          className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Save"
                         >
                           {isUpdating ? (
-                            <Loader2 className="w-4 h-4 text-[#FFFFFF] animate-spin" />
+                            <Loader2 className="w-4 h-4 text-black animate-spin" />
                           ) : (
-                            <Check className="w-4 h-4 text-[#FFFFFF]" />
+                            <Check className="w-4 h-4 text-success" />
                           )}
                         </button>
                         <button
                           onClick={handleCancelAdd}
                           disabled={isUpdating}
-                          className="p-2 bg-slate-600 hover:bg-slate-800/60 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-border-card/60 hover:bg-bg-card/40 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                           title="Cancel"
                         >
-                          <X className="w-4 h-4 text-[#FFFFFF]" />
+                          <X className="w-4 h-4 text-text-secondary" />
                         </button>
                       </div>
                     </td>
@@ -287,9 +292,9 @@ export default function PaymentTypeManager() {
                 {paymentTypes.map((item, idx) => (
                   <tr
                     key={idx}
-                    className="hover:bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm transition-colors"
+                    className="hover:bg-bg-card/30 transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm text-[#A0A0A0]">
+                    <td className="px-6 py-4 text-sm text-text-secondary">
                       {idx + 1}
                     </td>
                     <td className="px-6 py-4">
@@ -304,10 +309,10 @@ export default function PaymentTypeManager() {
                           }}
                           autoFocus
                           disabled={isUpdating}
-                          className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-lg px-3 py-2 text-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent disabled:opacity-50"
                         />
                       ) : (
-                        <span className="text-[#FFFFFF] font-medium">{item}</span>
+                        <span className="text-text-primary font-medium">{item}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -316,22 +321,22 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={() => handleSaveEdit(item)}
                             disabled={isUpdating || !editValue.trim()}
-                            className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Save"
                           >
                             {isUpdating ? (
-                              <Loader2 className="w-4 h-4 text-[#FFFFFF] animate-spin" />
+                              <Loader2 className="w-4 h-4 text-black animate-spin" />
                             ) : (
-                              <Check className="w-4 h-4 text-[#FFFFFF]" />
+                              <Check className="w-4 h-4 text-success" />
                             )}
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             disabled={isUpdating}
-                            className="p-2 bg-slate-600 hover:bg-slate-800/60 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-border-card/60 hover:bg-bg-card/40 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                             title="Cancel"
                           >
-                            <X className="w-4 h-4 text-[#FFFFFF]" />
+                            <X className="w-4 h-4 text-text-secondary" />
                           </button>
                         </div>
                       ) : (
@@ -339,18 +344,18 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={() => handleStartEdit(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-[#00D9FF] hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-accent/15 hover:bg-accent/25 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-accent/40"
                             title="Edit"
                           >
-                            <Edit2 className="w-4 h-4 text-[#FFFFFF]" />
+                            <Edit2 className="w-4 h-4 text-accent" />
                           </button>
                           <button
                             onClick={() => handleDelete(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-error/40"
                             title="Delete"
                           >
-                            <Trash2 className="w-4 h-4 text-[#FFFFFF]" />
+                            <Trash2 className="w-4 h-4 text-error" />
                           </button>
                         </div>
                       )}
@@ -361,8 +366,8 @@ export default function PaymentTypeManager() {
                 {paymentTypes.length === 0 && !isAdding && (
                   <tr>
                     <td colSpan={3} className="px-6 py-12 text-center">
-                      <p className="text-[#A0A0A0]">No paymentTypes found</p>
-                      <p className="text-sm text-[#A0A0A0] mt-1">Click &quot;Add Payment Type&quot; to create your first payment type</p>
+                      <p className="text-text-secondary">No paymentTypes found</p>
+                      <p className="text-sm text-text-secondary mt-1">Click &quot;Add Payment Type&quot; to create your first payment type</p>
                     </td>
                   </tr>
                 )}
@@ -379,8 +384,8 @@ export default function PaymentTypeManager() {
             toast.type === 'success'
               ? 'bg-green-900/90 border-green-700/50 text-green-100'
               : toast.type === 'error'
-              ? 'bg-[#FF3366]/90 border-red-700/50 text-red-100'
-              : 'bg-blue-900/90 border-blue-700/50 text-blue-100'
+              ? 'bg-error/90 border-error text-text-primary'
+              : 'bg-red-900/90 border-red-700/50 text-red-100'
           }`}>
             <div className="flex items-center gap-3">
               {toast.type === 'success' ? (

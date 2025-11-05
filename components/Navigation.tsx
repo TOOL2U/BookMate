@@ -21,7 +21,7 @@ export default function Navigation() {
 
   const navItems = [
     { href: '/upload', label: 'Upload', icon: Upload },
-    { href: '/inbox', label: 'Inbox', icon: Inbox },
+    { href: '/inbox', label: 'Activity', icon: Inbox },
     { href: '/pnl', label: 'P&L', icon: BarChart3 },
     { href: '/balance', label: 'Balance', icon: Wallet },
     { href: '/admin', label: 'Admin', icon: Settings },
@@ -61,7 +61,20 @@ export default function Navigation() {
               transition={{ duration: 0.2 }}
               className="relative"
             >
-              <div className="h-2 w-2 rounded-full bg-yellow shadow-glow" />
+              {/* Pulsing yellow glow effect */}
+              <motion.div
+                className="absolute inset-0 bg-yellow rounded-full blur-md opacity-40"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.4, 0.6, 0.4],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <div className="h-2 w-2 rounded-full bg-yellow shadow-glow relative z-10" />
             </motion.div>
 
             {/* Title - Bebas Neue font */}
@@ -95,15 +108,15 @@ export default function Navigation() {
                     className={`
                       relative px-3 py-2 rounded-xl transition-all duration-200
                       ${active
-                        ? 'text-yellow'
-                        : 'text-muted hover:text-fg'
+                        ? 'text-yellow bg-yellow/10 shadow-glow-sm'
+                        : 'text-muted hover:text-fg hover:bg-yellow/5 hover:shadow-glow-sm'
                       }
                     `}
                   >
                     {/* Subtle glow on hover */}
                     {hoveredItem === item.href && !active && (
                       <motion.div
-                        className="absolute inset-0 bg-grey-dark/50 rounded-xl"
+                        className="absolute inset-0 bg-yellow/5 rounded-xl shadow-glow-sm"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}

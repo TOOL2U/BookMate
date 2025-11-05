@@ -189,7 +189,7 @@ export default function SettingsPage() {
               <button
                 onClick={fetchOptions}
                 disabled={loading}
-                className="p-2 bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm hover:bg-slate-700/40 rounded-lg transition-colors disabled:opacity-50 border border-slate-700/50"
+                className="p-2 bg-gradient-to-br from-bg-card to-black backdrop-blur-sm hover:bg-border-card rounded-lg transition-colors disabled:opacity-50 border border-border-card"
                 aria-label="Refresh data"
               >
                 <RefreshCw className={`w-5 h-5 text-[#A0A0A0] ${loading ? 'animate-spin' : ''}`} />
@@ -208,8 +208,8 @@ export default function SettingsPage() {
         {syncStatus && (
           <div className={`backdrop-blur-sm border rounded-xl p-4 ${
             syncStatus.needsSync
-              ? 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border-[#FFD700]/30'
-              : 'bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border-[#00FF88]/30'
+              ? 'bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border-[#FFD700]/30'
+              : 'bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border-[#00FF88]/30'
           }`}>
             <div className="flex items-start gap-3">
               {syncStatus.needsSync ? (
@@ -221,13 +221,13 @@ export default function SettingsPage() {
                 <h3 className="text-white font-semibold text-sm mb-1">
                   {syncStatus.needsSync ? 'Pending Changes' : 'All Synced'}
                 </h3>
-                <p className="text-slate-300 text-xs">
+                <p className="text-text-primary text-xs">
                   {syncStatus.needsSync
                     ? 'You have unsaved changes. Click "Sync to Sheets" to update Google Sheets and mobile app.'
                     : 'All changes are synced to Google Sheets and available in the mobile app.'}
                 </p>
                 {syncStatus.lastSynced && (
-                  <p className="text-slate-400 text-xs mt-1">
+                  <p className="text-text-secondary text-xs mt-1">
                     Last synced: {new Date(syncStatus.lastSynced).toLocaleString()}
                   </p>
                 )}

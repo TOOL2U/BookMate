@@ -101,18 +101,20 @@ export default function InboxPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="max-w-6xl mx-auto"
+        className="max-w-7xl mx-auto page-transition"
       >
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <InboxIcon className="w-8 h-8 text-accent" />
+              <div className="p-3 bg-yellow/10 rounded-xl2 border border-yellow/20">
+                <InboxIcon className="w-7 h-7 text-yellow icon" strokeWidth={2} />
+              </div>
               <div>
-                <h1 className="text-3xl font-bold text-text-primary">Inbox</h1>
-                <p className="text-text-secondary text-sm mt-1">
+                <h1 className="font-bebasNeue text-4xl uppercase text-yellow">Activity</h1>
+                <p className="text-muted text-sm mt-1 font-aileron">
                   <span className="inline-flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-accent" />
+                    <Zap className="w-4 h-4 text-yellow" strokeWidth={2} />
                     View and manage your processed entries
                   </span>
                 </p>
@@ -121,9 +123,9 @@ export default function InboxPage() {
             <button
               onClick={() => fetchReceipts(true)}
               disabled={isRefreshing}
-              className="p-2 bg-[#0A0A0A] hover:bg-[#0A0A0A]/80 rounded-lg transition-colors disabled:opacity-50 border border-border-card"
+              className="p-2.5 bg-grey-dark hover:bg-black rounded-xl2 transition-all duration-200 disabled:opacity-50 border border-border shadow-glow-sm"
             >
-              <RefreshCw className={`w-5 h-5 text-text-secondary ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-5 h-5 text-yellow icon ${isRefreshing ? 'animate-spin' : ''}`} strokeWidth={2} />
             </button>
           </div>
         </div>
@@ -137,12 +139,12 @@ export default function InboxPage() {
             exit={{ opacity: 0, y: -10 }}
             className="mb-6"
           >
-            <Card className="border border-error/40 bg-error/10">
+            <Card className="border-error/40 bg-error/10">
               <div className="flex items-center gap-3 text-error">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 flex-shrink-0" strokeWidth={2} />
                 <div>
-                  <p className="font-semibold">Error loading receipts</p>
-                  <p className="text-sm opacity-90 text-text-secondary">{error}</p>
+                  <p className="font-semibold font-aileron">Error loading receipts</p>
+                  <p className="text-sm opacity-90 text-muted font-aileron">{error}</p>
                 </div>
               </div>
             </Card>
@@ -152,7 +154,7 @@ export default function InboxPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <Card>
+        <Card glow={true}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -163,43 +165,29 @@ export default function InboxPage() {
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="inline-block mb-4"
             >
-              <RefreshCw className="w-12 h-12 text-accent" />
+              <RefreshCw className="w-12 h-12 text-yellow" strokeWidth={2} />
             </motion.div>
-            <p className="text-text-secondary">Loading receipts...</p>
+            <p className="text-muted font-aileron">Loading receipts...</p>
           </motion.div>
         </Card>
       )}
 
       {/* Desktop Table View */}
       {!isLoading && receipts.length > 0 && (
-        <div className="hidden sm:block bg-[#0A0A0A] border border-border-card rounded-2xl overflow-x-auto">
-          <table className="w-full divide-y divide-border-card">
-            <thead className="bg-bg-app">
-              <tr>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[25%]">
-                  Detail
-                </th>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[12%]">
-                  Property
-                </th>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[15%]">
-                  Type
-                </th>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[12%]">
-                  Amount
-                </th>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[12%]">
-                  Date
-                </th>
-                <th className="px-4 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[12%]">
-                  Status
-                </th>
-                <th className="px-4 py-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider w-[12%]">
-                  Actions
-                </th>
+        <div className="hidden sm:block bg-card border border-border rounded-xl2 overflow-hidden shadow-soft">
+          <table className="table">
+            <thead>
+              <tr className="bg-grey-dark/50">
+                <th className="px-4 py-4 w-[25%]">Detail</th>
+                <th className="px-4 py-4 w-[12%]">Property</th>
+                <th className="px-4 py-4 w-[15%]">Type</th>
+                <th className="px-4 py-4 w-[12%]">Amount</th>
+                <th className="px-4 py-4 w-[12%]">Date</th>
+                <th className="px-4 py-4 w-[12%]">Status</th>
+                <th className="px-4 py-4 text-right w-[12%]">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-card">
+            <tbody>
               <AnimatePresence>
                 {receipts.map((receipt, index) => (
                   <motion.tr
@@ -208,34 +196,34 @@ export default function InboxPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -100 }}
                     transition={{ delay: index * 0.03 }}
-                    className="hover:bg-[#0A0A0A]/70 transition-colors group"
+                    className="hover:bg-grey-dark/30 transition-colors group"
                   >
                     <td className="px-4 py-4">
-                      <div className="text-sm font-medium text-text-primary max-w-[280px] truncate">
+                      <div className="text-sm font-medium text-fg max-w-[280px] truncate font-aileron">
                         {receipt.detail || '-'}
                       </div>
                       {receipt.ref && (
-                        <div className="text-xs text-text-tertiary truncate max-w-[280px]">
+                        <div className="text-xs text-muted truncate max-w-[280px] font-aileron">
                           Ref: {receipt.ref}
                         </div>
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <div className="text-sm text-text-secondary truncate max-w-[120px]">{receipt.property || '-'}</div>
+                      <div className="text-sm text-muted truncate max-w-[120px] font-aileron">{receipt.property || '-'}</div>
                     </td>
                     <td className="px-4 py-4">
-                      <div className="text-xs">
-                        <div className="text-text-primary font-medium truncate max-w-[150px]">{receipt.typeOfOperation || '-'}</div>
-                        <div className="text-text-tertiary truncate max-w-[150px]">{receipt.typeOfPayment || '-'}</div>
+                      <div className="text-xs font-aileron">
+                        <div className="text-fg font-medium truncate max-w-[150px]">{receipt.typeOfOperation || '-'}</div>
+                        <div className="text-muted truncate max-w-[150px]">{receipt.typeOfPayment || '-'}</div>
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className={`text-sm font-semibold ${receipt.debit > 0 ? 'text-error' : 'text-success'}`}>
+                      <div className={`text-sm font-semibold font-aileron ${receipt.debit > 0 ? 'text-error' : 'text-success'}`}>
                         {receipt.debit > 0 ? `-${receipt.debit}` : `+${receipt.credit}`} THB
                       </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-text-secondary">{receipt.date || '-'}</div>
+                      <div className="text-sm text-muted font-aileron">{receipt.date || '-'}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <Badge variant="success">
@@ -247,9 +235,9 @@ export default function InboxPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDelete(receipt)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-error hover:bg-error/10 rounded-lg transition-colors duration-200"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-error hover:bg-error/10 rounded-xl2 transition-all duration-200 font-aileron border border-transparent hover:border-error/30"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" strokeWidth={2} />
                         <span className="hidden xl:inline">Delete</span>
                       </motion.button>
                     </td>

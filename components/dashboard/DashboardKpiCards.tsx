@@ -59,7 +59,7 @@ function KPICard({
 }: KPICardProps) {
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6 animate-pulse">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6 animate-pulse">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="w-12 h-12 bg-[#222222] rounded-lg" />
@@ -73,7 +73,7 @@ function KPICard({
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6 hover:border-[#2A2A2A]/50 transition-all duration-200 group">
+    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6 hover:border-[#2A2A2A]/50 transition-all duration-200 group">
       {/* Icon and Badge */}
       <div className="flex items-center justify-between mb-4">
         <div className={`w-12 h-12 rounded-lg ${iconBgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
@@ -97,7 +97,7 @@ function KPICard({
         {isPercentage && (
           <div className="flex items-center gap-2">
             <p className={`text-3xl font-bold ${
-              trend === 'up' ? 'text-green-400' : trend === 'down' ? 'text-red-400' : 'text-[#00D9FF]'
+              trend === 'up' ? 'text-green-400' : trend === 'down' ? 'text-red-400' : 'text-yellow'
             }`}>
               {value.toFixed(1)}%
             </p>
@@ -112,7 +112,7 @@ function KPICard({
 
 export default function DashboardKpiCards({ pnlData, balanceData, isLoading }: DashboardKpiCardsProps) {
   const monthRevenue = pnlData?.month.revenue || 0;
-  const monthExpenses = pnlData?.month.overheads || 0;  // Only overheads, NOT property/person
+  const monthExpenses = pnlData?.month.overheads || 0; // Only overheads, NOT property/person
   const monthGop = pnlData?.month.gop || 0;
   const ebitdaMargin = pnlData?.month.ebitdaMargin || 0;
   const totalBalance = balanceData?.total || 0;
@@ -147,8 +147,8 @@ export default function DashboardKpiCards({ pnlData, balanceData, isLoading }: D
         value={monthGop}
         subtitle="This Month"
         icon={<DollarSign className="w-6 h-6" />}
-        iconBgColor="bg-[#00D9FF]/10"
-        iconColor="text-[#00D9FF]"
+        iconBgColor="bg-yellow/10"
+        iconColor="text-yellow"
         isLoading={isLoading}
       />
       
@@ -157,7 +157,7 @@ export default function DashboardKpiCards({ pnlData, balanceData, isLoading }: D
         value={ebitdaMargin}
         subtitle="Profitability"
         icon={<BarChart3 className="w-6 h-6" />}
-        iconBgColor="bg-purple-500/10"
+        iconBgColor="bg-black-500/10"
         iconColor="text-purple-500"
         isPercentage
         isLoading={isLoading}
@@ -169,8 +169,8 @@ export default function DashboardKpiCards({ pnlData, balanceData, isLoading }: D
         value={totalBalance}
         subtitle="Current"
         icon={<Wallet className="w-6 h-6" />}
-        iconBgColor="bg-cyan-500/10"
-        iconColor="text-cyan-500"
+        iconBgColor="bg-yellow/10"
+        iconColor="text-yellow"
         isLoading={isLoading}
       />
       

@@ -41,21 +41,21 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
   
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 animate-pulse">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6 animate-pulse">
         <div className="space-y-4">
-          <div className="h-4 bg-slate-700/50 rounded w-2/3" />
-          <div className="h-10 bg-slate-700/50 rounded w-full" />
-          <div className="h-3 bg-slate-700/50 rounded w-1/2" />
+          <div className="h-4 bg-border-card rounded w-2/3" />
+          <div className="h-10 bg-border-card rounded w-full" />
+          <div className="h-3 bg-border-card rounded w-1/2" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:border-slate-600/50 transition-all duration-200">
+    <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
       {/* Title */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">
+        <h3 className="text-sm font-medium text-text-secondary font-bebasNeue uppercase tracking-wider">
           {title}
         </h3>
         {!isPercentage && (
@@ -87,7 +87,7 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
       </div>
 
       {/* Subtitle */}
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-text-secondary">
         {subtitle || 'Live from P&L sheet'}
       </p>
     </div>
@@ -95,8 +95,7 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
 }
 
 export default function PnLKpiRow({ monthData, yearData, updatedAt, isLoading }: PnLKpiRowProps) {
-  // Monthly expenses should only be overheads (matching Q80 in spreadsheet)
-  // Property/Person is tracking only, not part of expenses
+  // Show only overheads (NOT adding property/person)
   const monthExpenses = monthData?.overheads || 0;
   const yearExpenses = yearData?.overheads || 0;
 
@@ -113,7 +112,7 @@ export default function PnLKpiRow({ monthData, yearData, updatedAt, isLoading }:
         <KPICard
           title="Monthly Expenses"
           value={monthExpenses}
-          subtitle="Total Overhead Expenses"
+          subtitle="Overhead Expenses Only"
           isLoading={isLoading}
         />
         <KPICard
