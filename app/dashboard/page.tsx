@@ -71,9 +71,9 @@ export default function DashboardPage() {
 
       // Process balance data - Map from unified API to Balance format
       let balancesArray: Balance[] = [];
-      if (balanceData.ok && balanceData.data) {
+      if (balanceData.ok && balanceData.items) {
         console.log('📊 Dashboard balance source:', balanceData.source); // Will show "BalanceSummary" or "Computed"
-        balancesArray = balanceData.data.map((account: any) => ({
+        balancesArray = balanceData.items.map((account: any) => ({
           bankName: account.accountName,
           balance: account.currentBalance,
           timestamp: account.lastTxnAt || new Date().toISOString()

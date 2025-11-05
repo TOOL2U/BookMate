@@ -55,11 +55,11 @@ function BalanceAnalyticsPage() {
       const res = await fetch('/api/balance?month=ALL');
       const data = await res.json();
 
-      if (data.ok && data.data) {
+      if (data.ok && data.items) {
         console.log('📊 Balance data source:', data.source); // Will show "BalanceSummary" or "Computed"
         
         // Map unified API format to Balance format
-        const balancesArray = data.data.map((account: any) => ({
+        const balancesArray = data.items.map((account: any) => ({
           bankName: account.accountName,
           balance: account.currentBalance,
           uploadedBalance: account.openingBalance,
