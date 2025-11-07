@@ -6,6 +6,26 @@ export const maxDuration = 60;              // ask Vercel for max allowed (Pro p
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
+// In-memory cache for balance data (60 seconds)
+interface BalanceCacheEntry {
+  data: any;
+  timestamp: number;
+}
+const balanceCache = new Map<string, BalanceCacheEntry>();
+const CACHE_DURATION_MS = 60 * 1000; // 60 seconds
+
+function getCachedBalance(month: string): any | null {
+  const cached = balanceCache.get(month);
+  if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION_MS) {
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedBalance(month: string, data: any): void {
+  balanceCache.set(month, { data, timestamp: Date.now() });
+}
+
 // small helper: hard timeout
 function withTimeout<T>(p: Promise<T>, ms: number, label = 'timeout'): Promise<T> {
   let t: ReturnType<typeof setTimeout>;
@@ -50,6 +70,21 @@ function buildAuth() {
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const month = (url.searchParams.get('month') || 'ALL').toUpperCase();
+
+  // Check cache first
+  const cached = getCachedBalance(month);
+  if (cached) {
+    console.log(`✅ [Balance API] Returning cached data for month: ${month}`);
+    return NextResponse.json({
+      ...cached,
+      cached: true,
+      cacheAge: Math.floor((Date.now() - balanceCache.get(month)!.timestamp) / 1000)
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
+      }
+    });
+  }
 
   const start = Date.now();
   try {
@@ -122,18 +157,22 @@ export async function GET(req: Request) {
       outflow: acc.outflow + it.outflow,
     }), { netChange: 0, currentBalance: 0, inflow: 0, outflow: 0 });
 
-    return NextResponse.json({
+    const responseData = {
       ok: true,
       source: 'BalanceSummary',
       month,
       items: filtered,
       totals,
       durationMs: Date.now() - start,
-    }, {
-      // ensure no caching surprises on Vercel or browsers
+      cached: false
+    };
+
+    // Cache the response
+    setCachedBalance(month, responseData);
+
+    return NextResponse.json(responseData, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'Pragma': 'no-cache'
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       }
     });
 

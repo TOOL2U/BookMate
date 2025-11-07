@@ -6,6 +6,25 @@ import { google } from 'googleapis';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// In-memory cache for options data (5 minutes - options change infrequently)
+interface OptionsCacheEntry {
+  data: any;
+  timestamp: number;
+}
+let optionsCache: OptionsCacheEntry | null = null;
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+function getCachedOptions(): any | null {
+  if (optionsCache && (Date.now() - optionsCache.timestamp) < CACHE_DURATION_MS) {
+    return optionsCache.data;
+  }
+  return null;
+}
+
+function setCachedOptions(data: any): void {
+  optionsCache = { data, timestamp: Date.now() };
+}
+
 /**
  * GET /api/options
  * 
@@ -41,6 +60,24 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
+    // Check cache first
+    const cached = getCachedOptions();
+    if (cached) {
+      console.log('✅ [OPTIONS] Returning cached data');
+      return new NextResponse(JSON.stringify({
+        ...cached,
+        cached: true,
+        cacheAge: Math.floor((Date.now() - optionsCache!.timestamp) / 1000)
+      }), {
+        status: 200,
+        headers: {
+          'content-type': 'application/json; charset=utf-8',
+          'cache-control': 'public, s-maxage=300, stale-while-revalidate=600',
+          'x-options-source': 'cache'
+        }
+      });
+    }
+
     // Read the live dropdowns config file for properties and operations
     const configPath = path.join(process.cwd(), 'config', 'live-dropdowns.json');
     
@@ -542,11 +579,14 @@ export async function GET(request: NextRequest) {
     console.log(`[OPTIONS] Plain: Properties=${properties.length}, Operations=${typeOfOperations.length}, Payments=${typeOfPayments.length}, Revenues=${(normalizedRevenues || []).length}`);
     console.log(`[OPTIONS] Rich: Properties=${propertiesRich.length}, Operations=${typeOfOperationsRich.length}, Payments=${typeOfPayments.length}, Revenues=${revenuesRich.length}`);
 
+    // Cache the response
+    setCachedOptions(response);
+
     return new NextResponse(JSON.stringify(response), {
       status: 200,
       headers: {
         'content-type': 'application/json; charset=utf-8',
-        'cache-control': 'no-store, max-age=0',
+        'cache-control': 'public, s-maxage=300, stale-while-revalidate=600', // Cache for 5 mins
         'x-options-source': 'google_sheets_lists+data'
       }
     });

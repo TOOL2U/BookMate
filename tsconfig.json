@@ -17,6 +17,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": false,
+    "types": [],
     "plugins": [
       {
         "name": "next"
@@ -37,6 +38,8 @@
   "exclude": [
     "node_modules",
     "src",
-    "assets"
+    "assets",
+    "**/*.spec.ts",
+    "**/*.test.ts"
   ]
 }

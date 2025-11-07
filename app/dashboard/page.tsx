@@ -1,13 +1,43 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import AdminShell from '@/components/layout/AdminShell';
 import DashboardKpiCards from '@/components/dashboard/DashboardKpiCards';
-import MonthlyIncomeExpenses from '@/components/dashboard/MonthlyIncomeExpenses';
-import ExpenseBreakdownDonut from '@/components/dashboard/ExpenseBreakdownDonut';
-import CashFlowTrend from '@/components/dashboard/CashFlowTrend';
-import RecentTransactionsTable from '@/components/dashboard/RecentTransactionsTable';
 import { RefreshCw, AlertCircle } from 'lucide-react';
+
+// Lazy load heavy chart components to improve initial load time
+const MonthlyIncomeExpenses = dynamic(
+  () => import('@/components/dashboard/MonthlyIncomeExpenses'),
+  {
+    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    ssr: false // Charts don't need SSR
+  }
+);
+
+const ExpenseBreakdownDonut = dynamic(
+  () => import('@/components/dashboard/ExpenseBreakdownDonut'),
+  {
+    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    ssr: false
+  }
+);
+
+const CashFlowTrend = dynamic(
+  () => import('@/components/dashboard/CashFlowTrend'),
+  {
+    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    ssr: false
+  }
+);
+
+const RecentTransactionsTable = dynamic(
+  () => import('@/components/dashboard/RecentTransactionsTable'),
+  {
+    loading: () => <div className="h-[300px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    ssr: false
+  }
+);
 
 interface PnLPeriodData {
   revenue: number;
