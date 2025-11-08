@@ -243,6 +243,7 @@ export async function GET(request: NextRequest) {
         // ========================================
         // EXTRACT OPERATIONS (Data!A2:A + Data!B2:B)
         // Combine Revenues (A) and Overhead Expenses (B)
+        // ALWAYS add "Transfer" as a valid operation type
         // ========================================
         const revenueRows = dataRevenuesRange?.values || [];
         const overheadRows = dataOverheadRange?.values || [];
@@ -277,8 +278,21 @@ export async function GET(request: NextRequest) {
           }
         });
         
-        typeOfOperations = normalizedOperations;
-        console.log(`[OPTIONS] Found ${typeOfOperations.length} operations from Data!A2:A + Data!B2:B`);
+        // ALWAYS add "Transfer" to the list if not already present
+        if (!normalizedOperations.includes('Transfer')) {
+          normalizedOperations.push('Transfer');
+        }
+        
+        // REMOVE old transfer formats to prevent confusion
+        // Only "Transfer" should be used for transfers (not "EXP - Transfer" or "Revenue - Transfer")
+        typeOfOperations = normalizedOperations.filter(op => 
+          op !== 'EXP - Transfer' && op !== 'Revenue - Transfer'
+        );
+        
+        console.log(`[OPTIONS] Found ${typeOfOperations.length} operations from Data!A2:A + Data!B2:B + Transfer`);
+        console.log(`[OPTIONS] Transfer included: ${typeOfOperations.includes('Transfer')}`);
+        console.log(`[OPTIONS] Old transfer formats removed: EXP - Transfer, Revenue - Transfer`);
+
         
         // ========================================
         // EXTRACT PAYMENT TYPES (Data!D2:D)

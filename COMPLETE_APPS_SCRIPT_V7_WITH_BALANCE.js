@@ -1,6 +1,6 @@
 /**
  * Google Apps Script - BookMate Webhook + Dynamic P&L + Inbox + Balance Management
- * Version 8.5 (V8.5)
+ * Version 9.0 (V9.0)
  *
  * DEPLOYMENT INSTRUCTIONS:
  * 1. Open your Google Sheet → Extensions → Apps Script
@@ -8,21 +8,37 @@
  * 3. COPY this ENTIRE file and PASTE it
  * 4. Click Save (💾)
  * 5. Click Deploy → Manage deployments → Edit → New version
- * 6. Description: "V8.5 - Transfer operation + Property optional for expenses"
+ * 6. Description: "V9.0 - Transfer Logic with Data!F2 Schema Support"
  * 7. Click Deploy
  * 8. The URL stays the same - no need to update environment variables!
  *
- * NEW IN V8.5 (Phase 5 Mobile Integration):
- * ✨ Property field now OPTIONAL for expense and transfer transactions
- * ✨ Property field still REQUIRED for revenue transactions
- * ✨ Support for "Transfer - Internal" operation type
- * ✨ Better validation messages for mobile app integration
+ * 🧩 TRANSFER LOGIC UPDATE (V9.0):
+ * ✨ "Transfer" is now defined in Data!F2 as a neutral category (not revenue or expense)
+ * ✨ Transfer validation reads from Data sheet schema (columns A-F)
+ * ✨ Transfers EXCLUDED from P&L revenue/expense calculations
+ * ✨ Property field OPTIONAL for Transfer operations
+ * ✨ Two-row transfer pattern: fromAccount (debit) + toAccount (credit)
+ * ✨ Dual-entry support with matching ref IDs
+ * ✨ Compatible with existing 10-column input schema
+ * ✨ Mobile + Web + Sheets alignment complete
  *
- * CRITICAL FIXES IN V8:
- * 🐛 Fixed balance tracking bug - balances now save/load correctly (bankName + balance format)
- * 🐛 Fixed P&L sheet name - changed "P&L " to "P&L (DO NOT EDIT)" in 3 places
- * 🐛 Fixed Property/Person endpoint - now works correctly
- * 🐛 Fixed Overhead Expenses endpoint - now works correctly
+ * TRANSFER SPEC (Two-Row Pattern):
+ * Row A (source):
+ *   - typeOfOperation: "Transfer" (from Data!F2)
+ *   - typeOfPayment: FROM account
+ *   - debit: amount, credit: 0
+ *   - ref: T-[id] (same for both rows)
+ *   - detail: "Transfer to [TO_ACCOUNT]"
+ * Row B (destination):
+ *   - typeOfOperation: "Transfer" (from Data!F2)
+ *   - typeOfPayment: TO account
+ *   - debit: 0, credit: amount
+ *   - ref: T-[id] (same for both rows)
+ *   - detail: "Transfer from [FROM_ACCOUNT]"
+ *
+ * ❌ DEPRECATED:
+ * - "EXP - Transfer" (removed from schema)
+ * - "Revenue - Transfer" (removed from schema)
  *
  * FEATURES:
  * ✨ Balance Management: Track individual bank & cash balances
@@ -46,6 +62,78 @@ const CACHE_TTL_SECONDS = 60;
 const SHEET_NAME = 'BookMate P&L 2025';
 const BALANCES_SHEET_NAME = 'Bank & Cash Balance';
 const HEADER_ROW = 6; // Data starts from row 6
+
+// ============================================================================
+// Type of Operation Validation (V9.0 - Reads from Data Sheet)
+// ============================================================================
+
+/**
+ * Get all valid typeOfOperation values from Data sheet (columns A-F)
+ * Includes revenue, expenses, and Transfer from Data!F2
+ * @returns {Array<string>} List of valid typeOfOperation values
+ */
+function getValidTypeOfOperations_() {
+  const cache = CacheService.getScriptCache();
+  const cacheKey = 'valid_type_operations_v2';
+  const cached = cache.get(cacheKey);
+
+  if (cached) {
+    Logger.log('✓ Using cached typeOfOperation list');
+    return JSON.parse(cached);
+  }
+
+  Logger.log('→ Fetching typeOfOperation list from Data sheet');
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const dataSheet = ss.getSheetByName('Data');
+
+  if (!dataSheet) {
+    Logger.log('⚠ Data sheet not found, using minimal fallback');
+    // Minimal safe fallback so Transfers are not blocked
+    return ['Transfer'];
+  }
+
+  // Pull from:
+  // - A: Revenue types
+  // - B: Expense types
+  // - F: Neutral/system types (e.g. Transfer)
+  const revenueValues = dataSheet.getRange('A2:A100').getValues();
+  const expenseValues = dataSheet.getRange('B2:B100').getValues();
+  const neutralValues = dataSheet.getRange('F2:F100').getValues();
+
+  const typeList = [];
+
+  function addIfValid(cell) {
+    if (!cell) return;
+    const str = cell.toString().trim();
+    if (!str) return;
+    if (typeList.indexOf(str) === -1) {
+      typeList.push(str);
+    }
+  }
+
+  revenueValues.forEach(row => addIfValid(row[0]));
+  expenseValues.forEach(row => addIfValid(row[0]));
+  neutralValues.forEach(row => addIfValid(row[0]));
+
+  Logger.log('✓ Valid typeOfOperation values: ' + typeList.join(', '));
+
+  // Cache for 60 seconds
+  cache.put(cacheKey, JSON.stringify(typeList), 60);
+
+  return typeList;
+}
+
+/**
+ * Check if a typeOfOperation value is valid (V9.0)
+ * @param {string} value - The typeOfOperation to validate
+ * @returns {boolean} True if valid, false otherwise
+ */
+function isValidTypeOfOperation_(value) {
+  if (!value) return false;
+  
+  const validTypes = getValidTypeOfOperations_();
+  return validTypes.indexOf(value.toString().trim()) !== -1;
+}
 
 // ============================================================================
 // Named Range Discovery & Mapping
@@ -359,8 +447,8 @@ function doGet(e) {
       return ContentService
     .createTextOutput(JSON.stringify({
       status: 'ok',
-      message: 'Accounting Buddy webhook + Dynamic P&L + Inbox + Balance + Overhead Expenses',
-      version: '7.1 - With Overhead Expenses Modal Support',
+      message: 'BookMate webhook + Dynamic P&L + Inbox + Balance + Transfer Support',
+      version: '9.0 - Transfer Logic with Data!F2 Schema Support',
       timestamp: new Date().toISOString(),
       endpoints: {
         webhook: 'POST with accounting data',
@@ -374,17 +462,28 @@ function doGet(e) {
         discover: 'POST with { action: "list_named_ranges", secret: "..." }'
       },
       features: [
+        'V9.0: Transfer validation from Data!F2 schema',
+        'V9.0: Transfers excluded from P&L calculations',
+        'V9.0: Dual-entry transfer support (debit + credit)',
         'Automatic named range discovery',
         'Fuzzy matching (handles naming variations)',
         '60-second caching with CacheService',
         'Computed EBITDA fallbacks',
         'Property/Person expense tracking',
-        'Overhead expenses breakdown (24 categories)',
+        'Overhead expenses breakdown (28+ categories)',
         'Bank & Cash balance management',
         'Inbox data retrieval',
         'Delete entry functionality',
         'Graceful error handling'
-      ]
+      ],
+      transferSpec: {
+        typeOfOperation: 'Transfer (from Data!F2)',
+        pattern: 'Two-row: debit (source) + credit (destination)',
+        ref: 'Required - same value for both rows (e.g., T-2025-001)',
+        property: 'Optional for transfers',
+        pnlImpact: 'Excluded from revenue and expense totals',
+        deprecated: ['EXP - Transfer', 'Revenue - Transfer']
+      }
     }))
     .setMimeType(ContentService.MimeType.JSON);
 }
@@ -467,13 +566,13 @@ function doPost(e) {
 }
 
 // ============================================================================
-// handleWebhook - Process accounting data
+// handleWebhook - Process accounting data (V9.0 - Enhanced Transfer Support)
 // ============================================================================
 function handleWebhook(payload) {
   try {
     delete payload.secret;
 
-    // Make property optional for expenses and transfers (V8.5 change)
+    // Required fields for all transaction types
     const requiredFields = ['day', 'month', 'year', 'typeOfOperation', 'typeOfPayment', 'detail'];
     const missingFields = requiredFields.filter(function(field) { return !payload[field]; });
 
@@ -482,10 +581,34 @@ function handleWebhook(payload) {
       return createErrorResponse('Missing required fields: ' + missingFields.join(', '));
     }
 
-    // Property is required only for revenue transactions
-    if (!payload.property && payload.typeOfOperation && payload.typeOfOperation.indexOf('Revenue') === 0) {
+    // V9.0: Validate typeOfOperation against Data sheet schema
+    if (!isValidTypeOfOperation_(payload.typeOfOperation)) {
+      Logger.log('ERROR: Invalid typeOfOperation: ' + payload.typeOfOperation);
+      return createErrorResponse('Invalid typeOfOperation. Must be a valid value from Data sheet columns A-F.');
+    }
+
+    // Property validation rules:
+    // - REQUIRED for revenue transactions (typeOfOperation starts with "Revenue")
+    // - OPTIONAL for expenses and transfers
+    const isRevenue = payload.typeOfOperation && payload.typeOfOperation.indexOf('Revenue') === 0;
+    const isTransfer = payload.typeOfOperation && payload.typeOfOperation === 'Transfer';
+    
+    if (!payload.property && isRevenue) {
       Logger.log('ERROR: Property is required for revenue transactions');
       return createErrorResponse('Property is required for revenue transactions');
+    }
+    
+    // V9.0: Enhanced transfer detection logging
+    if (isTransfer) {
+      Logger.log('✓ Transfer operation detected (from Data!F2 schema)');
+      Logger.log('Transfer details: ' + payload.typeOfPayment + ' | Debit: ' + (payload.debit || 0) + ' | Credit: ' + (payload.credit || 0));
+      Logger.log('Ref: ' + (payload.ref || 'MISSING') + ' | Detail: ' + payload.detail);
+      
+      // Validate transfer-specific requirements
+      if (!payload.ref) {
+        Logger.log('ERROR: Transfer missing ref field');
+        return createErrorResponse('Ref is required for transfer entries. Both transfer rows must share the same ref value.');
+      }
     }
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
@@ -509,6 +632,11 @@ function handleWebhook(payload) {
 
     sheet.appendRow(rowData);
     Logger.log('✓ Data appended to row ' + sheet.getLastRow());
+    
+    // V9.0: Log transfer acknowledgment
+    if (isTransfer) {
+      Logger.log('✓ Transfer row recorded - P&L will EXCLUDE this from revenue/expense totals');
+    }
 
     return ContentService
       .createTextOutput(JSON.stringify({
@@ -516,7 +644,9 @@ function handleWebhook(payload) {
         success: true,
         message: 'Data appended successfully',
         row: sheet.getLastRow(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        isTransfer: isTransfer,
+        version: '9.0'
       }))
       .setMimeType(ContentService.MimeType.JSON);
 
@@ -1060,14 +1190,14 @@ function createErrorResponse(message) {
 function testWebhook() {
   const testPayload = {
     secret: EXPECTED_SECRET,
-    day: "27",
-    month: "Oct",
+    day: "8",
+    month: "Nov",
     year: "2025",
     property: "Sia Moon - Land - General",
     typeOfOperation: "EXP - Construction - Materials",
     typeOfPayment: "Cash",
-    detail: "Test receipt from Apps Script V6",
-    ref: "TEST-V6",
+    detail: "Test expense from Apps Script V8.6",
+    ref: "TEST-V8.6",
     debit: 1000,
     credit: 0
   };
@@ -1081,6 +1211,75 @@ function testWebhook() {
   const response = doPost(mockEvent);
   Logger.log('=== Webhook Test Response ===');
   Logger.log(response.getContent());
+}
+
+/**
+ * Test transfer functionality (Two-Row Pattern) - V9.0
+ * This test demonstrates the proper way to create a transfer using Data!F2 schema
+ */
+function testTransfer() {
+  Logger.log('=== Testing Transfer (Two-Row Pattern - V9.0) ===');
+  
+  // IMPORTANT: Transfer requires TWO separate webhook calls
+  // Row A: Source account (debit)
+  const transferOut = {
+    secret: EXPECTED_SECRET,
+    day: "8",
+    month: "Nov",
+    year: "2025",
+    property: "",  // Optional for transfers
+    typeOfOperation: "Transfer",  // V9.0: Must match Data!F2
+    typeOfPayment: "Cash - Family",
+    detail: "Transfer to Bank Transfer - Bangkok Bank - Shaun Ducker",
+    ref: "T-2025-001",  // V9.0: Required for transfers
+    debit: 500,
+    credit: 0
+  };
+  
+  const mockEvent1 = {
+    postData: {
+      contents: JSON.stringify(transferOut)
+    }
+  };
+  
+  const response1 = doPost(mockEvent1);
+  Logger.log('--- Transfer OUT (Source) ---');
+  Logger.log(response1.getContent());
+  
+  // Row B: Destination account (credit)
+  const transferIn = {
+    secret: EXPECTED_SECRET,
+    day: "8",
+    month: "Nov",
+    year: "2025",
+    property: "",  // Optional for transfers
+    typeOfOperation: "Transfer",  // V9.0: Must match Data!F2
+    typeOfPayment: "Bank Transfer - Bangkok Bank - Shaun Ducker",
+    detail: "Transfer from Cash - Family",
+    ref: "T-2025-001",  // SAME ref as Row A
+    debit: 0,
+    credit: 500
+  };
+  
+  const mockEvent2 = {
+    postData: {
+      contents: JSON.stringify(transferIn)
+    }
+  };
+  
+  const response2 = doPost(mockEvent2);
+  Logger.log('--- Transfer IN (Destination) ---');
+  Logger.log(response2.getContent());
+  
+  Logger.log('');
+  Logger.log('✓ Transfer test complete! (V9.0)');
+  Logger.log('Expected result:');
+  Logger.log('  - Two rows in sheet with typeOfOperation = "Transfer" (from Data!F2)');
+  Logger.log('  - Cash - Family: -500 (debit)');
+  Logger.log('  - Bangkok Bank: +500 (credit)');
+  Logger.log('  - P&L totals: UNCHANGED (transfers excluded)');
+  Logger.log('  - Balance Summary: Cash -500, Bangkok Bank +500');
+  Logger.log('  - Transactions sheet: 2 entries with matching ref T-2025-001');
 }
 
 /**

@@ -49,13 +49,32 @@ export interface ValidationResult {
  * ⚠️ ASYNC: Now fetches live dropdown options from /api/options
  */
 export async function validatePayload(payload: ReceiptPayload): Promise<ValidationResult> {
-  // Check for required fields (day, month, year, property, typeOfOperation, typeOfPayment, detail)
-  // ref is optional, debit and credit can be 0
-  if (!payload.day || !payload.month || !payload.year || !payload.property ||
+  // Check for required fields
+  // For TRANSFERS: day, month, year, typeOfOperation, typeOfPayment, detail, ref are required; property is OPTIONAL
+  // For REVENUE/EXPENSES: day, month, year, property, typeOfOperation, typeOfPayment, detail are required; ref is optional
+  const isTransfer = payload.typeOfOperation?.trim() === 'Transfer';
+  
+  if (!payload.day || !payload.month || !payload.year ||
       !payload.typeOfOperation || !payload.typeOfPayment || !payload.detail) {
     return {
       isValid: false,
-      error: 'Missing required fields: day, month, year, property, typeOfOperation, typeOfPayment, and detail are all required',
+      error: 'Missing required fields: day, month, year, typeOfOperation, typeOfPayment, and detail are all required',
+    };
+  }
+
+  // Property validation: REQUIRED for revenue/expenses, OPTIONAL for transfers
+  if (!isTransfer && !payload.property) {
+    return {
+      isValid: false,
+      error: 'Property is required for revenue and expense entries',
+    };
+  }
+
+  // Ref validation: REQUIRED for transfers, optional for revenue/expenses
+  if (isTransfer && !payload.ref?.trim()) {
+    return {
+      isValid: false,
+      error: 'Ref is required for transfer entries. Both transfer rows must share the same ref value.',
     };
   }
 
@@ -91,10 +110,11 @@ export async function validatePayload(payload: ReceiptPayload): Promise<Validati
     };
   }
 
-  if (!property) {
+  // Property can be empty for transfers, but not for revenue/expenses (already validated above)
+  if (!isTransfer && !property) {
     return {
       isValid: false,
-      error: 'Property cannot be empty',
+      error: 'Property cannot be empty for revenue and expense entries',
     };
   }
 
@@ -155,8 +175,8 @@ export async function validatePayload(payload: ReceiptPayload): Promise<Validati
     };
   }
 
-  // Check if property is valid
-  if (!validProperties.includes(property)) {
+  // Check if property is valid (skip for transfers where property can be empty)
+  if (!isTransfer && property && !validProperties.includes(property)) {
     return {
       isValid: false,
       error: `Invalid property "${property}". Please select from: ${validProperties.join(', ')}`,
@@ -225,6 +245,41 @@ export async function validatePayload(payload: ReceiptPayload): Promise<Validati
     };
   }
 
+  // ========================================
+  // TRANSFER-SPECIFIC VALIDATION RULES
+  // ========================================
+  if (isTransfer) {
+    // Rule 1: Detail must contain "Transfer to" or "Transfer from"
+    const detailLower = detail.toLowerCase();
+    if (!detailLower.includes('transfer to') && !detailLower.includes('transfer from')) {
+      return {
+        isValid: false,
+        error: 'Transfer entries must have detail containing "Transfer to" or "Transfer from"',
+      };
+    }
+
+    // Rule 2: Exactly ONE of debit/credit must be non-zero (not both, not neither)
+    const hasDebit = debit > 0;
+    const hasCredit = credit > 0;
+    
+    if (hasDebit && hasCredit) {
+      return {
+        isValid: false,
+        error: 'Transfer entries must have either debit OR credit, not both',
+      };
+    }
+    
+    if (!hasDebit && !hasCredit) {
+      return {
+        isValid: false,
+        error: 'Transfer entries must have either a debit or credit value (cannot be zero)',
+      };
+    }
+
+    // Rule 3: Ref is required and must not be empty (already validated above)
+    // This ensures matching transfer pairs can be identified
+  }
+
   // Return validated and sanitized data
   return {
     isValid: true,
@@ -232,7 +287,7 @@ export async function validatePayload(payload: ReceiptPayload): Promise<Validati
       day,
       month,
       year,
-      property,
+      property, // Can be empty string for transfers
       typeOfOperation,
       typeOfPayment,
       detail,
