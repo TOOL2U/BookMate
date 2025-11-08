@@ -1,33 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * ⚠️ DEPRECATED - Use /api/balance i    const data = await response.json();
-
-    if (!data.ok) {
-      return NextResponse.json(
-        { error: data.error || 'Failed to fetch balance' },
-        { status: 500 }
-      );
-    }
-
-    // Add deprecation warning to response
-    const responseData = {
-      ...data,
-      deprecated: true,
-      deprecationMessage: "⚠️ This endpoint is deprecated. Use GET /api/balance?month=ALL instead.",
-      migrationGuide: "https://github.com/TOOL2U/BookMate/blob/main/WEBAPP_UPDATED_TO_UNIFIED_BALANCE.md",
-    };
-
-    // Log deprecation warning
-    console.warn('⚠️ DEPRECATED: /api/balance/get called. Use /api/balance instead.');
-
-    // Cache the response
-    balanceCache = {
-      data: responseData,
-      timestamp: now
-    };
-
-    return NextResponse.json(responseData);is endpoint is deprecated in favor of the unified balance system.
+ * ⚠️ DEPRECATED - Use /api/balance instead
+ * 
+ * This endpoint is deprecated in favor of the unified balance system.
  * 
  * Migration Guide:
  * - OLD: POST /api/balance/get (calls Google Apps Script webhook)

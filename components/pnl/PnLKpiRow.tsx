@@ -66,13 +66,13 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
       {/* Value */}
       <div className="flex items-baseline gap-2 mb-2">
         {!isPercentage && (
-          <span className="text-3xl font-bold text-white">
+          <span className="font-madeMirage text-4xl text-yellow">
             ฿{formatCurrency(value)}
           </span>
         )}
         {isPercentage && (
           <div className="flex items-center gap-2">
-            <span className={`text-3xl font-bold ${
+            <span className={`font-madeMirage text-4xl ${
               isPositive ? 'text-green-400' : 'text-red-400'
             }`}>
               {formatPercentage(value)}%
@@ -87,7 +87,7 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
       </div>
 
       {/* Subtitle */}
-      <p className="text-xs text-text-secondary">
+      <p className="font-aileron text-xs text-text-secondary">
         {subtitle || 'Live from P&L sheet'}
       </p>
     </div>

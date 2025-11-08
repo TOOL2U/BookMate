@@ -68,8 +68,8 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
     <div className="space-y-6">
       {/* Section Header */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Detailed P&L Breakdown</h2>
-        <p className="text-text-secondary">Complete financial statement with all line items</p>
+        <h2 className="font-bebasNeue text-3xl text-text-primary uppercase tracking-wide mb-2">Detailed P&L Breakdown</h2>
+        <p className="font-aileron text-text-secondary">Complete financial statement with all line items</p>
       </div>
 
       {/* Table Container */}
@@ -79,16 +79,16 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
             {/* Table Header - Sticky */}
             <thead className="bg-black/80 sticky top-0 z-10">
               <tr className="border-b border-border-card">
-                <th className="text-left py-4 px-6 text-sm font-semibold text-text-primary uppercase tracking-wider">
+                <th className="font-bebasNeue text-left py-4 px-6 text-sm text-text-primary uppercase tracking-wider">
                   Category
                 </th>
-                <th className="text-right py-4 px-6 text-sm font-semibold text-text-primary uppercase tracking-wider">
+                <th className="font-bebasNeue text-right py-4 px-6 text-sm text-text-primary uppercase tracking-wider">
                   This Month (THB)
                 </th>
-                <th className="text-right py-4 px-6 text-sm font-semibold text-text-primary uppercase tracking-wider">
+                <th className="font-bebasNeue text-right py-4 px-6 text-sm text-text-primary uppercase tracking-wider">
                   Year to Date (THB)
                 </th>
-                <th className="text-right py-4 px-6 text-sm font-semibold text-text-primary uppercase tracking-wider">
+                <th className="font-bebasNeue text-right py-4 px-6 text-sm text-text-primary uppercase tracking-wider">
                   % of Revenue
                 </th>
               </tr>
@@ -124,9 +124,9 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                     {/* Category Name */}
                     <td className={`
                       py-4 px-6
-                      ${isHeader ? 'font-bold text-white text-sm uppercase tracking-wider' : 'text-text-primary'}
+                      ${isHeader ? 'font-bebasNeue text-white text-sm uppercase tracking-wider' : 'font-aileron text-text-primary'}
                       ${row.indent ? 'pl-12' : ''}
-                      ${isProfit || isMargin ? 'font-semibold' : ''}
+                      ${isProfit || isMargin ? 'font-madeMirage' : ''}
                     `}>
                       {row.category}
                     </td>
@@ -134,9 +134,9 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                     {/* Month Value */}
                     <td className={`
                       py-4 px-6 text-right font-mono
-                      ${isHeader ? 'text-text-secondary' : ''}
-                      ${isProfit ? 'text-green-400 font-bold' : ''}
-                      ${isMargin ? 'text-blue-400 font-bold' : ''}
+                      ${isHeader ? 'font-aileron text-text-secondary' : ''}
+                      ${isProfit ? 'font-madeMirage text-green-400' : ''}
+                      ${isMargin ? 'font-madeMirage text-blue-400' : ''}
                       ${isExpense ? 'text-red-400' : ''}
                       ${isRevenue ? 'text-green-400' : ''}
                       ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue ? 'text-white' : ''}
@@ -147,9 +147,9 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                     {/* Year Value */}
                     <td className={`
                       py-4 px-6 text-right font-mono
-                      ${isHeader ? 'text-text-secondary' : ''}
-                      ${isProfit ? 'text-green-400 font-bold' : ''}
-                      ${isMargin ? 'text-blue-400 font-bold' : ''}
+                      ${isHeader ? 'font-aileron text-text-secondary' : ''}
+                      ${isProfit ? 'font-madeMirage text-green-400' : ''}
+                      ${isMargin ? 'font-madeMirage text-blue-400' : ''}
                       ${isExpense ? 'text-red-400' : ''}
                       ${isRevenue ? 'text-green-400' : ''}
                       ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue ? 'text-white' : ''}
@@ -173,8 +173,8 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
 
         {/* Footer Note */}
         <div className="bg-black/50 px-6 py-4 border-t border-border-card">
-          <p className="text-xs text-text-secondary">
-            <span className="font-semibold">Note:</span> Percentages show Month % / Year % of total revenue. 
+          <p className="font-aileron text-xs text-text-secondary">
+            <span className="font-medium">Note:</span> Percentages show Month % / Year % of total revenue. 
             EBITDA Margin is shown as a percentage value.
           </p>
         </div>

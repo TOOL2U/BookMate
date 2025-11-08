@@ -229,10 +229,10 @@ export default function AdminPage() {
   if (!isUnlocked) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent-purple/10" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-black-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        {/* Background effects - Brand compliant yellow accents */}
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow/5 to-transparent" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-yellow/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
         <div className="relative z-10 w-full max-w-md">
           <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-8">
@@ -249,7 +249,7 @@ export default function AdminPage() {
             {/* Title */}
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold mb-2">
-                <span className="bg-gradient-to-r from-accent via-accent-purple to-accent bg-clip-text text-transparent">
+                <span className="text-yellow">
                   Admin Access
                 </span>
               </h1>
@@ -327,11 +327,11 @@ export default function AdminPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-accent/20 to-accent-purple/20 rounded-xl mb-4">
-            <Shield className="w-8 h-8 text-accent" />
+          <div className="inline-flex items-center justify-center p-3 bg-yellow/10 rounded-xl mb-4">
+            <Shield className="w-8 h-8 text-yellow" />
           </div>
           <h1 className="text-4xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-accent via-accent-purple to-accent bg-clip-text text-transparent">
+            <span className="text-yellow">
               Admin Panel
             </span>
           </h1>
@@ -454,19 +454,19 @@ interface ToolCardProps {
 
 function ToolCard({ icon: Icon, title, description, color, isLoading, onClick, buttonText, buttonIcon: ButtonIcon }: ToolCardProps) {
   const colorClasses = {
-    blue: 'from-accent/20 to-accent-purple/20 text-accent',
-    green: 'from-success/20 to-accent/20 text-success',
-    orange: 'from-warning/20 to-accent/20 text-warning',
-    purple: 'from-accent-purple/20 to-accent/20 text-info'
+    blue: { bg: 'bg-yellow/10', text: 'text-yellow' },
+    green: { bg: 'bg-success/10', text: 'text-success' },
+    orange: { bg: 'bg-warning/10', text: 'text-warning' },
+    purple: { bg: 'bg-yellow/10', text: 'text-yellow' }
   };
 
-  const [gradientClass, iconColorClass] = colorClasses[color].split(' text-');
+  const colors = colorClasses[color];
 
   return (
     <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-6">
       <div className="flex items-center gap-3 mb-4">
-        <div className={`p-3 bg-gradient-to-br ${gradientClass} rounded-xl`}>
-          <Icon className={`w-6 h-6 text-${iconColorClass}`} />
+        <div className={`p-3 ${colors.bg} rounded-xl`}>
+          <Icon className={`w-6 h-6 ${colors.text}`} />
         </div>
         <div>
           <h3 className="text-lg font-bold text-text-primary">{title}</h3>

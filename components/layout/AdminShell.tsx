@@ -3,6 +3,7 @@
 import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import LogoBM from '@/components/LogoBM';
 import {
   LayoutDashboard,
   TrendingUp,
@@ -39,10 +40,10 @@ export default function AdminShell({ children }: AdminShellProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg-app via-bg-card to-bg-app">
-      {/* Background effects */}
-      <div className="fixed inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-purple/5 pointer-events-none" />
-      <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="fixed bottom-1/4 right-1/4 w-96 h-96 bg-accent-purple/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Background effects - Brand compliant yellow accents */}
+      <div className="fixed inset-0 bg-gradient-to-br from-yellow/5 to-transparent pointer-events-none" />
+      <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-yellow/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-1/4 right-1/4 w-96 h-96 bg-yellow/3 rounded-full blur-3xl pointer-events-none" />
 
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
@@ -62,14 +63,12 @@ export default function AdminShell({ children }: AdminShellProps) {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Logo / Brand */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-border-card">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center shadow-glow">
-              <span className="text-text-primary font-bold text-sm">BM</span>
-            </div>
+        <div className="h-20 flex items-center justify-between px-6 border-b border-border-card">
+          <div className="flex items-center gap-4">
+            <LogoBM size={56} />
             <div>
-              <h1 className="text-text-primary font-semibold text-sm">BookMate</h1>
-              <p className="text-text-secondary text-xs">Dashboard</p>
+              <h1 className="text-yellow font-bebasNeue text-xl uppercase tracking-wide">BookMate</h1>
+              <p className="text-text-secondary font-aileron text-xs">Analytics Dashboard</p>
             </div>
           </div>
           <button

@@ -93,10 +93,10 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
     <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-[#FFFFFF] mb-2">Revenue vs Expenses Trend</h2>
-        <p className="text-sm text-[#A0A0A0]">
+        <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-2">Revenue vs Expenses Trend</h2>
+        <p className="font-aileron text-sm text-text-secondary">
           Last 6 months performance overview
-          <span className="ml-2 text-xs text-[#A0A0A0]">(Historical data coming soon)</span>
+          <span className="ml-2 text-xs text-text-secondary">(Historical data coming soon)</span>
         </p>
       </div>
 
@@ -155,7 +155,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
       </div>
 
       {/* Legend explanation */}
-      <div className="mt-4 flex items-center gap-6 text-xs text-[#A0A0A0]">
+      <div className="mt-4 flex items-center gap-6 font-aileron text-xs text-text-secondary">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-green-500" />
           <span>Revenue (Income)</span>

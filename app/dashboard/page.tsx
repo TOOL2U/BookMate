@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import AdminShell from '@/components/layout/AdminShell';
 import DashboardKpiCards from '@/components/dashboard/DashboardKpiCards';
+import LogoBM from '@/components/LogoBM';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 
 // Lazy load heavy chart components to improve initial load time
@@ -191,14 +192,17 @@ export default function DashboardPage() {
     <AdminShell>
       <div className="relative space-y-8">
         {/* Page header - Made Mirage font for title */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-madeMirage font-bold text-text-primary tracking-tight">
+            <h1 className="text-5xl font-madeMirage font-bold text-text-primary tracking-tight">
               Dashboard
             </h1>
-            <p className="text-text-secondary mt-2 font-aileron">
+            <p className="text-text-secondary mt-3 font-aileron text-lg">
               Real-time overview of your business performance
             </p>
+          </div>
+          <div className="-ml-86">
+            <LogoBM size={100} />
           </div>
           <button
             onClick={fetchDashboardData}

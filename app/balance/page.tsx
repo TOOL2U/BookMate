@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import AdminShell from '@/components/layout/AdminShell';
+import LogoBM from '@/components/LogoBM';
 import { Wallet, TrendingUp, TrendingDown, Clock, AlertTriangle, RefreshCw, Upload, Plus, CheckCircle, XCircle, Zap, Edit3, Camera, Banknote, Building2, Save } from 'lucide-react';
 
 interface Balance {
@@ -264,7 +265,7 @@ function BalanceAnalyticsPage() {
     <AdminShell>
       <div className="space-y-6">
         {/* Page header - Made Mirage font for title */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-4xl font-madeMirage font-bold text-text-primary tracking-tight">
               Balance Overview
@@ -278,6 +279,9 @@ function BalanceAnalyticsPage() {
                 Last updated: {lastUpdated}
               </p>
             )}
+          </div>
+          <div className="-ml-86">
+            <LogoBM size={100} />
           </div>
           <button
             onClick={fetchBalances}
@@ -304,10 +308,10 @@ function BalanceAnalyticsPage() {
             <div className="h-12 w-48 bg-border-card/60 animate-pulse rounded" />
           ) : (
             <div>
-              <p className="text-5xl font-bold text-text-primary mb-2">
+              <p className="font-madeMirage text-6xl text-yellow mb-2">
                 ฿{totalBalance.toLocaleString()}
               </p>
-              <p className="text-text-secondary text-sm">
+              <p className="font-aileron text-text-secondary text-sm">
                 Cash + Bank Accounts
               </p>
             </div>
@@ -323,14 +327,14 @@ function BalanceAnalyticsPage() {
                 <Wallet className="w-6 h-6 text-success" />
               </div>
               <div>
-                <p className="text-sm text-white">Cash in Hand</p>
-                <p className="text-xs text-text-tertiary">Physical currency</p>
+                <p className="font-bebasNeue text-sm text-white uppercase tracking-wide">Cash in Hand</p>
+                <p className="font-aileron text-xs text-text-tertiary">Physical currency</p>
               </div>
             </div>
             {loading ? (
               <div className="h-10 w-32 bg-border-card/60 animate-pulse rounded" />
             ) : (
-              <p className="text-3xl font-bold text-text-primary">
+              <p className="font-madeMirage text-4xl text-yellow">
                 ฿{cashBalance.toLocaleString()}
               </p>
             )}
@@ -343,14 +347,14 @@ function BalanceAnalyticsPage() {
                 <TrendingUp className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <p className="text-sm text-white">Bank Accounts</p>
-                <p className="text-xs text-text-tertiary">Total in all banks</p>
+                <p className="font-bebasNeue text-sm text-white uppercase tracking-wide">Bank Accounts</p>
+                <p className="font-aileron text-xs text-text-tertiary">Total in all banks</p>
               </div>
             </div>
             {loading ? (
               <div className="h-10 w-32 bg-border-card/60 animate-pulse rounded" />
             ) : (
-              <p className="text-3xl font-bold text-text-primary">
+              <p className="font-madeMirage text-4xl text-yellow">
                 ฿{bankBalance.toLocaleString()}
               </p>
             )}
@@ -359,7 +363,7 @@ function BalanceAnalyticsPage() {
 
         {/* Individual Account Balances */}
         <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-6">Account Details</h2>
+          <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-6">Account Details</h2>
           
           {loading ? (
             <div className="space-y-3">
@@ -387,9 +391,9 @@ function BalanceAnalyticsPage() {
                       }`} />
                     </div>
                     <div>
-                      <p className="text-text-primary font-medium">{balance.bankName}</p>
+                      <p className="font-aileron text-text-primary font-medium">{balance.bankName}</p>
                       {balance.timestamp && (
-                        <p className="text-xs text-text-secondary mt-1">
+                        <p className="font-aileron text-xs text-text-secondary mt-1">
                           Last updated {new Date(balance.timestamp).toLocaleString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -399,7 +403,7 @@ function BalanceAnalyticsPage() {
                         </p>
                       )}
                       {balance.transactionCount !== undefined && balance.transactionCount > 0 && (
-                        <p className="text-xs text-text-secondary mt-1">
+                        <p className="font-aileron text-xs text-text-secondary mt-1">
                           {balance.transactionCount} transaction{balance.transactionCount !== 1 ? 's' : ''} 
                           {balance.totalExpense! > 0 && ` • -฿${balance.totalExpense!.toLocaleString()} expenses`}
                           {balance.totalRevenue! > 0 && ` • +฿${balance.totalRevenue!.toLocaleString()} revenue`}
@@ -408,7 +412,7 @@ function BalanceAnalyticsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-text-primary">
+                    <p className="font-madeMirage text-3xl text-yellow">
                       ฿{balance.balance.toLocaleString()}
                     </p>
                   </div>
@@ -418,19 +422,19 @@ function BalanceAnalyticsPage() {
           ) : (
             <div className="text-center py-12">
               <AlertTriangle className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
-              <p className="text-text-secondary">No balance data available</p>
-              <p className="text-sm text-text-secondary mt-1">Use the mobile app to upload balances</p>
+              <p className="font-aileron text-text-secondary">No balance data available</p>
+              <p className="font-aileron text-sm text-text-secondary mt-1">Use the mobile app to upload balances</p>
             </div>
           )}
         </div>
 
         {/* Balance History Preview (Placeholder for future) */}
         <div className="bg-gradient-to-br from-[#000000] to-[#141E21] border border-border-card rounded-xl p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-4">Balance Trend</h2>
+          <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-4">Balance Trend</h2>
           <div className="text-center py-12">
             <TrendingUp className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
-            <p className="text-text-secondary">Historical trend coming soon</p>
-            <p className="text-sm text-text-secondary mt-1">
+            <p className="font-aileron text-text-secondary">Historical trend coming soon</p>
+            <p className="font-aileron text-sm text-text-secondary mt-1">
               Track balance changes over time
             </p>
           </div>
@@ -440,11 +444,11 @@ function BalanceAnalyticsPage() {
         <div className="bg-black border border-border-card rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-semibold text-text-primary flex items-center gap-2">
+              <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide flex items-center gap-2">
                 <Edit3 className="w-6 h-6 text-accent" />
                 Update Monthly Balances
               </h2>
-              <p className="text-sm text-text-secondary mt-1">Upload screenshots or manually enter new bank balances</p>
+              <p className="font-aileron text-sm text-text-secondary mt-1">Upload screenshots or manually enter new bank balances</p>
             </div>
             {!showUploadModal && (
               <button
@@ -465,7 +469,7 @@ function BalanceAnalyticsPage() {
                   onClick={() => setUploadMethod('manual')}
                   className={`group relative p-6 rounded-xl border-2 transition-all duration-200 ${
                     uploadMethod === 'manual'
-                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-black/10 shadow-lg shadow-glow'
+                      ? 'border-yellow bg-yellow/10 shadow-glow'
                       : 'border-border-card bg-black hover:border-border-card hover:bg-[#0A0A0A]'
                   }`}
                 >
@@ -477,8 +481,8 @@ function BalanceAnalyticsPage() {
                     }`}>
                       <Edit3 className={`w-8 h-8 ${uploadMethod === 'manual' ? 'text-yellow' : 'text-text-secondary'}`} />
                     </div>
-                    <p className="text-white font-semibold text-lg">Manual Entry</p>
-                    <p className="text-xs text-text-secondary mt-2">Type in balances manually</p>
+                    <p className="font-bebasNeue text-white text-xl uppercase tracking-wide">Manual Entry</p>
+                    <p className="font-aileron text-xs text-text-secondary mt-2">Type in balances manually</p>
                   </div>
                   {uploadMethod === 'manual' && (
                     <div className="absolute top-3 right-3">
@@ -490,7 +494,7 @@ function BalanceAnalyticsPage() {
                   onClick={() => setUploadMethod('ocr')}
                   className={`group relative p-6 rounded-xl border-2 transition-all duration-200 ${
                     uploadMethod === 'ocr'
-                      ? 'border-accent bg-gradient-to-br from-accent/20 to-accent-purple/10 shadow-lg shadow-glow'
+                      ? 'border-yellow bg-yellow/10 shadow-glow'
                       : 'border-border-card bg-[#0A0A0A] hover:border-border-card hover:bg-[#0A0A0A]'
                   }`}
                 >
@@ -502,8 +506,8 @@ function BalanceAnalyticsPage() {
                     }`}>
                       <Camera className={`w-8 h-8 ${uploadMethod === 'ocr' ? 'text-black' : 'text-text-secondary'}`} />
                     </div>
-                    <p className="text-text-primary font-semibold text-lg">Upload Screenshot</p>
-                    <p className="text-xs text-text-secondary mt-2">Auto-extract from image</p>
+                    <p className="font-bebasNeue text-text-primary text-xl uppercase tracking-wide">Upload Screenshot</p>
+                    <p className="font-aileron text-xs text-text-secondary mt-2">Auto-extract from image</p>
                   </div>
                   {uploadMethod === 'ocr' && (
                     <div className="absolute top-3 right-3">
@@ -518,7 +522,7 @@ function BalanceAnalyticsPage() {
                 <div className="space-y-4">
                   {/* Bank Selection for OCR */}
                   <div className="bg-[#0A0A0A] rounded-lg p-4 border border-border-card">
-                    <label className="block text-sm font-semibold text-text-primary mb-3">
+                    <label className="font-bebasNeue block text-sm text-text-primary uppercase tracking-wide mb-3">
                       Select Bank Account for this Statement
                     </label>
                     <select
@@ -536,7 +540,7 @@ function BalanceAnalyticsPage() {
                       })}
                     </select>
                     {selectedBank && (
-                      <p className="text-xs text-accent mt-2 inline-flex items-center gap-1">
+                      <p className="font-aileron text-xs text-accent mt-2 inline-flex items-center gap-1">
                         <CheckCircle className="w-3 h-3" />
                         <span>Selected: {selectedBank}</span>
                       </p>
@@ -544,7 +548,7 @@ function BalanceAnalyticsPage() {
                   </div>
 
                   {/* Upload Area */}
-                  <div className="relative border-2 border-dashed border-accent/30 rounded-xl p-10 bg-gradient-to-br from-accent/10 to-accent-purple/10 hover:border-accent/50 transition-all duration-200">
+                  <div className="relative border-2 border-dashed border-yellow/30 rounded-xl p-10 bg-yellow/5 hover:border-yellow/50 transition-all duration-200">
                     <div className="text-center">
                       <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br bg-yellow flex items-center justify-center">
                         <Camera className="w-10 h-10 text-text-secondary" />
@@ -566,26 +570,26 @@ function BalanceAnalyticsPage() {
                         {uploading ? (
                           <>
                             <RefreshCw className="w-5 h-5 text-text-primary animate-spin" />
-                            <span className="text-text-primary font-semibold">Processing Image...</span>
+                            <span className="font-aileron text-text-primary font-semibold">Processing Image...</span>
                           </>
                         ) : (
                           <>
                             <Upload className="w-5 h-5 text-text-primary" />
-                            <span className="text-text-primary font-semibold">
+                            <span className="font-aileron text-text-primary font-semibold">
                               {selectedFile ? selectedFile.name : 'Choose Bank Statement'}
                             </span>
                           </>
                         )}
                       </label>
                       {!selectedBank && (
-                        <p className="text-sm text-warning mt-4">
+                        <p className="font-aileron text-sm text-warning mt-4">
                           Please select a bank account first
                         </p>
                       )}
-                      <p className="text-sm text-text-secondary mt-4">
+                      <p className="font-aileron text-sm text-text-secondary mt-4">
                         Upload a screenshot of your bank statement or balance
                       </p>
-                      <p className="text-xs text-text-secondary mt-2">
+                      <p className="font-aileron text-xs text-text-secondary mt-2">
                         Supports JPG, PNG • AI will auto-extract balance amounts
                       </p>
                     </div>
@@ -598,7 +602,7 @@ function BalanceAnalyticsPage() {
                 <div className="space-y-4">
                 {/* Bank Selection Dropdown */}
                 <div className="bg-[#0A0A0A] rounded-lg p-4 border border-border-card">
-                  <label className="block text-sm font-semibold text-text-primary mb-3">
+                  <label className="font-bebasNeue block text-sm text-text-primary uppercase tracking-wide mb-3">
                     Select Bank Account to Update
                   </label>
                   <select
@@ -616,7 +620,7 @@ function BalanceAnalyticsPage() {
                     })}
                   </select>
                   {selectedBank && (
-                    <p className="text-xs text-accent mt-2 inline-flex items-center gap-1">
+                    <p className="font-aileron text-xs text-accent mt-2 inline-flex items-center gap-1">
                       <CheckCircle className="w-3 h-3" />
                       <span>Selected: {selectedBank}</span>
                     </p>
@@ -647,22 +651,22 @@ function BalanceAnalyticsPage() {
                           )}
                         </div>
                         <div className="flex-1">
-                          <p className="text-text-primary text-base font-semibold">{selectedBank}</p>
-                          <p className="text-xs text-text-secondary">{isCash ? 'Cash Account' : 'Bank Account'}</p>
+                          <p className="font-bebasNeue text-text-primary text-base uppercase tracking-wide">{selectedBank}</p>
+                          <p className="font-aileron text-xs text-text-secondary">{isCash ? 'Cash Account' : 'Bank Account'}</p>
                         </div>
                       </div>
 
                       {/* Previous Balance */}
                       <div className="bg-[#0A0A0A] rounded-lg p-4">
-                        <label className="block text-xs text-text-secondary mb-1">Previous Balance</label>
-                        <p className="text-text-primary text-lg font-medium">
+                        <label className="font-aileron block text-xs text-text-secondary mb-1">Previous Balance</label>
+                        <p className="font-madeMirage text-text-primary text-2xl">
                           ฿{previousBalance.toLocaleString()}
                         </p>
                       </div>
 
                       {/* New Balance Input */}
                       <div>
-                        <label className="block text-sm font-semibold text-text-primary mb-2">
+                        <label className="font-bebasNeue block text-sm text-text-primary uppercase tracking-wide mb-2">
                           New Balance <span className="text-error">*</span>
                         </label>
                         <div className="relative">
@@ -689,7 +693,7 @@ function BalanceAnalyticsPage() {
                           />
                         </div>
                         {hasChanged && (
-                          <p className="text-xs text-accent mt-2 inline-flex items-center gap-1">
+                          <p className="font-aileron text-xs text-accent mt-2 inline-flex items-center gap-1">
                             <CheckCircle className="w-3 h-3" />
                             <span>Balance changed by ฿{Math.abs(entry.balance - previousBalance).toLocaleString()}</span>
                           </p>
@@ -698,7 +702,7 @@ function BalanceAnalyticsPage() {
 
                       {/* Note Input */}
                       <div>
-                        <label className="block text-sm font-semibold text-text-primary mb-2">
+                        <label className="font-bebasNeue block text-sm text-text-primary uppercase tracking-wide mb-2">
                           Note (Optional)
                         </label>
                         <input
@@ -725,7 +729,7 @@ function BalanceAnalyticsPage() {
                 {!selectedBank && (
                   <div className="bg-[#0A0A0A] rounded-lg p-8 border border-border-card text-center">
                     <Wallet className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
-                    <p className="text-text-secondary text-sm">
+                    <p className="font-aileron text-text-secondary text-sm">
                       Please select a bank account from the dropdown above to update its balance
                     </p>
                   </div>
@@ -736,7 +740,7 @@ function BalanceAnalyticsPage() {
               {/* Reconciliation Summary */}
               {newBalances.some(b => b.balance > 0) && (
                 <div className="border border-border-card rounded-lg p-4 bg-[#0A0A0A]">
-                  <h3 className="text-text-primary font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-bebasNeue text-text-primary uppercase tracking-wide mb-3 flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-accent" />
                     Money Tracking Reconciliation
                   </h3>
@@ -841,7 +845,7 @@ function BalanceAnalyticsPage() {
         <div className="bg-[#0A0A0A] border border-warning/30 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <AlertTriangle className="w-6 h-6 text-warning" />
-            <h2 className="text-xl font-semibold text-text-primary">Alerts & Warnings</h2>
+            <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide">Alerts & Warnings</h2>
           </div>
           <div className="space-y-2">
             {cashBalance < 10000 && (

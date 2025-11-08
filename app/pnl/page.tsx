@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 import AdminShell from '@/components/layout/AdminShell';
+import LogoBM from '@/components/LogoBM';
 import PnLKpiRow from '@/components/pnl/PnLKpiRow';
 import PnLTrendChart from '@/components/pnl/PnLTrendChart';
 import PnLExpenseBreakdown from '@/components/pnl/PnLExpenseBreakdown';
@@ -102,14 +103,17 @@ export default function PnLPage() {
     <AdminShell>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-madeMirage font-bold text-text-primary tracking-tight mb-2">
+            <h1 className="text-3xl font-madeMirage font-bold text-text-primary tracking-tight mb-2">
               P&L Dashboard
             </h1>
             <p className="text-text-secondary font-aileron">
               Comprehensive financial performance and analytics
             </p>
+          </div>
+          <div className="-ml-86">
+            <LogoBM size={100} />
           </div>
           <button
             onClick={fetchPnLData}

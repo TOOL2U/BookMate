@@ -81,22 +81,22 @@ function KPICard({
             {icon}
           </div>
         </div>
-        <span className="text-xs text-[#A0A0A0] uppercase tracking-wider">{subtitle}</span>
+        <span className="font-aileron text-xs text-text-secondary uppercase tracking-wider">{subtitle}</span>
       </div>
 
       {/* Title */}
-      <p className="text-sm text-[#A0A0A0] mb-2 font-medium">{title}</p>
+      <p className="font-bebasNeue text-sm text-text-secondary mb-2 uppercase tracking-wide">{title}</p>
 
       {/* Value */}
       <div className="flex items-baseline gap-2">
         {!isPercentage && (
-          <p className="text-3xl font-bold text-[#FFFFFF]">
+          <p className="font-madeMirage text-4xl text-yellow">
             ฿{formatCurrency(value)}
           </p>
         )}
         {isPercentage && (
           <div className="flex items-center gap-2">
-            <p className={`text-3xl font-bold ${
+            <p className={`font-madeMirage text-4xl ${
               trend === 'up' ? 'text-green-400' : trend === 'down' ? 'text-red-400' : 'text-yellow'
             }`}>
               {value.toFixed(1)}%

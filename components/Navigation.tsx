@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Upload, Inbox, BarChart3, Settings, Sparkles, Wallet } from 'lucide-react';
 import { useState } from 'react';
+import LogoBM from './LogoBM';
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -47,40 +48,27 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between md:justify-between items-center h-14">
           {/* Logo/Title - Hidden on mobile, visible on desktop */}
-          <Link href="/upload" className="hidden md:flex items-center gap-2 group relative">
+          <Link href="/upload" className="hidden md:flex items-center gap-3 group relative">
             {/* Subtle hover glow */}
             <motion.div
               className="absolute inset-0 bg-yellow/5 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
               style={{ transform: 'scale(1.5)' }}
             />
 
-            {/* Logo indicator */}
+            {/* BM Logo */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
               className="relative"
             >
-              {/* Pulsing yellow glow effect */}
-              <motion.div
-                className="absolute inset-0 bg-yellow rounded-full blur-md opacity-40"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.4, 0.6, 0.4],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-              <div className="h-2 w-2 rounded-full bg-yellow shadow-glow relative z-10" />
+              <LogoBM size={32} />
             </motion.div>
 
             {/* Title - Bebas Neue font */}
             <div className="relative">
               <motion.span
-                className="text-xl font-bebasNeue tracking-wide text-white uppercase"
+                className="text-xl font-bebasNeue tracking-wide text-yellow uppercase"
               >
                 BookMate
               </motion.span>

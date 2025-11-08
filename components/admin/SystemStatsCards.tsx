@@ -20,8 +20,8 @@ export default function SystemStatsCards({ stats, isLoading }: SystemStatsCardsP
       icon: Database,
       value: stats.totalEntries,
       label: 'Total Entries',
-      color: 'accent',
-      gradient: 'from-accent/15 to-transparent'
+      color: 'yellow',
+      gradient: 'from-yellow/15 to-transparent'
     },
     {
       icon: TrendingUp,

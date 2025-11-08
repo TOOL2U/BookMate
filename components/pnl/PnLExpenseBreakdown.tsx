@@ -45,12 +45,12 @@ function ExpensePanel({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
-          <p className="text-sm text-text-secondary mt-1">{subtitle}</p>
+          <h3 className="font-bebasNeue text-xl text-text-primary uppercase tracking-wide">{title}</h3>
+          <p className="font-aileron text-sm text-text-secondary mt-1">{subtitle}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-text-secondary uppercase tracking-wider">Total</p>
-          <p className="text-2xl font-bold text-text-primary">฿{formatCurrency(total)}</p>
+          <p className="font-aileron text-xs text-text-secondary uppercase tracking-wider">Total</p>
+          <p className="font-madeMirage text-3xl text-yellow">฿{formatCurrency(total)}</p>
         </div>
       </div>
 
@@ -191,8 +191,8 @@ export default function PnLExpenseBreakdown({
     <div className="space-y-6">
       {/* Section Header */}
       <div>
-        <h2 className="text-2xl font-bold text-text-primary mb-2">Expense Breakdown</h2>
-        <p className="text-text-secondary">Detailed cost analysis for {periodLabel.toLowerCase()}</p>
+        <h2 className="font-bebasNeue text-3xl text-text-primary uppercase tracking-wide mb-2">Expense Breakdown</h2>
+        <p className="font-aileron text-text-secondary">Detailed cost analysis for {periodLabel.toLowerCase()}</p>
       </div>
 
       {/* Two-column grid */}
