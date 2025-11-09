@@ -8,6 +8,8 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import AdminShell from '@/components/layout/AdminShell';
+import PageLoadingScreen from '@/components/PageLoadingScreen';
+import { usePageLoading } from '@/hooks/usePageLoading';
 
 interface Receipt {
   id: string;
@@ -28,6 +30,11 @@ interface Receipt {
 }
 
 export default function InboxPage() {
+  // Coordinate page loading with data fetching
+  const { isLoading: showPageLoading, setDataReady } = usePageLoading({
+    minLoadingTime: 800
+  });
+  
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -42,6 +49,9 @@ export default function InboxPage() {
         setIsLoading(true);
       }
       setError(null);
+
+      console.log('📥 Activity Page: Fetching receipts...');
+      const startTime = Date.now();
 
       const response = await fetch('/api/inbox');
       const data = await response.json();
@@ -58,9 +68,13 @@ export default function InboxPage() {
       });
 
       setReceipts(sortedReceipts);
+      
+      console.log(`✅ Activity Page: Data loaded in ${Date.now() - startTime}ms`);
+      setDataReady(true);
     } catch (err: any) {
       console.error('Error fetching receipts:', err);
       setError(err.message || 'Failed to load receipts');
+      setDataReady(true); // Still mark ready on error
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -70,7 +84,7 @@ export default function InboxPage() {
   // Load receipts on mount
   useEffect(() => {
     fetchReceipts();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDelete = async (receipt: Receipt) => {
     if (!confirm(`Are you sure you want to delete this entry?\n\n${receipt.detail} - ${receipt.amount} THB`)) {
@@ -101,6 +115,15 @@ export default function InboxPage() {
       alert('Failed to delete entry: ' + err.message);
     }
   };
+
+  // Show page loading screen while data loads
+  if (showPageLoading) {
+    return (
+      <AdminShell>
+        <PageLoadingScreen />
+      </AdminShell>
+    );
+  }
 
   return (
     <AdminShell>
