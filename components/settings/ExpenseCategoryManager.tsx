@@ -180,12 +180,12 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
   }, []);
 
   return (
-    <div className="bg-bg-card border border-border-card rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+    <div className="bg-bg-card border border-border-card rounded-xl2 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
       {/* Header */}
       <div className="border-b border-border-card p-6 bg-bg-app/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl2 bg-accent/10 flex items-center justify-center">
               <BriefcaseBusiness className="w-5 h-5 text-yellow" />
             </div>
             <div>
@@ -196,7 +196,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
           <button
             onClick={handleStartAdd}
             disabled={loading || isUpdating || isAdding}
-            className="px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-glow"
+            className="px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 text-black text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-glow"
           >
             <Plus className="w-4 h-4" />
             Add Expense Category
@@ -261,7 +261,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                         placeholder="e.g., EXP - Marketing - Online Ads"
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50"
+                        className="w-full bg-bg-card border border-border-card rounded-xl2 px-3 py-2 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50"
                       />
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -269,7 +269,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                         <button
                           onClick={handleSaveAdd}
                           disabled={isUpdating || !newValue.trim()}
-                          className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-success/40"
+                          className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-success/40"
                           title="Save"
                         >
                           {isUpdating ? (
@@ -281,7 +281,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                         <button
                           onClick={handleCancelAdd}
                           disabled={isUpdating}
-                          className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-border-card"
+                          className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-border-card"
                           title="Cancel"
                         >
                           <X className="w-4 h-4 text-text-secondary" />
@@ -312,7 +312,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                           }}
                           autoFocus
                           disabled={isUpdating}
-                          className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50"
+                          className="w-full bg-bg-card border border-border-card rounded-xl2 px-3 py-2 text-text-primary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 disabled:opacity-50"
                         />
                       ) : (
                         <span className="text-text-primary font-medium">{item}</span>
@@ -324,7 +324,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                           <button
                             onClick={() => handleSaveEdit(item)}
                             disabled={isUpdating || !editValue.trim()}
-                            className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-success/40"
+                            className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-success/40"
                             title="Save"
                           >
                             {isUpdating ? (
@@ -336,7 +336,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                           <button
                             onClick={handleCancelEdit}
                             disabled={isUpdating}
-                            className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-border-card"
+                            className="p-2 bg-border-card/60 hover:bg-border-card disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-border-card"
                             title="Cancel"
                           >
                             <X className="w-4 h-4 text-text-secondary" />
@@ -347,7 +347,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                           <button
                             onClick={() => handleStartEdit(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-accent/15 hover:bg-accent/25 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-accent/40"
+                            className="p-2 bg-accent/15 hover:bg-accent/25 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-accent/40"
                             title="Edit"
                           >
                             <Edit2 className="w-4 h-4 text-accent" />
@@ -355,7 +355,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
                           <button
                             onClick={() => handleDelete(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-error/40"
+                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-error/40"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4 text-error" />
@@ -383,7 +383,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
       {/* Toast Notification */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
-          <div className={`px-6 py-4 rounded-xl shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-sm border ${
+          <div className={`px-6 py-4 rounded-xl2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-sm border ${
             toast.type === 'success'
               ? 'bg-success/90 border-success text-text-primary'
               : toast.type === 'error'
