@@ -26,22 +26,20 @@ export default function ExpenseBreakdownDonut({ overheadCategories, propertyCate
     );
   }
 
-  // Combine overhead and property categories
-  const allCategories = [...overheadCategories, ...propertyCategories];
-  
-  if (allCategories.length === 0) {
+  // Only show overhead expenses
+  if (overheadCategories.length === 0) {
     return (
       <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6">
-        <h3 className="text-lg font-bebasNeue uppercase text-white mb-6">Expense Breakdown</h3>
+        <h3 className="text-lg font-bebasNeue uppercase text-white mb-6">Overhead Expense Breakdown</h3>
         <div className="h-80 flex items-center justify-center">
-          <p className="text-text-secondary">No expense data available</p>
+          <p className="text-text-secondary">No overhead expense data available</p>
         </div>
       </div>
     );
   }
 
   // Filter out zero values and sort by expense
-  const expenseData = allCategories
+  const expenseData = overheadCategories
     .filter(cat => cat.expense > 0)
     .sort((a, b) => b.expense - a.expense)
     .map(cat => ({
@@ -54,7 +52,7 @@ export default function ExpenseBreakdownDonut({ overheadCategories, propertyCate
   return (
     <div className="bg-linear-to-br from-bg-card to-black/50 backdrop-blur-sm border border-border-card rounded-xl2 p-4 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
       <div className="mb-4">
-        <h3 className="text-lg font-bebasNeue uppercase text-white mb-1">Expense Breakdown</h3>
+        <h3 className="text-lg font-bebasNeue uppercase text-white mb-1">Overhead Expense Breakdown</h3>
         <p className="text-sm text-text-secondary">Current month by category</p>
       </div>
 

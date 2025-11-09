@@ -73,7 +73,7 @@ export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlow
     <div className="bg-linear-to-br from-bg-card to-black/50 backdrop-blur-sm border border-border-card rounded-xl2 p-8 h-full hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
       <div className="mb-8 flex items-start justify-between">
         <div>
-          <h3 className="text-lg font-bebasNeue uppercase text-white mb-8">Net Profit Trend</h3>
+          <h3 className="text-lg font-bebasNeue uppercase text-white mb-2">Net Profit Trend</h3>
           <p className="text-sm text-text-secondary">GOP comparison</p>
         </div>
         <div className="text-right">
@@ -82,17 +82,17 @@ export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlow
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={220}>
-        <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+      <ResponsiveContainer width="100%" height={520}>
+        <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
           <XAxis 
             dataKey="period" 
             stroke="#b5b5b5"
-            style={{ fontSize: '12px' }}
+            style={{ fontSize: '14px' }}
           />
           <YAxis 
             stroke="#b5b5b5"
-            style={{ fontSize: '12px' }}
+            style={{ fontSize: '14px' }}
             tickFormatter={(value) => `฿${(value / 1000).toFixed(0)}k`}
           />
           <Tooltip
@@ -100,7 +100,7 @@ export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlow
               backgroundColor: '#171717',
               border: '1px solid #2a2a2a',
               borderRadius: '8px',
-              fontSize: '12px'
+              fontSize: '14px'
             }}
             formatter={(value: number) => [`฿${value.toLocaleString()}`, 'Net Profit (GOP)']}
           />

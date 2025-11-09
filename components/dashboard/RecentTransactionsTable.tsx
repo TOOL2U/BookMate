@@ -66,7 +66,7 @@ export default function RecentTransactionsTable({ transactions, isLoading }: Rec
 
   return (
     <div className="bg-linear-to-br from-bg-card to-black/50 backdrop-blur-sm border border-border-card rounded-xl2 p-4 h-full hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
-      <div className="mb-4">
+      <div className="mb-6">
         <h3 className="text-lg font-bebasNeue uppercase text-white mb-1">Recent Transactions</h3>
         <p className="text-sm text-text-secondary">
           {sortedTransactions.length > 0 
@@ -77,7 +77,7 @@ export default function RecentTransactionsTable({ transactions, isLoading }: Rec
       </div>
 
       {sortedTransactions.length > 0 ? (
-        <div className="space-y-2 max-h-[440px] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-2 max-h-[560px] overflow-y-auto pr-2 custom-scrollbar">
           {sortedTransactions.map((txn, index) => {
             const amount = getAmount(txn);
             const income = isIncome(txn);

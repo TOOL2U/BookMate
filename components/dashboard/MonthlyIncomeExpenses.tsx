@@ -56,22 +56,22 @@ export default function MonthlyIncomeExpenses({ pnlData, isLoading }: MonthlyInc
 
   return (
     <div className="bg-linear-to-br from-bg-card to-black/50 backdrop-blur-sm border border-border-card rounded-xl2 p-4 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200 hover:border-[#2A2A2A]/50 transition-all duration-200 group">
-      <div className="mb-4">
+      <div className="mb-6">
         <h3 className="text-lg font-bebasNeue uppercase text-white mb-1">Income vs Expenses</h3>
         <p className="text-sm text-text-secondary">Monthly and yearly comparison</p>
       </div>
 
-      <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+      <ResponsiveContainer width="100%" height={520}>
+        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }} barGap={20} barCategoryGap="30%">
           <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
           <XAxis 
             dataKey="period" 
             stroke="#b5b5b5"
-            style={{ fontSize: '12px' }}
+            style={{ fontSize: '14px' }}
           />
           <YAxis 
             stroke="#b5b5b5"
-            style={{ fontSize: '12px' }}
+            style={{ fontSize: '14px' }}
             tickFormatter={(value) => `฿${(value / 1000).toFixed(0)}k`}
           />
           <Tooltip
@@ -79,16 +79,16 @@ export default function MonthlyIncomeExpenses({ pnlData, isLoading }: MonthlyInc
               backgroundColor: '#171717',
               border: '1px solid #2a2a2a',
               borderRadius: '8px',
-              fontSize: '12px'
+              fontSize: '14px'
             }}
             formatter={(value: number) => `฿${value.toLocaleString()}`}
           />
           <Legend 
-            wrapperStyle={{ fontSize: '12px' }}
+            wrapperStyle={{ fontSize: '14px' }}
             iconType="circle"
           />
-          <Bar dataKey="Income" fill="#00FF88" radius={[8, 8, 0, 0]} />
-          <Bar dataKey="Expenses" fill="#FF3366" radius={[8, 8, 0, 0]} />
+          <Bar dataKey="Income" fill="#00FF88" radius={[8, 8, 0, 0]} maxBarSize={120} />
+          <Bar dataKey="Expenses" fill="#FF3366" radius={[8, 8, 0, 0]} maxBarSize={120} />
         </BarChart>
       </ResponsiveContainer>
     </div>
