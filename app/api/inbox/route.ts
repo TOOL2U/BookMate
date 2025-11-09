@@ -7,24 +7,26 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// Cache for inbox data (5 seconds TTL to keep it fresh)
+// Cache for inbox data (30 seconds TTL - balance between freshness and performance)
 let cache: {
   data: any[];
   timestamp: number;
 } | null = null;
 
-const CACHE_DURATION_MS = 5000; // 5 seconds
+const CACHE_DURATION_MS = 30000; // 30 seconds
 
 /**
  * GET /api/inbox
  * Returns all entries from Google Sheets
  */
 export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  
   try {
     // Check cache first
     const now = Date.now();
     if (cache && (now - cache.timestamp) < CACHE_DURATION_MS) {
-      console.log('✅ Returning cached inbox data');
+      console.log(`✅ Returning cached inbox data (${Date.now() - startTime}ms)`);
       return NextResponse.json({
         ok: true,
         data: cache.data,
@@ -61,6 +63,8 @@ export async function GET(request: NextRequest) {
 
     console.log('📥 Fetching fresh inbox data from Google Sheets...');
 
+    const fetchStart = Date.now();
+    
     // Fetch data from Apps Script endpoint
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
@@ -101,6 +105,9 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
+    const fetchTime = Date.now() - fetchStart;
+    console.log(`⏱️ Google Sheets fetch took ${fetchTime}ms`);
+
     if (!data.ok) {
       console.error('❌ Apps Script returned error:', data.error);
       return NextResponse.json(
@@ -112,7 +119,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`✅ Fetched ${data.count || 0} entries from Google Sheets`);
+    console.log(`✅ Fetched ${data.count || 0} entries from Google Sheets (total: ${Date.now() - startTime}ms)`);
 
     // Update cache
     cache = {
@@ -124,7 +131,9 @@ export async function GET(request: NextRequest) {
       ok: true,
       data: data.data || [],
       count: data.count || 0,
-      cached: false
+      cached: false,
+      fetchTime: fetchTime,
+      totalTime: Date.now() - startTime
     });
 
   } catch (error) {

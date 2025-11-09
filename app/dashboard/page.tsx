@@ -99,14 +99,19 @@ export default function DashboardPage() {
       setLoading(true);
       setError(null);
 
+      const dashboardStartTime = Date.now();
+      console.log('🚀 Dashboard: Starting data fetch...');
+
       // PERFORMANCE: Fetch critical data first (P&L + Balance), then load charts after
       // This allows KPI cards to display immediately while charts load in background
       
       // Phase 1: Critical data for KPI cards (parallel)
+      const phase1Start = Date.now();
       const [pnlRes, balanceRes] = await Promise.all([
         fetch('/api/pnl', { cache: 'default' }), // Allow browser caching for 60s
         fetch('/api/balance?month=ALL', { cache: 'default' })
       ]);
+      console.log(`⏱️ Phase 1 (P&L + Balance) took ${Date.now() - phase1Start}ms`);
 
       const pnlData = await pnlRes.json();
       const balanceData = await balanceRes.json();
@@ -146,12 +151,16 @@ export default function DashboardPage() {
 
       setLoading(false); // KPI cards ready - show them now!
 
+      console.log(`✅ Dashboard KPIs ready in ${Date.now() - dashboardStartTime}ms`);
+
       // Phase 2: Load chart data in background (non-blocking)
+      const phase2Start = Date.now();
       Promise.all([
         fetch('/api/pnl/overhead-expenses?period=month', { cache: 'default' }),
         fetch('/api/pnl/property-person?period=month', { cache: 'default' }),
-        fetch(`/api/inbox?t=${Date.now()}`, { cache: 'no-store' }) // Cache-busting for live data
+        fetch('/api/inbox', { cache: 'default' }) // Allow 30s cache on inbox
       ]).then(async ([overheadRes, propertyRes, inboxRes]) => {
+        console.log(`⏱️ Phase 2 (Charts) took ${Date.now() - phase2Start}ms`);
         const [overheadData, propertyData, inboxData] = await Promise.all([
           overheadRes.json(),
           propertyRes.json(),
@@ -176,6 +185,8 @@ export default function DashboardPage() {
           propertyCategories: propertyData.ok ? (propertyData.data || []) : [],
           recentActivity: sortedTransactions // Show ALL transactions, sorted by date
         }));
+        
+        console.log(`✅ Dashboard fully loaded in ${Date.now() - dashboardStartTime}ms`);
       }).catch(err => {
         console.warn('Chart data loading failed:', err);
         // Don't set error - KPI cards are already showing
@@ -203,7 +214,7 @@ export default function DashboardPage() {
     <AdminShell>
       <div className="relative space-y-4">
         {/* Page header - Made Mirage font for title */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 animate-fade-in opacity-0" style={{ animationDelay: '0ms', animationFillMode: 'forwards' }}>
           <div>
             <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight">
               Dashboard
@@ -226,14 +237,16 @@ export default function DashboardPage() {
         </div>
 
         {/* SECTION 1: KPI Cards - Total Income, Total Expenses, Net Profit, Bank Balance */}
-        <DashboardKpiCards
-          pnlData={data.pnl}
-          balanceData={balanceSummary}
-          isLoading={loading}
-        />
+        <div className="animate-fade-in opacity-0" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+          <DashboardKpiCards
+            pnlData={data.pnl}
+            balanceData={balanceSummary}
+            isLoading={loading}
+          />
+        </div>
 
         {/* SECTION 2: Two-column Charts - Monthly Income vs Expenses (Bar) + Expense Breakdown (Donut) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in opacity-0" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
           <MonthlyIncomeExpenses
             pnlData={data.pnl}
             isLoading={loading}
@@ -246,7 +259,7 @@ export default function DashboardPage() {
         </div>
 
         {/* SECTION 3: Cash Flow Trend Line Chart + Recent Transactions Table */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 animate-fade-in opacity-0" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
           <CashFlowTrend
             pnlData={data.pnl}
             balances={data.balances}
