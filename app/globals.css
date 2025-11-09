@@ -210,12 +210,12 @@ button, a, input, textarea, select {
 /* Logo Loading with Glow - Yellow glow pulse */
 @keyframes logo-loading-glow {
   0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 8px rgba(255, 240, 43, 0.3));
+    transform: scale(0.95);
+    filter: drop-shadow(0 0 6px rgba(255, 240, 43, 0.2));
   }
   50% {
-    transform: scale(1.08);
-    filter: drop-shadow(0 0 20px rgba(255, 240, 43, 0.6));
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 12px rgba(255, 240, 43, 0.4));
   }
 }
 
