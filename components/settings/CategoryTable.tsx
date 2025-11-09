@@ -91,7 +91,7 @@ export default function CategoryTable({
     }
   };
   return (
-    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl overflow-hidden">
+    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl2 overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-border-card">
         <div className="flex items-center justify-between">
@@ -106,7 +106,7 @@ export default function CategoryTable({
           <button
             onClick={handleStartAdd}
             disabled={loading || isUpdating || isAdding}
-            className="px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-glow"
+            className="px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 text-black text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-glow"
           >
             <Plus className="w-4 h-4" />
             Add New
@@ -154,7 +154,7 @@ export default function CategoryTable({
                       placeholder="Enter new category name..."
                       autoFocus
                       disabled={isUpdating}
-                      className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-white placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow disabled:opacity-50"
+                      className="w-full bg-bg-card border border-border-card rounded-xl2 px-3 py-2 text-white placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow disabled:opacity-50"
                     />
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -162,7 +162,7 @@ export default function CategoryTable({
                       <button
                         onClick={handleSaveAdd}
                         disabled={isUpdating || !newValue.trim()}
-                        className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                        className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors"
                         title="Save"
                       >
                         {isUpdating ? (
@@ -174,7 +174,7 @@ export default function CategoryTable({
                       <button
                         onClick={handleCancelAdd}
                         disabled={isUpdating}
-                        className="p-2 bg-bg-card hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-border-card"
+                        className="p-2 bg-bg-card hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-border-card"
                         title="Cancel"
                       >
                         <X className="w-4 h-4 text-white" />
@@ -205,7 +205,7 @@ export default function CategoryTable({
                         }}
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow disabled:opacity-50"
+                        className="w-full bg-bg-card border border-border-card rounded-xl2 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow disabled:opacity-50"
                       />
                     ) : (
                       <span className="text-white font-medium">{item}</span>
@@ -217,7 +217,7 @@ export default function CategoryTable({
                         <button
                           onClick={() => handleSaveEdit(item)}
                           disabled={isUpdating || !editValue.trim()}
-                          className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors"
                           title="Save"
                         >
                           {isUpdating ? (
@@ -229,7 +229,7 @@ export default function CategoryTable({
                         <button
                           onClick={handleCancelEdit}
                           disabled={isUpdating}
-                          className="p-2 bg-bg-card hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-border-card"
+                          className="p-2 bg-bg-card hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-border-card"
                           title="Cancel"
                         >
                           <X className="w-4 h-4 text-white" />
@@ -240,7 +240,7 @@ export default function CategoryTable({
                         <button
                           onClick={() => handleStartEdit(idx, item)}
                           disabled={isUpdating || isAdding}
-                          className="p-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors shadow-glow-sm"
+                          className="p-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors shadow-glow-sm"
                           title="Edit"
                         >
                           <Edit2 className="w-4 h-4 text-black" />
@@ -248,7 +248,7 @@ export default function CategoryTable({
                         <button
                           onClick={() => handleDelete(idx, item)}
                           disabled={isUpdating || isAdding}
-                          className="p-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4 text-white" />

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface OverheadExpenseItem {
@@ -135,44 +136,46 @@ export default function OverheadExpensesModal({ isOpen, onClose, period, totalEx
     return acc;
   }, {} as Record<string, OverheadExpenseItem[]>);
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-9999 isolate">
+          {/* Full Screen Backdrop with Strong Opacity */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md"
           />
           
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6"
-          >
-            {/* Modal Container - Larger Size */}
-            <div className="bg-linear-to-br from-bg-card to-black backdrop-blur-xl rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/20 max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          {/* Modal Container - Centered on Screen */}
+          <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-bg-card backdrop-blur-xl rounded-xl2 shadow-glow-lg border border-border-card max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col my-auto"
+            >
               {/* Header */}
-              <div className="px-8 py-6 border-b border-white/20 shrink-0 bg-linear-to-r from-bg-card to-black">
+              <div className="px-8 py-6 border-b border-border-card shrink-0 bg-bg-app/40">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-semibold text-white">
-                      {expenseType === 'overhead' ? 'Overhead Expenses' : 'Property/Person Expenses'} Breakdown
+                    <h2 className="text-2xl font-bebasNeue uppercase text-text-primary tracking-tight">
+                      {expenseType === 'overhead' ? 'Overhead Expenses' : 'Property Expenses'} Breakdown
                     </h2>
-                    <p className="text-base text-text-primary mt-2">
+                    <p className="text-text-secondary font-aileron mt-2">
                       {period === 'month' ? 'This Month' : 'Year Total'} • {formatCurrency(totalExpense)} Total
                     </p>
                   </div>
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-3 hover:bg-black rounded-xl2 transition-all border border-border-card hover:border-yellow/20"
+                    aria-label="Close modal"
                   >
-                    <svg className="w-5 h-5 text-text-primary hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-text-secondary hover:text-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -195,7 +198,7 @@ export default function OverheadExpensesModal({ isOpen, onClose, period, totalEx
                     <p className="text-text-secondary text-xs mb-4">{error}</p>
                     <button
                       onClick={fetchOverheadExpensesData}
-                      className="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white rounded-lg transition-colors text-sm"
+                      className="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-white rounded-xl2 transition-colors text-sm"
                     >
                       Try Again
                     </button>
@@ -242,7 +245,7 @@ export default function OverheadExpensesModal({ isOpen, onClose, period, totalEx
                               >
                                 <div
                                   onClick={() => handleCategoryClick(item.name)}
-                                  className="flex items-center justify-between p-4 bg-bg-card hover:bg-black/60 border border-white/10 hover:border-yellow/40 rounded-lg transition-all duration-150"
+                                  className="flex items-center justify-between p-4 bg-bg-card hover:bg-black/60 border border-border-card hover:border-yellow/40 rounded-xl2 transition-all duration-150"
                                 >
                                   <div className="flex-1 min-w-0">
                                     <h4 className="text-base font-medium text-white mb-2 truncate">
@@ -286,7 +289,7 @@ export default function OverheadExpensesModal({ isOpen, onClose, period, totalEx
                                       categoryTransactions.map((txn: any, txnIndex: number) => (
                                         <div
                                           key={txnIndex}
-                                          className="p-4 bg-black/40 border border-white/5 rounded-lg text-sm"
+                                          className="p-4 bg-black/40 border border-border-card rounded-xl2 text-sm"
                                         >
                                           <div className="flex justify-between items-start mb-2">
                                             <span className="text-white font-medium text-base">
@@ -322,7 +325,7 @@ export default function OverheadExpensesModal({ isOpen, onClose, period, totalEx
 
               {/* Footer */}
               {!loading && !error && data.length > 0 && (
-                <div className="px-8 py-6 border-t border-white/20 shrink-0 bg-linear-to-r from-bg-card to-black">
+                <div className="px-8 py-6 border-t border-border-card shrink-0 bg-linear-to-r from-bg-card to-black">
                   <div className="flex items-center justify-between text-base">
                     <div className="flex items-center gap-4">
                       <span className="text-text-primary">
@@ -338,10 +341,14 @@ export default function OverheadExpensesModal({ isOpen, onClose, period, totalEx
                   </div>
                 </div>
               )}
-            </div>
-          </motion.div>
-        </>
+            </motion.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );
+
+  // Use portal to render modal at body level, breaking out of any parent containers
+  if (typeof window === 'undefined') return null;
+  return createPortal(modalContent, document.body);
 }

@@ -44,13 +44,13 @@ export default function MonthlyIncomeExpenses({ pnlData, isLoading }: MonthlyInc
   const chartData = [
     {
       period: 'This Month',
-      Income: pnlData.month.revenue,
-      Expenses: pnlData.month.overheads, // ✅ ONLY OVERHEADS
+      Income: pnlData?.month?.revenue || 0,
+      Expenses: pnlData?.month?.overheads || 0, // ✅ ONLY OVERHEADS
     },
     {
       period: 'This Year',
-      Income: pnlData.year.revenue,
-      Expenses: pnlData.year.overheads, // ✅ ONLY OVERHEADS
+      Income: pnlData?.year?.revenue || 0,
+      Expenses: pnlData?.year?.overheads || 0, // ✅ ONLY OVERHEADS
     }
   ];
 

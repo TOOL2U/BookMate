@@ -105,6 +105,9 @@ const config: Config = {
         'modern-md': '12px',
         'modern-lg': '16px',
       },
+      zIndex: {
+        '9999': '9999',
+      },
       transitionTimingFunction: {
         'smoother': 'cubic-bezier(0.22, 1, 0.36, 1)',
       },

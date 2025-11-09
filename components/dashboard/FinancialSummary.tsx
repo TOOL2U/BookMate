@@ -26,7 +26,7 @@ interface FinancialSummaryProps {
 function CustomTooltip({ active, payload }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-black/95 backdrop-blur-sm border border-border-card rounded-lg p-4 shadow-xl">
+      <div className="bg-black/95 backdrop-blur-sm border border-border-card rounded-xl2 p-4 shadow-xl">
         <p className="text-white font-semibold mb-2">{payload[0].payload.name}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center justify-between gap-4 text-sm">
@@ -71,24 +71,24 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
   const comparisonData = [
     {
       name: 'Revenue',
-      Month: pnlData?.month.revenue || 0,
-      Year: pnlData?.year.revenue || 0
+      Month: pnlData?.month?.revenue || 0,
+      Year: pnlData?.year?.revenue || 0
     },
     {
       name: 'Expenses',
-      Month: pnlData?.month.overheads || 0, // Only overheads, NOT property/person
-      Year: pnlData?.year.overheads || 0 // Only overheads, NOT property/person
+      Month: pnlData?.month?.overheads || 0, // Only overheads, NOT property/person
+      Year: pnlData?.year?.overheads || 0 // Only overheads, NOT property/person
     },
     {
       name: 'GOP',
-      Month: pnlData?.month.gop || 0,
-      Year: pnlData?.year.gop || 0
+      Month: pnlData?.month?.gop || 0,
+      Year: pnlData?.year?.gop || 0
     }
   ];
 
   // Prepare data for expense breakdown pie chart - SEPARATE categories
-  const monthOverheads = pnlData?.month.overheads || 0;
-  const monthPropertyPerson = pnlData?.month.propertyPersonExpense || 0;
+  const monthOverheads = pnlData?.month?.overheads || 0;
+  const monthPropertyPerson = pnlData?.month?.propertyPersonExpense || 0;
   // Note: These are shown separately in the pie chart, not added together
   // totalExpenses is ONLY used for pie chart percentages and display, NOT for KPI calculations
   const totalExpenses = monthOverheads + monthPropertyPerson;
@@ -178,21 +178,21 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
 
           {/* Legend */}
           <div className="mt-6 space-y-2">
-            <div className="flex items-center justify-between p-3 bg-black rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-black rounded-xl2">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <span className="text-text-primary">Overheads</span>
               </div>
               <span className="text-white font-semibold">฿{monthOverheads.toLocaleString()}</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-black rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-black rounded-xl2">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
                 <span className="text-text-primary">Property/Person</span>
               </div>
               <span className="text-white font-semibold">฿{monthPropertyPerson.toLocaleString()}</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-black rounded-lg border-t border-border-card pt-3">
+            <div className="flex items-center justify-between p-3 bg-black rounded-xl2 border-t border-border-card pt-3">
               <span className="text-white font-medium">Total Expenses</span>
               <span className="text-xl font-bold text-red-400">฿{totalExpenses.toLocaleString()}</span>
             </div>

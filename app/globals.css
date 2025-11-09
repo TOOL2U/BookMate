@@ -223,6 +223,20 @@ button, a, input, textarea, select {
   animation: logo-loading-glow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Shimmer animation for skeleton loaders */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
 /* ===== BOOKMATE BRAND GLOW EFFECTS ===== */
 
 /* Primary CTA Button - Yellow gradient with glow */

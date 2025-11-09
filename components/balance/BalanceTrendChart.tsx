@@ -49,7 +49,7 @@ export default function BalanceTrendChart({ balances }: BalanceTrendChartProps) 
       {/* Current Balance Distribution */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {balances.slice(0, 3).map((balance, idx) => (
-          <div key={balance.bankName} className="bg-black border border-border-card rounded-lg p-4">
+          <div key={balance.bankName} className="bg-black border border-border-card rounded-xl2 p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-aileron text-sm text-muted">{balance.bankName}</p>
@@ -67,7 +67,7 @@ export default function BalanceTrendChart({ balances }: BalanceTrendChartProps) 
       </div>
 
       {/* Balance Distribution Chart */}
-      <div className="bg-black border border-border-card rounded-lg p-6">
+      <div className="bg-black border border-border-card rounded-xl2 p-6">
         <h3 className="font-bebasNeue uppercase text-lg text-text-primary mb-4">Balance Trend</h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={trendData}>
@@ -124,23 +124,23 @@ export default function BalanceTrendChart({ balances }: BalanceTrendChartProps) 
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-        <div className="bg-black border border-border-card rounded-lg p-4">
+        <div className="bg-black border border-border-card rounded-xl2 p-4">
           <p className="font-aileron text-sm text-muted">Total Accounts</p>
           <p className="font-bebasNeue text-xl text-text-primary mt-1">{balances.length}</p>
         </div>
-        <div className="bg-black border border-border-card rounded-lg p-4">
+        <div className="bg-black border border-border-card rounded-xl2 p-4">
           <p className="font-aileron text-sm text-muted">Total Balance</p>
           <p className="font-bebasNeue text-xl text-success mt-1">
             ฿{balances.reduce((sum, b) => sum + b.balance, 0).toLocaleString()}
           </p>
         </div>
-        <div className="bg-black border border-border-card rounded-lg p-4">
+        <div className="bg-black border border-border-card rounded-xl2 p-4">
           <p className="font-aileron text-sm text-muted">Highest Account</p>
           <p className="font-bebasNeue text-xl text-text-primary mt-1">
             {balances.reduce((max, b) => b.balance > max.balance ? b : max, balances[0])?.bankName || 'N/A'}
           </p>
         </div>
-        <div className="bg-black border border-border-card rounded-lg p-4">
+        <div className="bg-black border border-border-card rounded-xl2 p-4">
           <p className="font-aileron text-sm text-muted">Avg Balance</p>
           <p className="font-bebasNeue text-xl text-text-primary mt-1">
             ฿{(balances.reduce((sum, b) => sum + b.balance, 0) / balances.length).toLocaleString(undefined, { maximumFractionDigits: 0 })}

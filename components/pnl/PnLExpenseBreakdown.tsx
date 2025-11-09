@@ -14,6 +14,9 @@ interface PnLExpenseBreakdownProps {
   period: 'month' | 'year';
   overheadsTotal: number;
   propertyPersonTotal: number;
+  overheadItems?: ExpenseItem[];
+  propertyPersonItems?: ExpenseItem[];
+  isLoading?: boolean;
 }
 
 function formatCurrency(amount: number): string {
@@ -107,7 +110,7 @@ function ExpensePanel({
               {onViewAll && (
                 <button
                   onClick={onViewAll}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-yellow/10 hover:bg-yellow/20 border border-yellow/30 rounded-lg text-yellow text-sm font-medium transition-all duration-300 hover:shadow-glow"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-yellow/10 hover:bg-yellow/20 border border-yellow/30 rounded-xl2 text-yellow text-sm font-medium transition-all duration-300 hover:shadow-glow"
                 >
                   <span>View All Categories</span>
                   <ChevronRight className="w-4 h-4" />
@@ -124,66 +127,13 @@ function ExpensePanel({
 export default function PnLExpenseBreakdown({ 
   period, 
   overheadsTotal, 
-  propertyPersonTotal 
+  propertyPersonTotal,
+  overheadItems = [],
+  propertyPersonItems = [],
+  isLoading = false
 }: PnLExpenseBreakdownProps) {
-  const [overheadItems, setOverheadItems] = useState<ExpenseItem[]>([]);
-  const [propertyPersonItems, setPropertyPersonItems] = useState<ExpenseItem[]>([]);
-  const [overheadLoading, setOverheadLoading] = useState(true);
-  const [propertyPersonLoading, setPropertyPersonLoading] = useState(true);
-  const [overheadError, setOverheadError] = useState<string | null>(null);
-  const [propertyPersonError, setPropertyPersonError] = useState<string | null>(null);
   const [showOverheadModal, setShowOverheadModal] = useState(false);
   const [showPropertyModal, setShowPropertyModal] = useState(false);
-
-  useEffect(() => {
-    console.log('🔍 PnLExpenseBreakdown: useEffect triggered, period =', period);
-    fetchOverheadData();
-    fetchPropertyPersonData();
-  }, [period]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const fetchOverheadData = async () => {
-    console.log('📊 Fetching overhead expenses for period:', period);
-    setOverheadLoading(true);
-    setOverheadError(null);
-    
-    try {
-      const response = await fetch(`/api/pnl/overhead-expenses?period=${period}`);
-      console.log('📊 Overhead API response status:', response.status);
-      if (!response.ok) {
-        throw new Error('Failed to fetch overhead data');
-      }
-      
-      const result = await response.json();
-      console.log('📊 Overhead data received:', result.data?.length, 'items');
-      setOverheadItems(result.data || []);
-    } catch (err) {
-      console.error('❌ Error fetching overhead data:', err);
-      setOverheadError(err instanceof Error ? err.message : 'An error occurred');
-      setOverheadItems([]);
-    } finally {
-      setOverheadLoading(false);
-    }
-  };
-
-  const fetchPropertyPersonData = async () => {
-    setPropertyPersonLoading(true);
-    setPropertyPersonError(null);
-    
-    try {
-      const response = await fetch(`/api/pnl/property-person?period=${period}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch property/person data');
-      }
-      
-      const result = await response.json();
-      setPropertyPersonItems(result.data || []);
-    } catch (err) {
-      setPropertyPersonError(err instanceof Error ? err.message : 'An error occurred');
-      setPropertyPersonItems([]);
-    } finally {
-      setPropertyPersonLoading(false);
-    }
-  };
 
   const periodLabel = period === 'month' ? 'This Month' : 'Year to Date';
 
@@ -202,18 +152,18 @@ export default function PnLExpenseBreakdown({
           subtitle={`Top cost drivers - ${periodLabel}`}
           total={overheadsTotal}
           items={overheadItems}
-          isLoading={overheadLoading}
-          error={overheadError}
+          isLoading={isLoading}
+          error={null}
           onViewAll={() => setShowOverheadModal(true)}
         />
         
         <ExpensePanel
-          title="Property/Person Expenses"
+          title="Property Expenses"
           subtitle={`Top cost drivers - ${periodLabel}`}
           total={propertyPersonTotal}
           items={propertyPersonItems}
-          isLoading={propertyPersonLoading}
-          error={propertyPersonError}
+          isLoading={isLoading}
+          error={null}
           onViewAll={() => setShowPropertyModal(true)}
         />
       </div>

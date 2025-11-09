@@ -7,6 +7,11 @@ import PageLoadingScreen from '@/components/PageLoadingScreen';
 import { usePageLoading } from '@/hooks/usePageLoading';
 import BalanceTrendChart from '@/components/balance/BalanceTrendChart';
 import { Wallet, TrendingUp, TrendingDown, Clock, AlertTriangle, RefreshCw, Upload, Plus, CheckCircle, XCircle, Zap, Edit3, Camera, Banknote, Building2, Save } from 'lucide-react';
+import { useBalances, useOptions } from '@/hooks/useQueries';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/hooks/useQueries';
+import { SkeletonKPI, SkeletonCard } from '@/components/ui/Skeleton';
+import { startPerformanceTimer } from '@/lib/performance';
 
 interface Balance {
   bankName: string;
@@ -27,77 +32,78 @@ interface NewBalanceEntry {
 }
 
 function BalanceAnalyticsPage() {
+  const queryClient = useQueryClient();
+  
   // Coordinate page loading with data fetching
   const { isLoading: showPageLoading, setDataReady } = usePageLoading({
     minLoadingTime: 800
   });
   
-  const [balances, setBalances] = useState<Balance[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
-  const [availableBanks, setAvailableBanks] = useState<string[]>([]); // Dynamic bank list from API
-
-  const fetchBalances = async () => {
-    setLoading(true);
-    try {
-      console.log('💰 Balance Page: Fetching data...');
-      const startTime = Date.now();
-      
-      // Fetch available bank accounts from API (same as Settings page)
-      // Add cache-busting to ensure fresh data
-      const optionsRes = await fetch(`/api/options?t=${Date.now()}`);
-      const optionsData = await optionsRes.json();
-      
-      if (optionsData.ok && optionsData.data?.typeOfPayments) {
-        // Extract bank names from payment type objects
-        const bankNames = optionsData.data.typeOfPayments.map((payment: any) => 
-          typeof payment === 'string' ? payment : payment.name
-        );
-        setAvailableBanks(bankNames);
-      }
-
-      // 🆕 USE UNIFIED BALANCE API (reads from Balance Summary tab)
-      // Add cache-busting (?t=timestamp) to ensure fresh data on every page load
-      // This bypasses the 60-second in-memory cache in the API
-      const res = await fetch(`/api/balance?month=ALL&t=${Date.now()}`);
-      const data = await res.json();
-
-      if (data.ok && data.items) {
-        console.log('📊 Balance data source:', data.source); // Will show "BalanceSummary" or "Computed"
-        
-        // Map unified API format to Balance format
-        const balancesArray = data.items.map((account: any) => ({
-          bankName: account.accountName,
-          balance: account.currentBalance,
-          uploadedBalance: account.openingBalance,
-          uploadedDate: account.lastTxnAt || '',
-          totalRevenue: account.inflow,
-          totalExpense: account.outflow,
-          transactionCount: 0, // Not provided by unified API
-          variance: account.netChange,
-          timestamp: account.lastTxnAt || new Date().toISOString()
-        }));
-        setBalances(balancesArray);
-        setLastUpdated(new Date().toLocaleString());
-        
-        console.log(`✅ Balance Page: Data loaded in ${Date.now() - startTime}ms`);
-        setDataReady(true);
-      }
-    } catch (error) {
-      console.error('Error fetching balances:', error);
-      setDataReady(true); // Still mark ready on error
-    } finally {
-      setLoading(false);
+  // Use React Query for data fetching
+  const {
+    data: balanceData,
+    isLoading: balancesLoading,
+    error: balancesError,
+  } = useBalances();
+  
+  const {
+    data: optionsData,
+    isLoading: optionsLoading,
+  } = useOptions();
+  
+  const loading = balancesLoading || optionsLoading;
+  
+  // Performance tracking
+  useEffect(() => {
+    const endTimer = startPerformanceTimer('Balance Page');
+    
+    if (!loading && balanceData) {
+      endTimer();
+      setDataReady(true);
     }
+  }, [loading, balanceData, setDataReady]);
+  
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [availableBanks, setAvailableBanks] = useState<string[]>([]);
+
+  // Extract available banks from options
+  useEffect(() => {
+    if (optionsData?.typeOfPayments) {
+      const bankNames = optionsData.typeOfPayments.map((payment: any) => 
+        typeof payment === 'string' ? payment : payment.name
+      );
+      setAvailableBanks(bankNames);
+    }
+  }, [optionsData]);
+
+  // Update timestamp when data changes
+  useEffect(() => {
+    if (balanceData) {
+      setLastUpdated(new Date().toLocaleString());
+    }
+  }, [balanceData]);
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.balances });
+    queryClient.invalidateQueries({ queryKey: queryKeys.options });
   };
 
-  useEffect(() => {
-    fetchBalances();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Map balance data to component format
+  const balances = balanceData?.balances.map((account: any) => ({
+    bankName: account.accountName,
+    balance: account.currentBalance,
+    uploadedBalance: account.openingBalance,
+    uploadedDate: account.lastTxnAt || '',
+    totalRevenue: account.inflow,
+    totalExpense: account.outflow,
+    transactionCount: 0,
+    variance: account.netChange,
+    timestamp: account.lastTxnAt || new Date().toISOString()
+  })) || [];
 
-  const totalBalance = balances.reduce((sum, b) => sum + (b.balance || 0), 0);
-  const cashBalance = balances.find(b => b.bankName?.includes('Cash'))?.balance || 0;
-  const bankBalance = balances.filter(b => !b.bankName?.includes('Cash')).reduce((sum, b) => sum + (b.balance || 0), 0);
+  const totalBalance = balanceData?.total || 0;
+  const cashBalance = balanceData?.cash || 0;
+  const bankBalance = balanceData?.bank || 0;
 
   // Show page loading screen while data loads
   if (showPageLoading) {
@@ -112,7 +118,10 @@ function BalanceAnalyticsPage() {
     <AdminShell>
       <div className="space-y-4">
         {/* Page header - Made Mirage font for title */}
-        <div className="flex items-start justify-between mb-1">
+        <div 
+          className="flex items-start justify-between mb-1 animate-fade-in opacity-0"
+          style={{ animationDelay: '0ms', animationFillMode: 'forwards' }}
+        >
           <div>
             <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight">
               Balance Overview
@@ -131,7 +140,7 @@ function BalanceAnalyticsPage() {
             <LogoBM size={100} />
           </div>
           <button
-            onClick={fetchBalances}
+            onClick={handleRefresh}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-grey-dark hover:bg-black rounded-xl2 transition-all disabled:opacity-50 border border-border-card hover:border-yellow/20"
             aria-label="Refresh balances"
@@ -142,7 +151,10 @@ function BalanceAnalyticsPage() {
         </div>
 
         {/* Total Balance Card - #171717 bg, proper brand styling */}
-        <div className="bg-bg-card border border-border-card rounded-xl2 p-4 shadow-glow-sm">
+        <div 
+          className="bg-bg-card border border-border-card rounded-xl2 p-4 shadow-glow-sm animate-fade-in opacity-0"
+          style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}
+        >
           <div className="flex items-center justify-between mb-2">
             <div className="w-14 h-14 rounded-full bg-yellow/10 flex items-center justify-center">
               <Wallet className="w-7 h-7 text-yellow" />
@@ -166,11 +178,14 @@ function BalanceAnalyticsPage() {
         </div>
 
         {/* Cash vs Bank Breakdown */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in opacity-0"
+          style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}
+        >
           {/* Cash Card */}
           <div className="bg-bg-card border border-border-card rounded-xl2 p-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl2 bg-success/10 flex items-center justify-center">
                 <Wallet className="w-6 h-6 text-success" />
               </div>
               <div>
@@ -190,7 +205,7 @@ function BalanceAnalyticsPage() {
           {/* Bank Card */}
           <div className="bg-bg-card border border-border-card rounded-xl2 p-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl2 bg-accent/10 flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-accent" />
               </div>
               <div>
@@ -209,7 +224,10 @@ function BalanceAnalyticsPage() {
         </div>
 
         {/* Account Details & Balance Trend - Stacked Vertically */}
-        <div className="space-y-4">
+        <div 
+          className="space-y-4 animate-fade-in opacity-0"
+          style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}
+        >
           {/* Individual Account Balances */}
           <div className="bg-bg-card border border-border-card rounded-xl2 p-4">
             <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-2">Account Details</h2>
@@ -217,7 +235,7 @@ function BalanceAnalyticsPage() {
             {loading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="h-20 bg-border-card/60 animate-pulse rounded-lg" />
+                  <div key={i} className="h-20 bg-border-card/60 animate-pulse rounded-xl2" />
                 ))}
               </div>
             ) : balances.length > 0 ? (
@@ -225,10 +243,10 @@ function BalanceAnalyticsPage() {
                 {balances.map((balance, idx) => (
                   <div 
                     key={idx}
-                    className="flex items-center justify-between p-3 bg-black rounded-lg border border-border-card hover:border-accent/30 transition-colors"
+                    className="flex items-center justify-between p-3 bg-black rounded-xl2 border border-border-card hover:border-accent/30 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-xl2 flex items-center justify-center ${
                         balance.bankName === 'Cash' 
                           ? 'bg-success/10' 
                           : 'bg-accent/10'

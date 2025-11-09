@@ -85,7 +85,7 @@ export default function RecentTransactionsTable({ transactions, isLoading }: Rec
             return (
               <div 
                 key={index}
-                className="p-4 bg-black/50 rounded-lg border border-border-card hover:border-yellow/20 transition-all group"
+                className="p-4 bg-black/50 rounded-xl2 border border-border-card hover:border-yellow/20 transition-all group"
               >
                 {/* Date and Amount Row */}
                 <div className="flex items-center justify-between mb-2">

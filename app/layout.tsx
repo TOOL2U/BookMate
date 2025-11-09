@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { madeMirage, bebasNeue, aileron } from './fonts/fonts';
+import AuthProvider from '@/components/AuthProvider';
+import QueryProvider from '@/components/providers/QueryProvider';
 
 export const metadata: Metadata = {
   title: 'BookMate',
@@ -36,9 +38,11 @@ export default function RootLayout({
       className={`dark ${madeMirage.variable} ${bebasNeue.variable} ${aileron.variable}`}
     >
       <body className="min-h-screen bg-black text-fg font-aileron antialiased">
-        <main className="relative z-10 bg-black">
-          {children}
-        </main>
+        <QueryProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

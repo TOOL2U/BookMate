@@ -131,7 +131,7 @@ export default function PropertyPersonModal({ isOpen, onClose, period, totalExpe
                 {!loading && !error && data.length === 0 && (
                   <div className="text-center py-8">
                     <div className="text-4xl mb-2">📊</div>
-                    <p className="text-text-secondary text-sm">No property/person expenses found</p>
+                    <p className="text-text-secondary text-sm">No property expenses found</p>
                     <p className="text-text-tertiary text-xs mt-1">No data available for this period</p>
                   </div>
                 )}

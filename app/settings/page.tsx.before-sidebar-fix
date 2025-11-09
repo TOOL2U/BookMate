@@ -1,0 +1,292 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import AdminShell from '@/components/layout/AdminShell';
+import PageLoadingScreen from '@/components/PageLoadingScreen';
+import { usePageLoading } from '@/hooks/usePageLoading';
+import CategoryTable from '@/components/settings/CategoryTable';
+import ExpenseCategoryManager from '@/components/settings/ExpenseCategoryManager';
+import PropertyManager from '@/components/settings/PropertyManager';
+import PaymentTypeManager from '@/components/settings/PaymentTypeManager';
+import RevenueManager from '@/components/settings/RevenueManager';
+import { Settings as SettingsIcon, RefreshCw, Cloud, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+
+interface OptionsData {
+  properties: string[];
+  typeOfOperations: string[];
+  typeOfPayments: string[];
+}
+
+interface SyncStatus {
+  lastSynced: string | null;
+  lastModified: string | null;
+  needsSync: boolean;
+  source: string;
+}
+
+export default function SettingsPage() {
+  // Coordinate page loading with data fetching
+  const { isLoading: showPageLoading, setDataReady } = usePageLoading({
+    minLoadingTime: 800
+  });
+
+  const [data, setData] = useState<OptionsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 5000);
+  };
+
+  const fetchOptions = async () => {
+    try {
+      const startTime = Date.now();
+      setLoading(true);
+      const res = await fetch('/api/options');
+      const result = await res.json();
+
+      if (result.ok && result.data) {
+        // Convert typeOfPayments from objects to strings if needed
+        const typeOfPayments = result.data.typeOfPayments?.map((payment: any) =>
+          typeof payment === 'string' ? payment : payment.name
+        ) || [];
+        
+        // Convert typeOfOperations from objects to strings if needed  
+        const typeOfOperations = result.data.typeOfOperations?.map((operation: any) =>
+          typeof operation === 'string' ? operation : operation.name
+        ) || [];
+        
+        setData({
+          properties: result.data.properties || [],
+          typeOfOperations,
+          typeOfPayments
+        });
+        setLastUpdated(result.updatedAt ? new Date(result.updatedAt).toLocaleString() : '');
+        console.log(`✅ Settings Page: Data loaded in ${Date.now() - startTime}ms`);
+        setDataReady(true);
+      }
+    } catch (error) {
+      console.error('Error fetching options:', error);
+      showToast('Failed to load categories', 'error');
+        setDataReady(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSyncStatus = async () => {
+    try {
+      const res = await fetch('/api/categories/sync');
+      const result = await res.json();
+      if (result.ok) {
+        setSyncStatus(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching sync status:', error);
+    }
+  };
+
+  const handleUpdate = async (
+    type: string,
+    action: 'add' | 'edit' | 'delete',
+    oldValue?: string,
+    newValue?: string,
+    index?: number
+  ) => {
+    try {
+      setIsUpdating(true);
+
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, action, oldValue, newValue, index }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.ok) {
+        throw new Error(result.error || 'Failed to update category');
+      }
+
+      // Update local state
+      if (data) {
+        const updatedData = { ...data };
+        if (type === 'property') {
+          updatedData.properties = result.data.items;
+        } else if (type === 'typeOfOperation') {
+          updatedData.typeOfOperations = result.data.items;
+        } else if (type === 'typeOfPayment') {
+          updatedData.typeOfPayments = result.data.items;
+        }
+        setData(updatedData);
+      }
+
+      showToast(result.message, 'success');
+      await fetchSyncStatus();
+    } catch (error) {
+      console.error('Error updating category:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to update category', 'error');
+      throw error;
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSyncToSheets = async () => {
+    try {
+      setIsSyncing(true);
+      showToast('Syncing to Google Sheets...', 'success');
+
+      const res = await fetch('/api/categories/sync', {
+        method: 'POST',
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.ok) {
+        throw new Error(result.error || 'Failed to sync to Google Sheets');
+      }
+
+      showToast('Successfully synced to Google Sheets!', 'success');
+      await fetchSyncStatus();
+    } catch (error) {
+      console.error('Error syncing to sheets:', error);
+      showToast(error instanceof Error ? error.message : 'Failed to sync to Google Sheets', 'error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOptions();
+    fetchSyncStatus();
+  }, []);
+
+  // Show page loading screen while data is loading
+  if (showPageLoading) {
+    return <PageLoadingScreen />;
+  }
+
+  return (
+    <AdminShell>
+      <div className="space-y-6">
+        {/* Page header */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center ">
+              <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight">Settings</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              {syncStatus?.needsSync && (
+                <button
+                  onClick={handleSyncToSheets}
+                  disabled={isSyncing}
+                  className="px-4 py-2 bg-gradient-to-r from-[#00FF88] to-[#00D9FF] hover:shadow-[0_0_16px_rgba(0,255,136,0.5)] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-300 flex items-center gap-2"
+                >
+                  {isSyncing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <Cloud className="w-4 h-4" />
+                      Sync to Sheets
+                    </>
+                  )}
+                </button>
+              )}
+              <button
+                onClick={fetchOptions}
+                disabled={loading}
+                className="p-2 bg-gradient-to-br from-bg-card to-black backdrop-blur-sm hover:bg-border-card rounded-lg transition-colors disabled:opacity-50 border border-border-card"
+                aria-label="Refresh data"
+              >
+                <RefreshCw className={`w-5 h-5 text-[#A0A0A0] ${loading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
+          <p className="text-[#A0A0A0]">Manage business categories and configuration</p>
+          {lastUpdated && (
+            <p className="text-xs text-[#666666] mt-2">
+              Last updated: {lastUpdated}
+            </p>
+          )}
+        </div>
+
+        {/* Sync Status Banner */}
+        {syncStatus && (
+          <div className={`backdrop-blur-sm border rounded-xl p-4 ${
+            syncStatus.needsSync
+              ? 'bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border-[#FFD700]/30'
+              : 'bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border-[#00FF88]/30'
+          }`}>
+            <div className="flex items-start gap-3">
+              {syncStatus.needsSync ? (
+                <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+              ) : (
+                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1">
+                <h3 className="text-white font-semibold text-sm mb-1">
+                  {syncStatus.needsSync ? 'Pending Changes' : 'All Synced'}
+                </h3>
+                <p className="text-text-primary text-xs">
+                  {syncStatus.needsSync
+                    ? 'You have unsaved changes. Click "Sync to Sheets" to update Google Sheets and mobile app.'
+                    : 'All changes are synced to Google Sheets and available in the mobile app.'}
+                </p>
+                {syncStatus.lastSynced && (
+                  <p className="text-text-secondary text-xs mt-1">
+                    Last synced: {new Date(syncStatus.lastSynced).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Category Tables */}
+        <div className="space-y-6">
+          {/* NEW: Revenue Management (Google Sheets Integration) */}
+          <RevenueManager />
+
+          {/* NEW: Expense Categories (Google Sheets Integration) */}
+          <ExpenseCategoryManager onUpdate={fetchOptions} />
+
+          {/* NEW: Property Management (Google Sheets Integration) */}
+          <PropertyManager />
+
+          {/* NEW: Payment Type Management (Google Sheets Integration) */}
+          <PaymentTypeManager />
+        </div>
+
+        {/* Toast Notification */}
+        {toast && (
+          <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
+            <div className={`px-6 py-4 rounded-xl shadow-2xl backdrop-blur-sm border ${
+              toast.type === 'success'
+                ? 'bg-green-900/90 border-green-700/50 text-green-100'
+                : 'bg-red-900/90 border-red-700/50 text-red-100'
+            }`}>
+              <div className="flex items-center gap-3">
+                {toast.type === 'success' ? (
+                  <CheckCircle className="w-5 h-5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5" />
+                )}
+                <p className="font-medium">{toast.message}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </AdminShell>
+  );
+}
+

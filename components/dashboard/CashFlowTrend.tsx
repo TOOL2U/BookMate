@@ -51,22 +51,22 @@ export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlow
   const chartData = [
     {
       period: 'This Month',
-      profit: pnlData.month.gop
+      profit: pnlData?.month?.gop || 0
     },
     {
       period: 'This Year',
-      profit: pnlData.year.gop
+      profit: pnlData?.year?.gop || 0
     }
   ];
 
   // Debug: Log the values being displayed
   console.log('📊 Net Profit Trend Chart Data:', {
-    monthGOP: pnlData.month.gop,
-    yearGOP: pnlData.year.gop,
-    monthRevenue: pnlData.month.revenue,
-    monthOverheads: pnlData.month.overheads,
-    monthProperty: pnlData.month.propertyPersonExpense,
-    calculation: `${pnlData.month.revenue} - ${pnlData.month.overheads} - ${pnlData.month.propertyPersonExpense} = ${pnlData.month.revenue - pnlData.month.overheads - pnlData.month.propertyPersonExpense}`
+    monthGOP: pnlData?.month?.gop || 0,
+    yearGOP: pnlData?.year?.gop || 0,
+    monthRevenue: pnlData?.month?.revenue || 0,
+    monthOverheads: pnlData?.month?.overheads || 0,
+    monthProperty: pnlData?.month?.propertyPersonExpense || 0,
+    calculation: `${pnlData?.month?.revenue || 0} - ${pnlData?.month?.overheads || 0} - ${pnlData?.month?.propertyPersonExpense || 0} = ${(pnlData?.month?.revenue || 0) - (pnlData?.month?.overheads || 0) - (pnlData?.month?.propertyPersonExpense || 0)}`
   });
 
   return (

@@ -62,7 +62,7 @@ function KPICard({
       <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200 animate-pulse">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="w-12 h-12 bg-[#222222] rounded-lg" />
+            <div className="w-12 h-12 bg-[#222222] rounded-xl2" />
             <div className="h-4 w-16 bg-[#222222] rounded" />
           </div>
           <div className="h-4 bg-[#222222] rounded w-2/3" />
@@ -76,7 +76,7 @@ function KPICard({
     <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-4 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200 hover:border-[#2A2A2A]/50 transition-all duration-200 group">
       {/* Icon and Badge */}
       <div className="flex items-center justify-between mb-3">
-        <div className={`w-10 h-10 rounded-lg ${iconBgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+        <div className={`w-10 h-10 rounded-xl2 ${iconBgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
           <div className={iconColor}>
             {icon}
           </div>
@@ -111,12 +111,12 @@ function KPICard({
 }
 
 export default function DashboardKpiCards({ pnlData, balanceData, isLoading }: DashboardKpiCardsProps) {
-  const monthRevenue = pnlData?.month.revenue || 0;
-  const monthExpenses = pnlData?.month.overheads || 0; // Only overheads, NOT property/person
-  const monthGop = pnlData?.month.gop || 0;
-  const ebitdaMargin = pnlData?.month.ebitdaMargin || 0;
+  const monthRevenue = pnlData?.month?.revenue || 0;
+  const monthExpenses = pnlData?.month?.overheads || 0; // Only overheads, NOT property/person
+  const monthGop = pnlData?.month?.gop || 0;
+  const ebitdaMargin = pnlData?.month?.ebitdaMargin || 0;
   const totalBalance = balanceData?.total || 0;
-  const yearGop = pnlData?.year.gop || 0;
+  const yearGop = pnlData?.year?.gop || 0;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6">

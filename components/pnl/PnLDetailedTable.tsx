@@ -37,7 +37,7 @@ function calculatePercentage(value: number, revenue: number): string {
 export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnLDetailedTableProps) {
   if (isLoading) {
     return (
-      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6">
         <div className="space-y-4">
           <div className="h-6 bg-border-card rounded w-1/3 animate-pulse" />
           <div className="h-96 bg-border-card rounded animate-pulse" />
@@ -55,7 +55,7 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
     // Expenses Section
     { category: 'EXPENSES', monthValue: 0, yearValue: 0, type: 'header' },
     { category: 'Overheads', monthValue: monthData?.overheads || 0, yearValue: yearData?.overheads || 0, type: 'expense', indent: true },
-    { category: 'Property/Person Expenses', monthValue: monthData?.propertyPersonExpense || 0, yearValue: yearData?.propertyPersonExpense || 0, type: 'expense', indent: true },
+    { category: 'Property Expenses', monthValue: monthData?.propertyPersonExpense || 0, yearValue: yearData?.propertyPersonExpense || 0, type: 'expense', indent: true },
     // Note: Total Expenses row removed - we don't add these together
     
     // Profit Section
@@ -73,7 +73,7 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
       </div>
 
       {/* Table Container */}
-      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             {/* Table Header - Sticky */}

@@ -98,7 +98,7 @@ export async function GET(req: Request) {
 
     // Read ONLY the cells we need from Balance Summary (fast ranges)
     // Headers are in row 3, data from row 4 down. A:H is the 8 columns we expose.
-    const RANGE = `'Balance Summary'!A3:H200`; // keep a safe upper bound, not full columns
+    const RANGE = `'Balance Summary'!A3:H50`; // Reduced from 200 to 50 rows for faster fetch
 
     const res = await withTimeout(
       sheets.spreadsheets.values.get({
@@ -107,7 +107,7 @@ export async function GET(req: Request) {
         valueRenderOption: 'UNFORMATTED_VALUE',
         dateTimeRenderOption: 'FORMATTED_STRING',
       }),
-      8000,
+      25000, // Increased from 8s to 25s to allow Google Sheets more time
       'sheets/balanceSummary timeout'
     );
 

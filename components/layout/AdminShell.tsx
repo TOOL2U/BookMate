@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import LogoBM from '@/components/LogoBM';
 import {
   LayoutDashboard,
@@ -12,7 +12,8 @@ import {
   Inbox,
   Menu,
   X,
-  Shield
+  Shield,
+  LogOut
 } from 'lucide-react';
 
 interface AdminShellProps {
@@ -36,7 +37,14 @@ const navItems: NavItem[] = [
 
 export default function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('username');
+    router.push('/login');
+  };
 
   return (
     <div className="min-h-screen bg-black">
@@ -91,7 +99,7 @@ export default function AdminShell({ children }: AdminShellProps) {
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-lg
+                  flex items-center gap-3 px-4 py-3 rounded-xl2
                   transition-all duration-200
                   ${isActive
                     ? 'bg-yellow/20 text-yellow shadow-glow'
@@ -105,6 +113,17 @@ export default function AdminShell({ children }: AdminShellProps) {
             );
           })}
         </nav>
+
+        {/* Logout button */}
+        <div className="absolute bottom-20 left-0 right-0 px-4">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl2 text-text-secondary hover:text-yellow hover:bg-black/40 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
 
         {/* Footer info */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border-card">
@@ -120,7 +139,7 @@ export default function AdminShell({ children }: AdminShellProps) {
         {/* Mobile menu button - floating */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden fixed top-4 left-4 z-30 p-3 bg-[#0A0A0A] backdrop-blur-sm border border-border-card rounded-lg text-text-secondary hover:text-text-primary shadow-lg transition-colors"
+          className="lg:hidden fixed top-4 left-4 z-30 p-3 bg-[#0A0A0A] backdrop-blur-sm border border-border-card rounded-xl2 text-text-secondary hover:text-text-primary shadow-lg transition-colors"
         >
           <Menu className="w-6 h-6" />
         </button>

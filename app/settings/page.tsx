@@ -1,19 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import AdminShell from '@/components/layout/AdminShell';
-import CategoryTable from '@/components/settings/CategoryTable';
+import LogoBM from '@/components/LogoBM';
+import PageLoadingScreen from '@/components/PageLoadingScreen';
+import { usePageLoading } from '@/hooks/usePageLoading';
 import ExpenseCategoryManager from '@/components/settings/ExpenseCategoryManager';
 import PropertyManager from '@/components/settings/PropertyManager';
 import PaymentTypeManager from '@/components/settings/PaymentTypeManager';
 import RevenueManager from '@/components/settings/RevenueManager';
-import { Settings as SettingsIcon, RefreshCw, Cloud, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-
-interface OptionsData {
-  properties: string[];
-  typeOfOperations: string[];
-  typeOfPayments: string[];
-}
+import { RefreshCw, Cloud, CheckCircle, AlertCircle, Loader2, ChevronDown, TrendingUp, BriefcaseBusiness, Building2, CreditCard } from 'lucide-react';
+import { useOptions } from '@/hooks/useQueries';
+import { queryKeys } from '@/hooks/useQueries';
+import { SkeletonCard } from '@/components/ui/Skeleton';
+import { startPerformanceTimer } from '@/lib/performance';
 
 interface SyncStatus {
   lastSynced: string | null;
@@ -23,49 +24,64 @@ interface SyncStatus {
 }
 
 export default function SettingsPage() {
-  const [data, setData] = useState<OptionsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Start performance tracking
+  const endTimer = startPerformanceTimer('Settings Page');
+
+  // Coordinate page loading with data fetching
+  const { isLoading: showPageLoading, setDataReady } = usePageLoading({
+    minLoadingTime: 800
+  });
+
+  // Use React Query for data fetching
+  const queryClient = useQueryClient();
+  const { data: optionsData, isLoading, error, refetch } = useOptions();
+  
   const [isUpdating, setIsUpdating] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  
+  // Accordion state for each section
+  const [expandedSections, setExpandedSections] = useState<{
+    revenue: boolean;
+    expenses: boolean;
+    properties: boolean;
+    payments: boolean;
+  }>({
+    revenue: false,
+    expenses: false,
+    properties: false,
+    payments: false
+  });
+
+  // Update lastUpdated when data changes
+  useEffect(() => {
+    if (optionsData) {
+      setLastUpdated(new Date().toLocaleString());
+      endTimer();
+      setDataReady(true);
+    }
+  }, [optionsData, endTimer, setDataReady]);
+
+  useEffect(() => {
+    fetchSyncStatus();
+  }, []);
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 5000);
   };
 
-  const fetchOptions = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch('/api/options');
-      const result = await res.json();
-
-      if (result.ok && result.data) {
-        // Convert typeOfPayments from objects to strings if needed
-        const typeOfPayments = result.data.typeOfPayments?.map((payment: any) =>
-          typeof payment === 'string' ? payment : payment.name
-        ) || [];
-        
-        // Convert typeOfOperations from objects to strings if needed  
-        const typeOfOperations = result.data.typeOfOperations?.map((operation: any) =>
-          typeof operation === 'string' ? operation : operation.name
-        ) || [];
-        
-        setData({
-          properties: result.data.properties || [],
-          typeOfOperations,
-          typeOfPayments
-        });
-        setLastUpdated(result.updatedAt ? new Date(result.updatedAt).toLocaleString() : '');
-      }
-    } catch (error) {
-      console.error('Error fetching options:', error);
-      showToast('Failed to load categories', 'error');
-    } finally {
-      setLoading(false);
-    }
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.options });
   };
 
   const fetchSyncStatus = async () => {
@@ -102,18 +118,8 @@ export default function SettingsPage() {
         throw new Error(result.error || 'Failed to update category');
       }
 
-      // Update local state
-      if (data) {
-        const updatedData = { ...data };
-        if (type === 'property') {
-          updatedData.properties = result.data.items;
-        } else if (type === 'typeOfOperation') {
-          updatedData.typeOfOperations = result.data.items;
-        } else if (type === 'typeOfPayment') {
-          updatedData.typeOfPayments = result.data.items;
-        }
-        setData(updatedData);
-      }
+      // Invalidate options query to refetch latest data
+      queryClient.invalidateQueries({ queryKey: queryKeys.options });
 
       showToast(result.message, 'success');
       await fetchSyncStatus();
@@ -151,26 +157,47 @@ export default function SettingsPage() {
     }
   };
 
-  useEffect(() => {
-    fetchOptions();
-    fetchSyncStatus();
-  }, []);
+  // Map optionsData to local data format
+  const data = optionsData ? {
+    properties: optionsData.properties || [],
+    typeOfOperations: optionsData.typeOfOperations || [],
+    typeOfPayments: optionsData.typeOfPayments || []
+  } : null;
+
+  // Show page loading screen while data loads
+  if (showPageLoading) {
+    return (
+      <AdminShell>
+        <PageLoadingScreen />
+      </AdminShell>
+    );
+  }
 
   return (
     <AdminShell>
       <div className="space-y-6">
         {/* Page header */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center ">
-              <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight">Settings</h1>
-            </div>
-            <div className="flex items-center gap-2">
+        <div 
+          className="flex items-center justify-between mb-4 animate-fade-in opacity-0"
+          style={{ animationDelay: '0ms', animationFillMode: 'forwards' }}
+        >
+          <div>
+            <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight">
+              Settings
+            </h1>
+            <p className="text-text-secondary mt-3 font-aileron text-lg">
+              Manage categories and sync data with Google Sheets
+            </p>
+          </div>
+          <div className="-ml-86">
+            <LogoBM size={100} />
+          </div>
+          <div className="flex items-center gap-2">
               {syncStatus?.needsSync && (
                 <button
                   onClick={handleSyncToSheets}
                   disabled={isSyncing}
-                  className="px-4 py-2 bg-gradient-to-r from-[#00FF88] to-[#00D9FF] hover:shadow-[0_0_16px_rgba(0,255,136,0.5)] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-[#FFFFFF] text-sm font-medium transition-all duration-300 flex items-center gap-2"
+                  className="px-4 py-2 bg-success hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 text-black text-sm font-medium font-aileron transition-all duration-200 flex items-center gap-2 shadow-glow-green"
                 >
                   {isSyncing ? (
                     <>
@@ -186,35 +213,44 @@ export default function SettingsPage() {
                 </button>
               )}
               <button
-                onClick={fetchOptions}
-                disabled={loading}
-                className="p-2 bg-gradient-to-br from-bg-card to-black backdrop-blur-sm hover:bg-border-card rounded-lg transition-colors disabled:opacity-50 border border-border-card"
+                onClick={handleRefresh}
+                disabled={isLoading}
+                className="p-3 bg-bg-card hover:bg-black rounded-xl2 transition-all disabled:opacity-50 border border-border-card hover:border-yellow/20"
                 aria-label="Refresh data"
               >
-                <RefreshCw className={`w-5 h-5 text-[#A0A0A0] ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-5 h-5 text-text-secondary ${isLoading ? 'animate-spin' : ''}`} />
               </button>
             </div>
-          </div>
-          <p className="text-[#A0A0A0]">Manage business categories and configuration</p>
-          {lastUpdated && (
-            <p className="text-xs text-[#666666] mt-2">
-              Last updated: {lastUpdated}
-            </p>
-          )}
         </div>
+        
+        {/* Show skeleton loaders while loading */}
+        {isLoading && !data && (
+          <div className="space-y-4">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        )}
 
+        {/* Show content when data is loaded */}
+        {data && (
+          <>
         {/* Sync Status Banner */}
         {syncStatus && (
-          <div className={`backdrop-blur-sm border rounded-xl p-4 ${
-            syncStatus.needsSync
-              ? 'bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border-[#FFD700]/30'
-              : 'bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border-[#00FF88]/30'
-          }`}>
+          <div 
+            className={`backdrop-blur-sm border rounded-xl2 p-4 animate-fade-in opacity-0 ${
+              syncStatus.needsSync
+                ? 'bg-linear-to-r from-orange-900/20 to-yellow-900/20 border-orange-700/30'
+                : 'bg-linear-to-r from-green-900/20 to-emerald-900/20 border-green-700/30'
+            }`}
+            style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}
+          >
             <div className="flex items-start gap-3">
               {syncStatus.needsSync ? (
-                <AlertCircle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
               ) : (
-                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
               )}
               <div className="flex-1">
                 <h3 className="text-white font-semibold text-sm mb-1">
@@ -235,42 +271,186 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Category Tables */}
-        <div className="space-y-6">
-          {/* NEW: Revenue Management (Google Sheets Integration) */}
-          <RevenueManager />
-
-          {/* NEW: Expense Categories (Google Sheets Integration) */}
-          <ExpenseCategoryManager onUpdate={fetchOptions} />
-
-          {/* NEW: Property Management (Google Sheets Integration) */}
-          <PropertyManager />
-
-          {/* NEW: Payment Type Management (Google Sheets Integration) */}
-          <PaymentTypeManager />
-        </div>
-
-        {/* Toast Notification */}
-        {toast && (
-          <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
-            <div className={`px-6 py-4 rounded-xl shadow-2xl backdrop-blur-sm border ${
-              toast.type === 'success'
-                ? 'bg-green-900/90 border-green-700/50 text-green-100'
-                : 'bg-red-900/90 border-red-700/50 text-red-100'
-            }`}>
-              <div className="flex items-center gap-3">
-                {toast.type === 'success' ? (
-                  <CheckCircle className="w-5 h-5" />
-                ) : (
-                  <AlertCircle className="w-5 h-5" />
-                )}
-                <p className="font-medium">{toast.message}</p>
+        {/* Main Settings Container */}
+        <div 
+          className="bg-bg-card border border-border-card rounded-xl2 overflow-hidden shadow-glow-sm animate-fade-in opacity-0"
+          style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}
+        >
+          {/* Container Header */}
+          <div className="border-b border-border-card p-6 bg-bg-app/40">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl2 bg-yellow/10 flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-yellow" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bebasNeue uppercase text-text-primary tracking-tight">
+                  Property Management
+                </h2>
+                <p className="text-text-secondary font-aileron">
+                  Manage all business properties, categories, and settings
+                </p>
               </div>
             </div>
           </div>
+
+          {/* Sections */}
+          <div className="p-6 space-y-4">
+          {/* Revenue Management */}
+          <div className="bg-black/20 border border-border-card rounded-xl2 overflow-hidden">
+            <button
+              onClick={() => toggleSection('revenue')}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-black/40 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl2 bg-green-500/10 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-semibold text-text-primary font-bebasNeue uppercase tracking-wide">
+                    Revenue Categories
+                  </h3>
+                  <p className="text-sm text-text-secondary font-aileron">
+                    Manage revenue streams and income types
+                  </p>
+                </div>
+              </div>
+              <ChevronDown 
+                className={`w-5 h-5 text-text-secondary transition-transform duration-200 ${
+                  expandedSections.revenue ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {expandedSections.revenue && (
+              <div className="border-t border-border-card p-6 animate-in slide-in-from-top-2">
+                <RevenueManager 
+                  data={data}
+                  onUpdate={handleUpdate}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Expense Management */}
+          <div className="bg-black/20 border border-border-card rounded-xl2 overflow-hidden">
+            <button
+              onClick={() => toggleSection('expenses')}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-black/40 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl2 bg-red-500/10 flex items-center justify-center">
+                  <BriefcaseBusiness className="w-5 h-5 text-red-500" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-semibold text-text-primary font-bebasNeue uppercase tracking-wide">
+                    Expense Categories
+                  </h3>
+                  <p className="text-sm text-text-secondary font-aileron">
+                    Manage expense types and cost classifications
+                  </p>
+                </div>
+              </div>
+              <ChevronDown 
+                className={`w-5 h-5 text-text-secondary transition-transform duration-200 ${
+                  expandedSections.expenses ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {expandedSections.expenses && (
+              <div className="border-t border-border-card p-6 animate-in slide-in-from-top-2">
+                <ExpenseCategoryManager onUpdate={handleRefresh} />
+              </div>
+            )}
+          </div>
+
+          {/* Property Management */}
+          <div className="bg-black/20 border border-border-card rounded-xl2 overflow-hidden">
+            <button
+              onClick={() => toggleSection('properties')}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-black/40 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl2 bg-blue-500/10 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-blue-500" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-semibold text-text-primary font-bebasNeue uppercase tracking-wide">
+                    Properties
+                  </h3>
+                  <p className="text-sm text-text-secondary font-aileron">
+                    Manage business locations and properties
+                  </p>
+                </div>
+              </div>
+              <ChevronDown 
+                className={`w-5 h-5 text-text-secondary transition-transform duration-200 ${
+                  expandedSections.properties ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {expandedSections.properties && (
+              <div className="border-t border-border-card p-6 animate-in slide-in-from-top-2">
+                <PropertyManager 
+                  data={data}
+                  onUpdate={handleUpdate}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Payment Type Management */}
+          <div className="bg-black/20 border border-border-card rounded-xl2 overflow-hidden">
+            <button
+              onClick={() => toggleSection('payments')}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-black/40 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl2 bg-purple-500/10 flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-purple-500" />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-semibold text-text-primary font-bebasNeue uppercase tracking-wide">
+                    Payment Types
+                  </h3>
+                  <p className="text-sm text-text-secondary font-aileron">
+                    Manage payment methods and transaction types
+                  </p>
+                </div>
+              </div>
+              <ChevronDown 
+                className={`w-5 h-5 text-text-secondary transition-transform duration-200 ${
+                  expandedSections.payments ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {expandedSections.payments && (
+              <div className="border-t border-border-card p-6 animate-in slide-in-from-top-2">
+                <PaymentTypeManager 
+                  data={data}
+                  onUpdate={handleUpdate}
+                />
+              </div>
+            )}
+          </div>
+          </div>
+        </div>
+
+        {lastUpdated && (
+          <p className="text-text-secondary text-sm text-center mt-4">
+            Last updated: {lastUpdated}
+          </p>
+        )}
+        </>
         )}
       </div>
+
+      {/* Toast notification */}
+      {toast && (
+        <div className={`fixed bottom-4 right-4 px-6 py-3 rounded-xl2 shadow-lg ${
+          toast.type === 'success' ? 'bg-success text-black' : 'bg-error text-white'
+        }`}>
+          {toast.message}
+        </div>
+      )}
     </AdminShell>
   );
 }
-

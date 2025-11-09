@@ -116,7 +116,7 @@ The P&L sheet calculates values using **named ranges** that sum specific categor
 **The 8 test transactions you have are likely:**
 - Not categorized as revenue
 - Not categorized as overhead expenses
-- Not categorized as property/person expenses
+- Not categorized as property expenses
 - OR they're in a different time period (not current month/year)
 
 ---

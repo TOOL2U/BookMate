@@ -173,12 +173,12 @@ export default function PaymentTypeManager() {
   };
 
   return (
-    <div className="bg-bg-card border border-border-card rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+    <div className="bg-bg-card border border-border-card rounded-xl2 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
       {/* Header */}
       <div className="border-b border-border-card p-6 bg-bg-app/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl2 bg-accent/10 flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-yellow" />
             </div>
             <div>
@@ -193,7 +193,7 @@ export default function PaymentTypeManager() {
           <button
             onClick={handleStartAdd}
             disabled={isUpdating || isAdding}
-            className="flex items-center gap-2 px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black font-medium transition-all duration-200 shadow-glow"
+            className="flex items-center gap-2 px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 text-black font-medium transition-all duration-200 shadow-glow"
           >
             <Plus className="w-4 h-4" />
             Add Payment Type
@@ -258,7 +258,7 @@ export default function PaymentTypeManager() {
                         placeholder="e.g., Downtown Office"
                         autoFocus
                         disabled={isUpdating}
-                        className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent disabled:opacity-50"
+                        className="w-full bg-bg-card border border-border-card rounded-xl2 px-3 py-2 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent disabled:opacity-50"
                       />
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -266,7 +266,7 @@ export default function PaymentTypeManager() {
                         <button
                           onClick={handleSaveAdd}
                           disabled={isUpdating || !newValue.trim()}
-                          className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors"
                           title="Save"
                         >
                           {isUpdating ? (
@@ -278,7 +278,7 @@ export default function PaymentTypeManager() {
                         <button
                           onClick={handleCancelAdd}
                           disabled={isUpdating}
-                          className="p-2 bg-border-card/60 hover:bg-bg-card/40 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                          className="p-2 bg-border-card/60 hover:bg-bg-card/40 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors"
                           title="Cancel"
                         >
                           <X className="w-4 h-4 text-text-secondary" />
@@ -309,7 +309,7 @@ export default function PaymentTypeManager() {
                           }}
                           autoFocus
                           disabled={isUpdating}
-                          className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent disabled:opacity-50"
+                          className="w-full bg-bg-card border border-border-card rounded-xl2 px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent disabled:opacity-50"
                         />
                       ) : (
                         <span className="text-text-primary font-medium">{item}</span>
@@ -321,7 +321,7 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={() => handleSaveEdit(item)}
                             disabled={isUpdating || !editValue.trim()}
-                            className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-success/20 hover:bg-success/30 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors"
                             title="Save"
                           >
                             {isUpdating ? (
@@ -333,7 +333,7 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={handleCancelEdit}
                             disabled={isUpdating}
-                            className="p-2 bg-border-card/60 hover:bg-bg-card/40 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                            className="p-2 bg-border-card/60 hover:bg-bg-card/40 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors"
                             title="Cancel"
                           >
                             <X className="w-4 h-4 text-text-secondary" />
@@ -344,7 +344,7 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={() => handleStartEdit(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-accent/15 hover:bg-accent/25 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-accent/40"
+                            className="p-2 bg-accent/15 hover:bg-accent/25 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-accent/40"
                             title="Edit"
                           >
                             <Edit2 className="w-4 h-4 text-accent" />
@@ -352,7 +352,7 @@ export default function PaymentTypeManager() {
                           <button
                             onClick={() => handleDelete(idx, item)}
                             disabled={isUpdating || isAdding}
-                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors border border-error/40"
+                            className="p-2 bg-error/10 hover:bg-error/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl2 transition-colors border border-error/40"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4 text-error" />
@@ -380,7 +380,7 @@ export default function PaymentTypeManager() {
       {/* Toast Notification */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
-          <div className={`px-6 py-4 rounded-xl shadow-2xl backdrop-blur-sm border ${
+          <div className={`px-6 py-4 rounded-xl2 shadow-2xl backdrop-blur-sm border ${
             toast.type === 'success'
               ? 'bg-green-900/90 border-green-700/50 text-green-100'
               : toast.type === 'error'
