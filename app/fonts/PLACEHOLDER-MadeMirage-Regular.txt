@@ -1,5 +1,0 @@
-# Placeholder Font File
-
-This is a placeholder. Please replace with the actual MadeMirage-Regular.ttf font file.
-
-Download from the design team or approved font source.

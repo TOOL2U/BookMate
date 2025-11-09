@@ -58,7 +58,7 @@ export default function ExpenseBreakdownDonut({ overheadCategories, propertyCate
         <p className="text-sm text-text-secondary">Current month by category</p>
       </div>
 
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
             data={expenseData}

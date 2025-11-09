@@ -1,5 +1,0 @@
-# Placeholder Font File
-
-This is a placeholder. Please replace with the actual Aileron-Regular.ttf font file.
-
-Download from: https://www.dafont.com/aileron.font
