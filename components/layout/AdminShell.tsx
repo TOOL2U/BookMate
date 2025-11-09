@@ -29,7 +29,7 @@ const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'P&L', href: '/pnl', icon: TrendingUp },
   { name: 'Balances', href: '/balance', icon: Wallet },
-  { name: 'Activity', href: '/inbox', icon: Inbox },
+  { name: 'Activity', href: '/activity', icon: Inbox },
   { name: 'Settings', href: '/settings', icon: Settings },
   { name: 'Admin', href: '/admin', icon: Shield },
 ];
@@ -39,7 +39,7 @@ export default function AdminShell({ children }: AdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg-app via-bg-card to-bg-app">
+    <div className="min-h-screen bg-black">
       {/* Background effects - Brand compliant yellow accents */}
       <div className="fixed inset-0 bg-gradient-to-br from-yellow/5 to-transparent pointer-events-none" />
       <div className="fixed top-1/4 left-1/4 w-96 h-96 bg-yellow/5 rounded-full blur-3xl pointer-events-none" />
@@ -67,7 +67,7 @@ export default function AdminShell({ children }: AdminShellProps) {
           <div className="flex items-center gap-4">
             <LogoBM size={56} />
             <div>
-              <h1 className="text-yellow font-bebasNeue text-xl uppercase tracking-wide">BookMate</h1>
+              <h1 className="text-white font-bebasNeue text-xl uppercase tracking-wide">BookMate</h1>
               <p className="text-text-secondary font-aileron text-xs">Analytics Dashboard</p>
             </div>
           </div>

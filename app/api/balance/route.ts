@@ -70,20 +70,25 @@ function buildAuth() {
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const month = (url.searchParams.get('month') || 'ALL').toUpperCase();
+  const skipCache = url.searchParams.has('t'); // Cache-busting: if ?t= param exists, skip cache
 
-  // Check cache first
-  const cached = getCachedBalance(month);
-  if (cached) {
-    console.log(`✅ [Balance API] Returning cached data for month: ${month}`);
-    return NextResponse.json({
-      ...cached,
-      cached: true,
-      cacheAge: Math.floor((Date.now() - balanceCache.get(month)!.timestamp) / 1000)
-    }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
-      }
-    });
+  // Check cache first (unless cache-busting param is present)
+  if (!skipCache) {
+    const cached = getCachedBalance(month);
+    if (cached) {
+      console.log(`✅ [Balance API] Returning cached data for month: ${month}`);
+      return NextResponse.json({
+        ...cached,
+        cached: true,
+        cacheAge: Math.floor((Date.now() - balanceCache.get(month)!.timestamp) / 1000)
+      }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
+        }
+      });
+    }
+  } else {
+    console.log(`🔄 [Balance API] Cache-busting enabled, fetching fresh data for month: ${month}`);
   }
 
   const start = Date.now();

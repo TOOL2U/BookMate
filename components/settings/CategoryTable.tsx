@@ -99,14 +99,14 @@ export default function CategoryTable({
             <span className="text-2xl">{icon}</span>
             <div>
 
-              <h2 className="font-bebasNeue text-2xl text-white uppercase tracking-wide">{title}</h2>
-              <p className="font-aileron text-sm text-text-secondary">{description}</p>
+              <h2 className="text-xl font-bebasNeue uppercase text-white">{title}</h2>
+              <p className="text-sm text-text-secondary">{description}</p>
             </div>
           </div>
           <button
             onClick={handleStartAdd}
             disabled={loading || isUpdating || isAdding}
-            className="font-aileron px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-glow"
+            className="px-4 py-2 bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black text-sm font-medium transition-all duration-200 flex items-center gap-2 shadow-glow"
           >
             <Plus className="w-4 h-4" />
             Add New
@@ -124,13 +124,13 @@ export default function CategoryTable({
           <table className="w-full">
             <thead>
               <tr className="bg-black/50">
-                <th className="font-bebasNeue text-left px-6 py-3 text-xs text-text-secondary uppercase tracking-wider">
+                <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                   #
                 </th>
-                <th className="font-bebasNeue text-left px-6 py-3 text-xs text-text-secondary uppercase tracking-wider">
+                <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Name
                 </th>
-                <th className="font-bebasNeue text-right px-6 py-3 text-xs text-text-secondary uppercase tracking-wider">
+                <th className="text-right px-6 py-3 text-xs font-medium text-text-secondary uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -205,10 +205,10 @@ export default function CategoryTable({
                         }}
                         autoFocus
                         disabled={isUpdating}
-                        className="font-aileron w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow disabled:opacity-50"
+                        className="w-full bg-bg-card border border-border-card rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow disabled:opacity-50"
                       />
                     ) : (
-                      <span className="font-aileron text-white font-medium">{item}</span>
+                      <span className="text-white font-medium">{item}</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -262,8 +262,8 @@ export default function CategoryTable({
               {items.length === 0 && !isAdding && (
                 <tr>
                   <td colSpan={3} className="px-6 py-12 text-center">
-                    <p className="font-aileron text-text-secondary">No items found</p>
-                    <p className="font-aileron text-sm text-text-secondary mt-1">Click &quot;Add New&quot; to create your first category</p>
+                    <p className="text-text-secondary">No items found</p>
+                    <p className="text-sm text-text-secondary mt-1">Click &quot;Add New&quot; to create your first category</p>
                   </td>
                 </tr>
               )}

@@ -313,7 +313,7 @@ export default function BalanceAnalyticsPage() {
         {/* Cash vs Bank Breakdown */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Cash Card */}
-          <div className="bg-[#0A0A0A] border border-border-card rounded-xl p-6">
+          <div className="bg-[#0A0A0A] border border-border-card rounded-xl2 p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
                 <Wallet className="w-6 h-6 text-success" />

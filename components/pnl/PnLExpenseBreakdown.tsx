@@ -41,7 +41,7 @@ function ExpensePanel({
   onViewAll?: () => void;
 }) {
   return (
-    <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6">
+    <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -196,7 +196,7 @@ export default function PnLExpenseBreakdown({
       </div>
 
       {/* Two-column grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ExpensePanel
           title="Overheads"
           subtitle={`Top cost drivers - ${periodLabel}`}
@@ -225,16 +225,18 @@ export default function PnLExpenseBreakdown({
           onClose={() => setShowOverheadModal(false)}
           period={period}
           totalExpense={overheadsTotal}
+          expenseType="overhead"
         />
       )}
 
-      {/* Property/Person Expenses Modal - Currently reusing OverheadExpensesModal */}
+      {/* Property/Person Expenses Modal */}
       {showPropertyModal && (
         <OverheadExpensesModal
           isOpen={showPropertyModal}
           onClose={() => setShowPropertyModal(false)}
           period={period}
           totalExpense={propertyPersonTotal}
+          expenseType="property-person"
         />
       )}
     </div>

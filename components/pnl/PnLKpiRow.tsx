@@ -41,7 +41,7 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
   
   if (isLoading) {
     return (
-      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6 animate-pulse">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 animate-pulse">
         <div className="space-y-4">
           <div className="h-4 bg-border-card rounded w-2/3" />
           <div className="h-10 bg-border-card rounded w-full" />
@@ -52,7 +52,7 @@ function KPICard({ title, value, isPercentage, subtitle, isLoading }: KPICardPro
   }
 
   return (
-    <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
+    <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
       {/* Title */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-text-secondary font-bebasNeue uppercase tracking-wider">

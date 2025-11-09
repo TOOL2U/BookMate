@@ -45,7 +45,7 @@ function CustomTooltip({ active, payload }: any) {
 export default function FinancialSummary({ pnlData, isLoading }: FinancialSummaryProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
         <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
           <div className="h-6 bg-border-card rounded w-1/3 mb-6 animate-pulse" />
           <div className="h-80 bg-border-card rounded animate-pulse" />
@@ -109,7 +109,7 @@ export default function FinancialSummary({ pnlData, isLoading }: FinancialSummar
       </div>
 
       {/* Two-column grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
         {/* Month vs Year Comparison Chart */}
         <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl p-6">
           <h3 className="text-lg font-semibold text-white mb-6">Month vs Year Comparison</h3>

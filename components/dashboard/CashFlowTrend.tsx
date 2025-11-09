@@ -27,7 +27,7 @@ interface CashFlowTrendProps {
 export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlowTrendProps) {
   if (isLoading) {
     return (
-      <div className="bg-linear-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-2xl p-6">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6">
         <div className="h-6 bg-border-card rounded w-1/2 mb-6 animate-pulse" />
         <div className="h-80 bg-border-card rounded animate-pulse" />
       </div>
@@ -36,8 +36,8 @@ export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlow
 
   if (!pnlData) {
     return (
-      <div className="bg-linear-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-2xl p-6">
-        <h3 className="text-lg font-bebasNeue text-white mb-6">Net Profit Trend</h3>
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6">
+        <h3 className="text-lg font-bebasNeue uppercase text-white mb-6">Net Profit Trend</h3>
         <div className="h-80 flex items-center justify-center">
           <p className="text-text-secondary">No data available</p>
         </div>
@@ -70,10 +70,10 @@ export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlow
   });
 
   return (
-    <div className="bg-linear-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-2xl p-6 h-full">
-      <div className="mb-6 flex items-start justify-between">
+    <div className="bg-linear-to-br from-bg-card to-black/50 backdrop-blur-sm border border-border-card rounded-xl2 p-8 h-full hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
+      <div className="mb-8 flex items-start justify-between">
         <div>
-          <h3 className="text-lg font-bebasNeue text-white mb-1">Net Profit Trend</h3>
+          <h3 className="text-lg font-bebasNeue uppercase text-white mb-8">Net Profit Trend</h3>
           <p className="text-sm text-text-secondary">GOP comparison</p>
         </div>
         <div className="text-right">
@@ -82,7 +82,7 @@ export default function CashFlowTrend({ pnlData, balances, isLoading }: CashFlow
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={220}>
         <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
           <XAxis 

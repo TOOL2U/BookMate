@@ -161,10 +161,9 @@ export default function SettingsPage() {
       <div className="space-y-6">
         {/* Page header */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-3">
-              <SettingsIcon className="w-8 h-8 text-[#00D9FF]" />
-              <h1 className="text-3xl font-bold text-[#FFFFFF]">Category Management</h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center ">
+              <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight">Settings</h1>
             </div>
             <div className="flex items-center gap-2">
               {syncStatus?.needsSync && (

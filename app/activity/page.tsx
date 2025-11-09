@@ -1,396 +1,387 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RefreshCw, Inbox as InboxIcon, Zap, Trash2, AlertCircle } from 'lucide-react';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import AdminShell from '@/components/layout/AdminShell';
-import LogoBM from '@/components/LogoBM';
-import { Activity, Filter, TrendingUp, TrendingDown, ArrowRightLeft, Calendar, User, Search } from 'lucide-react';
 
-type ActivityKind = 'revenue' | 'expense' | 'transfer' | 'all';
-
-interface ActivityItem {
+interface Receipt {
   id: string;
-  ts: string;
-  kind: 'revenue' | 'expense' | 'transfer';
-  fromAccount?: string;
-  toAccount?: string;
+  rowNumber: number;
+  day: string;
+  month: string;
+  year: string;
+  property: string;
+  typeOfOperation: string;
+  typeOfPayment: string;
+  detail: string;
+  ref: string;
+  debit: number;
+  credit: number;
+  date: string;
   amount: number;
-  note?: string;
-  user?: string;
-  source: 'webapp' | 'mobile' | 'api';
-  ref?: string;
+  status: 'sent' | 'pending';
 }
 
-export default function ActivityLogPage() {
-  const [items, setItems] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function InboxPage() {
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [nextCursor, setNextCursor] = useState<string | undefined>();
-  
-  // Filters
-  const [kindFilter, setKindFilter] = useState<ActivityKind>('all');
-  const [accountFilter, setAccountFilter] = useState('');
-  const [userFilter, setUserFilter] = useState('');
-  const [monthFilter, setMonthFilter] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  // Selected item for detail view
-  const [selectedItem, setSelectedItem] = useState<ActivityItem | null>(null);
 
-  const fetchActivities = async (cursor?: string) => {
+  // Fetch receipts from API
+  const fetchReceipts = async (showRefreshing = false) => {
     try {
-      setLoading(true);
-      
-      const params = new URLSearchParams();
-      params.set('limit', '200');
-      if (cursor) params.set('cursor', cursor);
-      if (kindFilter !== 'all') params.set('kind', kindFilter);
-      if (accountFilter) params.set('account', accountFilter);
-      if (userFilter) params.set('user', userFilter);
-      if (monthFilter) params.set('month', monthFilter);
-
-      const res = await fetch(`/api/activity/log?${params.toString()}`);
-      const data = await res.json();
-
-      if (data.ok) {
-        setItems(cursor ? [...items, ...data.items] : data.items);
-        setNextCursor(data.nextCursor);
-        setError(null);
+      if (showRefreshing) {
+        setIsRefreshing(true);
       } else {
-        setError(data.error || 'Failed to fetch activity log');
+        setIsLoading(true);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
+      setError(null);
 
-  useEffect(() => {
-    fetchActivities();
-  }, [kindFilter, accountFilter, userFilter, monthFilter]);
+      const response = await fetch('/api/inbox');
+      const data = await response.json();
 
-  const groupByDay = () => {
-    const grouped: Record<string, ActivityItem[]> = {};
-    
-    items.forEach(item => {
-      const date = new Date(item.ts).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      if (!data.ok) {
+        throw new Error(data.error || 'Failed to fetch receipts');
+      }
+
+      // Sort receipts by date descending (most recent first)
+      const sortedReceipts = (data.data || []).sort((a: Receipt, b: Receipt) => {
+        const dateA = new Date(`${a.month} ${a.day}, ${a.year}`);
+        const dateB = new Date(`${b.month} ${b.day}, ${b.year}`);
+        return dateB.getTime() - dateA.getTime();
       });
-      
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
-      grouped[date].push(item);
-    });
 
-    return grouped;
-  };
-
-  const getKindIcon = (kind: 'revenue' | 'expense' | 'transfer') => {
-    switch (kind) {
-      case 'revenue':
-        return <TrendingUp className="w-4 h-4 text-green-600" />;
-      case 'expense':
-        return <TrendingDown className="w-4 h-4 text-red-600" />;
-      case 'transfer':
-        return <ArrowRightLeft className="w-4 h-4 text-blue-600" />;
+      setReceipts(sortedReceipts);
+    } catch (err: any) {
+      console.error('Error fetching receipts:', err);
+      setError(err.message || 'Failed to load receipts');
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
-  const getKindBadge = (kind: 'revenue' | 'expense' | 'transfer') => {
-    const styles = {
-      revenue: 'bg-green-100 text-green-800 border-green-200',
-      expense: 'bg-red-100 text-red-800 border-red-200',
-      transfer: 'bg-blue-100 text-blue-800 border-blue-200'
-    };
+  // Load receipts on mount
+  useEffect(() => {
+    fetchReceipts();
+  }, []);
 
-    return (
-      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${styles[kind]}`}>
-        {getKindIcon(kind)}
-        {kind}
-      </span>
-    );
+  const handleDelete = async (receipt: Receipt) => {
+    if (!confirm(`Are you sure you want to delete this entry?\n\n${receipt.detail} - ${receipt.amount} THB`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/inbox', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rowNumber: receipt.rowNumber
+        })
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        throw new Error(data.error || 'Failed to delete entry');
+      }
+
+      // Remove from local state
+      setReceipts(receipts.filter((r) => r.id !== receipt.id));
+    } catch (err: any) {
+      console.error('Error deleting receipt:', err);
+      alert('Failed to delete entry: ' + err.message);
+    }
   };
-
-  const filteredItems = searchTerm
-    ? items.filter(item =>
-        item.note?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.fromAccount?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.toAccount?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : items;
-
-  const groupedItems = groupByDay();
 
   return (
     <AdminShell>
-      <div className="p-6 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="max-w-7xl mx-auto page-transition"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="font-madeMirage text-3xl text-text-primary tracking-tight">Activity Log</h1>
-            <p className="font-aileron text-text-secondary mt-2">
-              Live transaction feed from Google Sheets
-            </p>
-          </div>
-          <div className="-ml-86">
-            <LogoBM size={100} />
-          </div>
-          <button
-            onClick={() => fetchActivities()}
-            className="px-4 py-2 bg-yellow hover:opacity-90 text-black rounded-lg transition-all shadow-glow hover:shadow-glow-lg font-aileron font-medium"
-          >
-            Refresh
-          </button>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-bg-card border border-border-card rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-5 h-5 text-text-secondary" />
-            <h2 className="font-bebasNeue text-xl text-text-primary uppercase tracking-wide">Filters</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div>
-              <label className="font-bebasNeue block text-sm text-text-secondary uppercase tracking-wide mb-1">Type</label>
-              <select
-                value={kindFilter}
-                onChange={(e) => setKindFilter(e.target.value as ActivityKind)}
-                className="font-aileron w-full px-3 py-2 bg-bg-app border border-border-card text-text-primary rounded-lg focus:ring-2 focus:ring-yellow focus:border-yellow transition-all"
-              >
-                <option value="all">All Types</option>
-                <option value="transfer">Transfer</option>
-                <option value="revenue">Revenue</option>
-                <option value="expense">Expense</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="font-bebasNeue block text-sm text-text-secondary uppercase tracking-wide mb-1">Account</label>
-              <input
-                type="text"
-                value={accountFilter}
-                onChange={(e) => setAccountFilter(e.target.value)}
-                placeholder="Any account"
-                className="font-aileron w-full px-3 py-2 bg-bg-app border border-border-card text-text-primary rounded-lg focus:ring-2 focus:ring-yellow focus:border-yellow transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="font-bebasNeue block text-sm text-text-secondary uppercase tracking-wide mb-1">User</label>
-              <input
-                type="text"
-                value={userFilter}
-                onChange={(e) => setUserFilter(e.target.value)}
-                placeholder="Any user"
-                className="font-aileron w-full px-3 py-2 bg-bg-app border border-border-card text-text-primary rounded-lg focus:ring-2 focus:ring-yellow focus:border-yellow transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="font-bebasNeue block text-sm text-text-secondary uppercase tracking-wide mb-1">Month</label>
-              <input
-                type="text"
-                value={monthFilter}
-                onChange={(e) => setMonthFilter(e.target.value)}
-                placeholder="JAN or 2025-01"
-                className="font-aileron w-full px-3 py-2 bg-bg-app border border-border-card text-text-primary rounded-lg focus:ring-2 focus:ring-yellow focus:border-yellow transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="font-bebasNeue block text-sm text-text-secondary uppercase tracking-wide mb-1">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-text-secondary" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search notes..."
-                  className="font-aileron w-full pl-9 pr-3 py-2 bg-bg-app border border-border-card text-text-primary rounded-lg focus:ring-2 focus:ring-yellow focus:border-yellow transition-all"
-                />
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-yellow/10 rounded-xl2 border border-yellow/20">
+                <InboxIcon className="w-7 h-7 text-yellow icon" strokeWidth={2} />
+              </div>
+              <div>
+                <h1 className="font-bebasNeue text-3xl uppercase text-white">Activity</h1>
+                <p className="text-muted text-sm mt-1 font-aileron">
+                  <span className="inline-flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-yellow" strokeWidth={2} />
+                    View and manage your processed entries
+                  </span>
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="bg-error/10 border border-error/30 rounded-lg p-4">
-            <p className="font-aileron text-error">{error}</p>
-          </div>
-        )}
-
-        {/* Activity Feed */}
-        {loading && items.length === 0 ? (
-          <div className="text-center py-12">
-            <Activity className="w-12 h-12 mx-auto mb-4 text-yellow animate-pulse" />
-            <p className="font-aileron text-text-secondary">Loading activity log...</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {Object.entries(groupedItems).map(([date, dayItems]) => (
-              <div key={date} className="bg-bg-card border border-border-card rounded-lg overflow-hidden">
-                <div className="bg-black/50 px-4 py-2 border-b border-border-card flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-text-secondary" />
-                  <h3 className="font-bebasNeue text-text-primary uppercase tracking-wide">{date}</h3>
-                  <span className="font-aileron text-sm text-text-secondary">({dayItems.length} transactions)</span>
-                </div>
-
-                <div className="divide-y divide-border-card">
-                  {dayItems.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => setSelectedItem(item)}
-                      className="p-4 hover:bg-bg-app/50 cursor-pointer transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            {getKindBadge(item.kind)}
-                            <span className="font-aileron text-xs text-text-secondary">
-                              {new Date(item.ts).toLocaleTimeString()}
-                            </span>
-                            {item.user && (
-                              <span className="font-aileron flex items-center gap-1 text-xs text-text-secondary">
-                                <User className="w-3 h-3" />
-                                {item.user}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2 text-sm mb-1">
-                            {item.fromAccount && (
-                              <span className="font-aileron font-medium text-text-primary">{item.fromAccount}</span>
-                            )}
-                            {item.kind === 'transfer' && (
-                              <ArrowRightLeft className="w-3 h-3 text-text-secondary" />
-                            )}
-                            {item.toAccount && (
-                              <span className="font-aileron font-medium text-text-primary">{item.toAccount}</span>
-                            )}
-                          </div>
-
-                          {item.note && (
-                            <p className="font-aileron text-sm text-text-secondary line-clamp-1">{item.note}</p>
-                          )}
-                        </div>
-
-                        <div className="text-right">
-                          <p className={`font-madeMirage text-2xl ${
-                            item.kind === 'revenue' ? 'text-success' :
-                            item.kind === 'expense' ? 'text-error' :
-                            'text-accent'
-                          }`}>
-                            {item.kind === 'expense' ? '-' : '+'}฿{item.amount.toLocaleString()}
-                          </p>
-                          {item.ref && (
-                            <p className="font-aileron text-xs text-text-secondary">Ref: {item.ref}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            {/* Load More */}
-            {nextCursor && (
-              <div className="text-center">
-                <button
-                  onClick={() => fetchActivities(nextCursor)}
-                  disabled={loading}
-                  className="font-aileron px-6 py-2 bg-yellow text-black rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-glow hover:shadow-glow-lg font-medium"
-                >
-                  {loading ? 'Loading...' : 'Load More'}
-                </button>
-              </div>
-            )}
-
-            {items.length === 0 && !loading && (
-              <div className="text-center py-12 text-text-secondary">
-                <Activity className="w-12 h-12 mx-auto mb-4 text-text-tertiary" />
-                <p className="font-aileron">No transactions found</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Detail Modal */}
-      {selectedItem && (
-        <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedItem(null)}
-        >
-          <div
-            className="bg-bg-card border border-border-card rounded-xl shadow-2xl max-w-lg w-full p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-4">Transaction Details</h3>
-            
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="font-aileron text-text-secondary">Type:</span>
-                {getKindBadge(selectedItem.kind)}
-              </div>
-              <div className="flex justify-between">
-                <span className="font-aileron text-text-secondary">Amount:</span>
-                <span className="font-madeMirage text-2xl text-yellow">฿{selectedItem.amount.toLocaleString()}</span>
-              </div>
-              {selectedItem.fromAccount && (
-                <div className="flex justify-between">
-                  <span className="font-aileron text-text-secondary">From Account:</span>
-                  <span className="font-aileron font-medium text-text-primary">{selectedItem.fromAccount}</span>
-                </div>
-              )}
-              {selectedItem.toAccount && (
-                <div className="flex justify-between">
-                  <span className="font-aileron text-text-secondary">To Account:</span>
-                  <span className="font-aileron font-medium text-text-primary">{selectedItem.toAccount}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="font-aileron text-text-secondary">Timestamp:</span>
-                <span className="font-aileron text-text-primary">{new Date(selectedItem.ts).toLocaleString()}</span>
-              </div>
-              {selectedItem.user && (
-                <div className="flex justify-between">
-                  <span className="font-aileron text-text-secondary">User:</span>
-                  <span className="font-aileron text-text-primary">{selectedItem.user}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="font-aileron text-text-secondary">Source:</span>
-                <span className="font-aileron capitalize text-text-primary">{selectedItem.source}</span>
-              </div>
-              {selectedItem.ref && (
-                <div className="flex justify-between">
-                  <span className="font-aileron text-text-secondary">Reference ID:</span>
-                  <span className="font-mono text-xs text-text-primary">{selectedItem.ref}</span>
-                </div>
-              )}
-              {selectedItem.note && (
-                <div className="pt-3 border-t border-border-card">
-                  <span className="font-aileron text-text-secondary block mb-1">Note:</span>
-                  <p className="font-aileron text-text-primary">{selectedItem.note}</p>
-                </div>
-              )}
-            </div>
-
             <button
-              onClick={() => setSelectedItem(null)}
-              className="font-aileron mt-6 w-full px-4 py-2 bg-yellow text-black rounded-lg hover:opacity-90 transition-all shadow-glow hover:shadow-glow-lg font-medium"
+              onClick={() => fetchReceipts(true)}
+              disabled={isRefreshing}
+              className="p-2.5 bg-grey-dark hover:bg-black rounded-xl2 transition-all duration-200 disabled:opacity-50 border border-border shadow-glow-sm"
             >
-              Close
+              <RefreshCw className={`w-5 h-5 text-yellow icon ${isRefreshing ? 'animate-spin' : ''}`} strokeWidth={2} />
             </button>
           </div>
         </div>
+
+      {/* Error State */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-6"
+          >
+            <Card className="border-error/40 bg-error/10">
+              <div className="flex items-center gap-3 text-error">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" strokeWidth={2} />
+                <div>
+                  <p className="font-semibold font-aileron">Error loading receipts</p>
+                  <p className="text-sm opacity-90 text-muted font-aileron">{error}</p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Loading State */}
+      {isLoading && (
+        <Card glow={true}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="p-12 text-center"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              className="inline-block mb-4"
+            >
+              <RefreshCw className="w-12 h-12 text-yellow" strokeWidth={2} />
+            </motion.div>
+            <p className="text-muted font-aileron">Loading receipts...</p>
+          </motion.div>
+        </Card>
       )}
+
+      {/* Desktop Table View */}
+      {!isLoading && receipts.length > 0 && (
+        <div className="hidden sm:block bg-card border border-border rounded-xl2 overflow-hidden shadow-soft">
+          <table className="table">
+            <thead>
+              <tr className="bg-grey-dark/50">
+                <th className="px-4 py-4 w-[25%]">Detail</th>
+                <th className="px-4 py-4 w-[12%]">Property</th>
+                <th className="px-4 py-4 w-[15%]">Type</th>
+                <th className="px-4 py-4 w-[12%]">Amount</th>
+                <th className="px-4 py-4 w-[12%]">Date</th>
+                <th className="px-4 py-4 w-[12%]">Status</th>
+                <th className="px-4 py-4 text-right w-[12%]">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <AnimatePresence>
+                {receipts.map((receipt, index) => (
+                  <motion.tr
+                    key={receipt.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{ delay: index * 0.03 }}
+                    className="hover:bg-grey-dark/30 transition-colors group"
+                  >
+                    <td className="px-4 py-4">
+                      <div className="text-sm font-medium text-fg max-w-[280px] truncate font-aileron">
+                        {receipt.detail || '-'}
+                      </div>
+                      {receipt.ref && (
+                        <div className="text-xs text-muted truncate max-w-[280px] font-aileron">
+                          Ref: {receipt.ref}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="text-sm text-muted truncate max-w-[120px] font-aileron">{receipt.property || '-'}</div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="text-xs font-aileron">
+                        <div className="text-fg font-medium truncate max-w-[150px]">{receipt.typeOfOperation || '-'}</div>
+                        <div className="text-muted truncate max-w-[150px]">{receipt.typeOfPayment || '-'}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className={`text-sm font-semibold font-aileron ${receipt.debit > 0 ? 'text-error' : 'text-success'}`}>
+                        {receipt.debit > 0 ? `-${receipt.debit}` : `+${receipt.credit}`} THB
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="text-sm text-muted font-aileron">{receipt.date || '-'}</div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <Badge variant="success">
+                        Synced
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-right">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleDelete(receipt)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-error hover:bg-error/10 rounded-xl2 transition-all duration-200 font-aileron border border-transparent hover:border-error/30"
+                      >
+                        <Trash2 className="w-4 h-4" strokeWidth={2} />
+                        <span className="hidden xl:inline">Delete</span>
+                      </motion.button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Mobile Card View */}
+      {!isLoading && receipts.length > 0 && (
+        <div className="sm:hidden space-y-4">
+          <AnimatePresence>
+            {receipts.map((receipt, index) => (
+              <motion.div
+                key={receipt.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ delay: index * 0.03 }}
+              >
+                <Card hoverable>
+                  <div className="space-y-3">
+                    {/* Header */}
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-text-primary truncate">{receipt.detail || 'No description'}</p>
+                        <p className="text-xs text-text-tertiary">{receipt.property || '-'}</p>
+                      </div>
+                      <Badge variant="success">
+                        Synced
+                      </Badge>
+                    </div>
+
+                    {/* Details */}
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-text-secondary">Type:</span>
+                        <span className="text-text-primary font-medium">{receipt.typeOfOperation || '-'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-text-secondary">Payment:</span>
+                        <span className="text-text-primary">{receipt.typeOfPayment || '-'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-text-secondary">Amount:</span>
+                        <span className={`font-bold ${receipt.debit > 0 ? 'text-error' : 'text-success'}`}>
+                          {receipt.debit > 0 ? `-${receipt.debit}` : `+${receipt.credit}`} THB
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-text-secondary">Date:</span>
+                        <span className="text-text-primary">{receipt.date || '-'}</span>
+                      </div>
+                      {receipt.ref && (
+                        <div className="flex justify-between">
+                          <span className="text-text-secondary">Ref:</span>
+                          <span className="text-text-primary text-xs">{receipt.ref}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Delete button */}
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleDelete(receipt)}
+                      className="w-full mt-2 hover:bg-error/10 hover:text-error hover:border-error/30"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Entry
+                    </Button>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && receipts.length === 0 && !error && (
+        <Card>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="p-12 text-center"
+          >
+            {/* Empty icon with animation */}
+            <motion.div
+              animate={{
+                y: [0, -10, 0],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="inline-block mb-4"
+            >
+              <div className="p-6 bg-gradient-to-br from-surface-2 to-surface-1 rounded-2xl border border-border-light">
+                <InboxIcon className="w-16 h-16 text-text-tertiary" />
+              </div>
+            </motion.div>
+
+            <h3 className="text-xl font-bold text-text-primary mb-2">
+              No entries yet
+            </h3>
+            <p className="text-text-secondary max-w-md mx-auto">
+              No activity yet. Upload a receipt or add a manual entry to get started.
+            </p>
+          </motion.div>
+        </Card>
+      )}
+
+      {/* Back to Upload Link */}
+      {!isLoading && receipts.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8 text-center"
+        >
+          <Link
+            href="/upload"
+            className="text-accent hover:text-info font-medium transition-colors duration-200 inline-flex items-center gap-2 group"
+          >
+            <motion.span
+              animate={{ x: [0, -4, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              ←
+            </motion.span>
+            <span>Add More Entries</span>
+          </Link>
+        </motion.div>
+      )}
+      </motion.div>
     </AdminShell>
   );
 }

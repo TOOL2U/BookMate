@@ -59,7 +59,7 @@ function generatePlaceholderData(monthData: PnLPeriodData | null): any[] {
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-black/95 backdrop-blur-sm border border-border-card rounded-lg p-4 shadow-xl">
+      <div className="bg-black/95 backdrop-blur-sm border border-border-card rounded-xl2 p-4 shadow-xl">
         <p className="text-text-primary font-semibold mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center justify-between gap-4 text-sm">
@@ -80,7 +80,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
         <div className="space-y-4">
           <div className="h-6 bg-[#222222] rounded w-1/3 animate-pulse" />
           <div className="h-80 bg-[#222222] rounded animate-pulse" />
@@ -90,7 +90,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
   }
 
   return (
-    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6">
+    <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
       {/* Header */}
       <div className="mb-6">
         <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-2">Revenue vs Expenses Trend</h2>

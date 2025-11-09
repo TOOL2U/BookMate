@@ -230,7 +230,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         {/* Background effects - Brand compliant yellow accents */}
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow/5 to-transparent" />
+        <div className="absolute inset-0 bg-black" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-yellow/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
@@ -240,7 +240,7 @@ export default function AdminPage() {
             <div className="flex justify-center mb-6">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-yellow via-yellow to-yellow rounded-full blur-xl opacity-50" />
-                <div className="relative bg-gradient-to-br bg-yellow p-5 rounded-2xl shadow-lg">
+                <div className="relative bg-gradient-to-br bg-[#0A0A0A] p-5 rounded-2xl shadow-lg">
                   <Shield className="w-10 h-10 text-text-primary" />
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function AdminPage() {
               <button
                 type="submit"
                 disabled={pin.length !== 4}
-                className="w-full px-4 py-3 bg-gradient-to-r bg-yellow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-text-primary font-medium transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 bg-gradient-to-r bg-yellow hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-black font-medium transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <CheckCircle className="w-5 h-5" />
                 Unlock

@@ -7,7 +7,6 @@ import LogoBM from '@/components/LogoBM';
 import PnLKpiRow from '@/components/pnl/PnLKpiRow';
 import PnLTrendChart from '@/components/pnl/PnLTrendChart';
 import PnLExpenseBreakdown from '@/components/pnl/PnLExpenseBreakdown';
-import PnLDetailedTable from '@/components/pnl/PnLDetailedTable';
 
 // Type definitions
 interface PnLPeriodData {
@@ -28,7 +27,7 @@ interface PnLData {
 function ErrorToast({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="fixed bottom-8 right-8 max-w-md z-50 animate-slide-in-right">
-      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-red-500/30 rounded-xl p-4 flex items-start gap-3 shadow-xl">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-red-500/30 rounded-xl2 p-4 flex items-start gap-3 shadow-xl">
         <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
           <p className="text-sm text-white font-medium mb-1">
@@ -105,7 +104,7 @@ export default function PnLPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-madeMirage font-bold text-text-primary tracking-tight mb-2">
+            <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight mb-2">
               P&L Dashboard
             </h1>
             <p className="text-text-secondary font-aileron">
@@ -118,7 +117,7 @@ export default function PnLPage() {
           <button
             onClick={fetchPnLData}
             disabled={isLoading}
-            className="p-3 bg-grey-dark hover:bg-black rounded-xl transition-all disabled:opacity-50 border border-border-card hover:border-yellow/20"
+            className="p-3 bg-grey-dark hover:bg-black rounded-xl2 transition-all disabled:opacity-50 border border-border-card hover:border-yellow/20"
             aria-label="Refresh data"
           >
             <RefreshCw className={`w-5 h-5 text-muted ${isLoading ? 'animate-spin' : ''}`} />
@@ -147,15 +146,8 @@ export default function PnLPage() {
           propertyPersonTotal={period === 'month' ? (data?.month.propertyPersonExpense || 0) : (data?.year.propertyPersonExpense || 0)}
         />
 
-        {/* SECTION 4: Full P&L Table */}
-        <PnLDetailedTable
-          monthData={data?.month || null}
-          yearData={data?.year || null}
-          isLoading={isLoading}
-        />
-
-        {/* SECTION 5: Footer / Meta */}
-        <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6">
+        {/* Footer / Meta */}
+        <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-muted">
             <div className="flex items-center gap-6">
               <span>Last updated: {lastUpdated || 'Loading...'}</span>

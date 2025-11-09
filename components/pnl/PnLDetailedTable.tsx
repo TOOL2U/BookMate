@@ -37,7 +37,7 @@ function calculatePercentage(value: number, revenue: number): string {
 export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnLDetailedTableProps) {
   if (isLoading) {
     return (
-      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl p-6">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6">
         <div className="space-y-4">
           <div className="h-6 bg-border-card rounded w-1/3 animate-pulse" />
           <div className="h-96 bg-border-card rounded animate-pulse" />
@@ -73,7 +73,7 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
       </div>
 
       {/* Table Container */}
-      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl overflow-hidden">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
         <div className="overflow-x-auto">
           <table className="w-full">
             {/* Table Header - Sticky */}
@@ -135,10 +135,10 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                     <td className={`
                       py-4 px-6 text-right font-mono
                       ${isHeader ? 'font-aileron text-text-secondary' : ''}
-                      ${isProfit ? 'font-madeMirage text-green-400' : ''}
-                      ${isMargin ? 'font-madeMirage text-blue-400' : ''}
-                      ${isExpense ? 'text-red-400' : ''}
-                      ${isRevenue ? 'text-green-400' : ''}
+                      ${isProfit ? 'font-madeMirage text-yellow' : ''}
+                      ${isMargin ? 'font-madeMirage text-yellow' : ''}
+                      ${isExpense ? 'text-error' : ''}
+                      ${isRevenue ? 'text-success' : ''}
                       ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue ? 'text-white' : ''}
                     `}>
                       {isHeader ? '-' : isMargin ? `${row.monthValue.toFixed(1)}%` : `฿${formatCurrency(row.monthValue)}`}
@@ -148,10 +148,10 @@ export default function PnLDetailedTable({ monthData, yearData, isLoading }: PnL
                     <td className={`
                       py-4 px-6 text-right font-mono
                       ${isHeader ? 'font-aileron text-text-secondary' : ''}
-                      ${isProfit ? 'font-madeMirage text-green-400' : ''}
-                      ${isMargin ? 'font-madeMirage text-blue-400' : ''}
-                      ${isExpense ? 'text-red-400' : ''}
-                      ${isRevenue ? 'text-green-400' : ''}
+                      ${isProfit ? 'font-madeMirage text-yellow' : ''}
+                      ${isMargin ? 'font-madeMirage text-yellow' : ''}
+                      ${isExpense ? 'text-error' : ''}
+                      ${isRevenue ? 'text-success' : ''}
                       ${!isHeader && !isProfit && !isMargin && !isExpense && !isRevenue ? 'text-white' : ''}
                     `}>
                       {isHeader ? '-' : isMargin ? `${row.yearValue.toFixed(1)}%` : `฿${formatCurrency(row.yearValue)}`}

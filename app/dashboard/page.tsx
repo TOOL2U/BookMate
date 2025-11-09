@@ -11,7 +11,7 @@ import { RefreshCw, AlertCircle } from 'lucide-react';
 const MonthlyIncomeExpenses = dynamic(
   () => import('@/components/dashboard/MonthlyIncomeExpenses'),
   {
-    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl2 animate-pulse" />,
     ssr: false // Charts don't need SSR
   }
 );
@@ -19,7 +19,7 @@ const MonthlyIncomeExpenses = dynamic(
 const ExpenseBreakdownDonut = dynamic(
   () => import('@/components/dashboard/ExpenseBreakdownDonut'),
   {
-    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl2 animate-pulse" />,
     ssr: false
   }
 );
@@ -27,7 +27,7 @@ const ExpenseBreakdownDonut = dynamic(
 const CashFlowTrend = dynamic(
   () => import('@/components/dashboard/CashFlowTrend'),
   {
-    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    loading: () => <div className="h-[400px] bg-bg-card border border-border-card rounded-xl2 animate-pulse" />,
     ssr: false
   }
 );
@@ -35,7 +35,7 @@ const CashFlowTrend = dynamic(
 const RecentTransactionsTable = dynamic(
   () => import('@/components/dashboard/RecentTransactionsTable'),
   {
-    loading: () => <div className="h-[300px] bg-bg-card border border-border-card rounded-xl animate-pulse" />,
+    loading: () => <div className="h-[300px] bg-bg-card border border-border-card rounded-xl2 animate-pulse" />,
     ssr: false
   }
 );
@@ -150,7 +150,7 @@ export default function DashboardPage() {
       Promise.all([
         fetch('/api/pnl/overhead-expenses?period=month', { cache: 'default' }),
         fetch('/api/pnl/property-person?period=month', { cache: 'default' }),
-        fetch('/api/inbox', { cache: 'default' })
+        fetch(`/api/inbox?t=${Date.now()}`, { cache: 'no-store' }) // Cache-busting for live data
       ]).then(async ([overheadRes, propertyRes, inboxRes]) => {
         const [overheadData, propertyData, inboxData] = await Promise.all([
           overheadRes.json(),
@@ -158,12 +158,23 @@ export default function DashboardPage() {
           inboxRes.json()
         ]);
 
+        // Sort transactions by date (most recent first)
+        let sortedTransactions: Transaction[] = [];
+        if (inboxData.ok && inboxData.data) {
+          sortedTransactions = [...inboxData.data].sort((a: Transaction, b: Transaction) => {
+            // Create date objects for comparison (DD/MM/YYYY format)
+            const dateA = new Date(parseInt(a.year), parseInt(a.month) - 1, parseInt(a.day));
+            const dateB = new Date(parseInt(b.year), parseInt(b.month) - 1, parseInt(b.day));
+            return dateB.getTime() - dateA.getTime(); // Most recent first
+          });
+        }
+
         // Update state with chart data
         setData(prev => ({
           ...prev,
           overheadCategories: overheadData.ok ? (overheadData.data || []) : [],
           propertyCategories: propertyData.ok ? (propertyData.data || []) : [],
-          recentActivity: inboxData.ok ? (inboxData.data || []).slice(0, 10) : []
+          recentActivity: sortedTransactions // Show ALL transactions, sorted by date
         }));
       }).catch(err => {
         console.warn('Chart data loading failed:', err);
@@ -190,11 +201,11 @@ export default function DashboardPage() {
 
   return (
     <AdminShell>
-      <div className="relative space-y-8">
+      <div className="relative space-y-4">
         {/* Page header - Made Mirage font for title */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-5xl font-madeMirage font-bold text-text-primary tracking-tight">
+            <h1 className="text-3xl font-bebasNeue uppercase text-text-primary tracking-tight">
               Dashboard
             </h1>
             <p className="text-text-secondary mt-3 font-aileron text-lg">
@@ -207,7 +218,7 @@ export default function DashboardPage() {
           <button
             onClick={fetchDashboardData}
             disabled={loading}
-            className="p-3 bg-bg-card hover:bg-black rounded-xl transition-all disabled:opacity-50 border border-border-card hover:border-yellow/20"
+            className="p-3 bg-bg-card hover:bg-black rounded-xl2 transition-all disabled:opacity-50 border border-border-card hover:border-yellow/20"
             aria-label="Refresh data"
           >
             <RefreshCw className={`w-5 h-5 text-text-secondary ${loading ? 'animate-spin' : ''}`} />
@@ -222,7 +233,7 @@ export default function DashboardPage() {
         />
 
         {/* SECTION 2: Two-column Charts - Monthly Income vs Expenses (Bar) + Expense Breakdown (Donut) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <MonthlyIncomeExpenses
             pnlData={data.pnl}
             isLoading={loading}
@@ -235,27 +246,23 @@ export default function DashboardPage() {
         </div>
 
         {/* SECTION 3: Cash Flow Trend Line Chart + Recent Transactions Table */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <CashFlowTrend
-              pnlData={data.pnl}
-              balances={data.balances}
-              isLoading={loading}
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <RecentTransactionsTable
-              transactions={data.recentActivity}
-              isLoading={loading}
-            />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <CashFlowTrend
+            pnlData={data.pnl}
+            balances={data.balances}
+            isLoading={loading}
+          />
+          <RecentTransactionsTable
+            transactions={data.recentActivity}
+            isLoading={loading}
+          />
         </div>
       </div>
 
       {/* Error Toast */}
       {error && (
         <div className="fixed bottom-8 right-8 max-w-md z-50 animate-slide-in-right">
-          <div className="bg-bg-card backdrop-blur-sm border border-error/40 rounded-xl p-4 flex items-start gap-3 shadow-xl">
+          <div className="bg-bg-card backdrop-blur-sm border border-error/40 rounded-xl2 p-4 flex items-start gap-3 shadow-xl">
             <AlertCircle className="w-5 h-5 text-error shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-text-primary font-medium mb-1">

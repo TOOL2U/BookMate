@@ -59,7 +59,7 @@ function KPICard({
 }: KPICardProps) {
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6 animate-pulse">
+      <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-6 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200 animate-pulse">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="w-12 h-12 bg-[#222222] rounded-lg" />
@@ -73,10 +73,10 @@ function KPICard({
   }
 
   return (
-    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-[#2A2A2A] rounded-xl p-6 hover:border-[#2A2A2A]/50 transition-all duration-200 group">
+    <div className="bg-bg-card backdrop-blur-sm border border-border-card rounded-xl2 p-4 hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200 hover:border-[#2A2A2A]/50 transition-all duration-200 group">
       {/* Icon and Badge */}
-      <div className="flex items-center justify-between mb-4">
-        <div className={`w-12 h-12 rounded-lg ${iconBgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+      <div className="flex items-center justify-between mb-3">
+        <div className={`w-10 h-10 rounded-lg ${iconBgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
           <div className={iconColor}>
             {icon}
           </div>
@@ -85,7 +85,7 @@ function KPICard({
       </div>
 
       {/* Title */}
-      <p className="font-bebasNeue text-sm text-text-secondary mb-2 uppercase tracking-wide">{title}</p>
+      <p className="font-bebasNeue uppercase text-sm text-text-secondary mb-1 tracking-wide">{title}</p>
 
       {/* Value */}
       <div className="flex items-baseline gap-2">

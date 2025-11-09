@@ -22,7 +22,7 @@ interface RecentTransactionsTableProps {
 export default function RecentTransactionsTable({ transactions, isLoading }: RecentTransactionsTableProps) {
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-2xl p-6">
+      <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-xl2 p-6">
         <div className="h-6 bg-border-card rounded w-1/2 mb-6 animate-pulse" />
         <div className="space-y-3">
           {[...Array(8)].map((_, i) => (
@@ -45,16 +45,40 @@ export default function RecentTransactionsTable({ transactions, isLoading }: Rec
     return txn.credit > 0;
   };
 
+  // Sort transactions by date (most recent first)
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    // Parse date components - month might be text like "NOV" or number like "11"
+    const parseMonth = (month: string): number => {
+      const monthNum = parseInt(month);
+      if (!isNaN(monthNum)) return monthNum - 1; // If numeric, convert to 0-indexed
+      
+      // If text month like "NOV", convert to number
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      const monthIndex = months.indexOf(month.toUpperCase());
+      return monthIndex >= 0 ? monthIndex : 0;
+    };
+
+    const dateA = new Date(parseInt(a.year), parseMonth(a.month), parseInt(a.day));
+    const dateB = new Date(parseInt(b.year), parseMonth(b.month), parseInt(b.day));
+    
+    return dateB.getTime() - dateA.getTime(); // Most recent first
+  });
+
   return (
-    <div className="bg-gradient-to-br from-bg-card to-black backdrop-blur-sm border border-border-card rounded-2xl p-6 h-full">
-      <div className="mb-6">
-        <h3 className="text-lg font-bebasNeue text-white mb-1">Recent Transactions</h3>
-        <p className="text-sm text-text-secondary">Last 10 transactions</p>
+    <div className="bg-linear-to-br from-bg-card to-black/50 backdrop-blur-sm border border-border-card rounded-xl2 p-4 h-full hover:border-yellow/30 hover:shadow-glow-sm transition-all duration-200">
+      <div className="mb-4">
+        <h3 className="text-lg font-bebasNeue uppercase text-white mb-1">Recent Transactions</h3>
+        <p className="text-sm text-text-secondary">
+          {sortedTransactions.length > 0 
+            ? `${sortedTransactions.length} transaction${sortedTransactions.length !== 1 ? 's' : ''} • Most recent first`
+            : 'No transactions yet'
+          }
+        </p>
       </div>
 
-      {transactions.length > 0 ? (
-        <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-          {transactions.map((txn, index) => {
+      {sortedTransactions.length > 0 ? (
+        <div className="space-y-2 max-h-[440px] overflow-y-auto pr-2 custom-scrollbar">
+          {sortedTransactions.map((txn, index) => {
             const amount = getAmount(txn);
             const income = isIncome(txn);
             
