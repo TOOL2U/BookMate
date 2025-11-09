@@ -220,7 +220,7 @@ button, a, input, textarea, select {
 }
 
 .animate-logo-loading-glow {
-  animation: logo-loading-glow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: logo-loading-glow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* ===== BOOKMATE BRAND GLOW EFFECTS ===== */
