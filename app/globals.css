@@ -171,6 +171,26 @@ button, a, input, textarea, select {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Logo Scaler Animation - 2.9s duration */
+@keyframes logo-scale {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-logo-scale {
+  animation: logo-scale 2.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* ===== BOOKMATE BRAND GLOW EFFECTS ===== */
 
 /* Primary CTA Button - Yellow gradient with glow */

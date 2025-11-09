@@ -9,7 +9,7 @@ const LoadingScreen: React.FC = () => {
         alt="BookMate"
         width={200}
         height={200}
-        className="animate-fade-in"
+        className="animate-logo-scale"
         priority
       />
     </div>
