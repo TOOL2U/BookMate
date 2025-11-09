@@ -322,10 +322,7 @@ export default function SettingsPage() {
             </button>
             {expandedSections.revenue && (
               <div className="border-t border-border-card p-6 animate-in slide-in-from-top-2">
-                <RevenueManager 
-                  data={data}
-                  onUpdate={handleUpdate}
-                />
+                <RevenueManager />
               </div>
             )}
           </div>
@@ -389,10 +386,7 @@ export default function SettingsPage() {
             </button>
             {expandedSections.properties && (
               <div className="border-t border-border-card p-6 animate-in slide-in-from-top-2">
-                <PropertyManager 
-                  data={data}
-                  onUpdate={handleUpdate}
-                />
+                <PropertyManager />
               </div>
             )}
           </div>
@@ -424,10 +418,7 @@ export default function SettingsPage() {
             </button>
             {expandedSections.payments && (
               <div className="border-t border-border-card p-6 animate-in slide-in-from-top-2">
-                <PaymentTypeManager 
-                  data={data}
-                  onUpdate={handleUpdate}
-                />
+                <PaymentTypeManager />
               </div>
             )}
           </div>
