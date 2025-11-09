@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 import AdminShell from '@/components/layout/AdminShell';
 import LogoBM from '@/components/LogoBM';
+import PageLoadingScreen from '@/components/PageLoadingScreen';
+import { usePageLoading } from '@/hooks/usePageLoading';
 import PnLKpiRow from '@/components/pnl/PnLKpiRow';
 import PnLTrendChart from '@/components/pnl/PnLTrendChart';
 import PnLExpenseBreakdown from '@/components/pnl/PnLExpenseBreakdown';
@@ -49,6 +51,11 @@ function ErrorToast({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 export default function PnLPage() {
+  // Coordinate page loading with data fetching
+  const { isLoading: showPageLoading, setDataReady } = usePageLoading({
+    minLoadingTime: 800 // Minimum 800ms for smooth animation
+  });
+  
   const [data, setData] = useState<PnLData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +67,9 @@ export default function PnLPage() {
       setIsLoading(true);
       setError(null);
 
+      console.log('📊 P&L Page: Fetching data...');
+      const startTime = Date.now();
+      
       const response = await fetch('/api/pnl');
       const result = await response.json();
 
@@ -75,6 +85,11 @@ export default function PnLPage() {
         minute: '2-digit'
       }));
 
+      console.log(`✅ P&L Page: Data loaded in ${Date.now() - startTime}ms`);
+      
+      // Mark data as ready for page loading
+      setDataReady(true);
+
       // Log warnings and computed fallbacks to console for debugging (visible in admin page)
       if (result.warnings && result.warnings.length > 0) {
         console.warn('⚠️ P&L Warnings:', result.warnings);
@@ -89,6 +104,8 @@ export default function PnLPage() {
     } catch (err) {
       console.error('Error fetching P&L data:', err);
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      // Still mark as ready even on error so loading screen doesn't hang
+      setDataReady(true);
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +113,16 @@ export default function PnLPage() {
 
   useEffect(() => {
     fetchPnLData();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Show page loading screen while data loads
+  if (showPageLoading) {
+    return (
+      <AdminShell>
+        <PageLoadingScreen />
+      </AdminShell>
+    );
+  }
 
   return (
     <AdminShell>

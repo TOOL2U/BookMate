@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import AdminShell from '@/components/layout/AdminShell';
 import LogoBM from '@/components/LogoBM';
+import PageLoadingScreen from '@/components/PageLoadingScreen';
+import { usePageLoading } from '@/hooks/usePageLoading';
 import BalanceTrendChart from '@/components/balance/BalanceTrendChart';
 import { Wallet, TrendingUp, TrendingDown, Clock, AlertTriangle, RefreshCw, Upload, Plus, CheckCircle, XCircle, Zap, Edit3, Camera, Banknote, Building2, Save } from 'lucide-react';
 
@@ -25,6 +27,11 @@ interface NewBalanceEntry {
 }
 
 function BalanceAnalyticsPage() {
+  // Coordinate page loading with data fetching
+  const { isLoading: showPageLoading, setDataReady } = usePageLoading({
+    minLoadingTime: 800
+  });
+  
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string>('');
@@ -33,6 +40,9 @@ function BalanceAnalyticsPage() {
   const fetchBalances = async () => {
     setLoading(true);
     try {
+      console.log('💰 Balance Page: Fetching data...');
+      const startTime = Date.now();
+      
       // Fetch available bank accounts from API (same as Settings page)
       // Add cache-busting to ensure fresh data
       const optionsRes = await fetch(`/api/options?t=${Date.now()}`);
@@ -69,9 +79,13 @@ function BalanceAnalyticsPage() {
         }));
         setBalances(balancesArray);
         setLastUpdated(new Date().toLocaleString());
+        
+        console.log(`✅ Balance Page: Data loaded in ${Date.now() - startTime}ms`);
+        setDataReady(true);
       }
     } catch (error) {
       console.error('Error fetching balances:', error);
+      setDataReady(true); // Still mark ready on error
     } finally {
       setLoading(false);
     }
@@ -79,11 +93,20 @@ function BalanceAnalyticsPage() {
 
   useEffect(() => {
     fetchBalances();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalBalance = balances.reduce((sum, b) => sum + (b.balance || 0), 0);
   const cashBalance = balances.find(b => b.bankName?.includes('Cash'))?.balance || 0;
   const bankBalance = balances.filter(b => !b.bankName?.includes('Cash')).reduce((sum, b) => sum + (b.balance || 0), 0);
+
+  // Show page loading screen while data loads
+  if (showPageLoading) {
+    return (
+      <AdminShell>
+        <PageLoadingScreen />
+      </AdminShell>
+    );
+  }
 
   return (
     <AdminShell>

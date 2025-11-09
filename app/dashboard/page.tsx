@@ -5,8 +5,8 @@ import dynamic from 'next/dynamic';
 import AdminShell from '@/components/layout/AdminShell';
 import DashboardKpiCards from '@/components/dashboard/DashboardKpiCards';
 import LogoBM from '@/components/LogoBM';
-import LoadingScreen from '@/components/LoadingScreen';
-import { useLoadingState } from '@/hooks/useLoadingState';
+import PageLoadingScreen from '@/components/PageLoadingScreen';
+import { usePageLoading } from '@/hooks/usePageLoading';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 
 // Lazy load heavy chart components to improve initial load time
@@ -87,9 +87,9 @@ interface DashboardData {
 
 export default function DashboardPage() {
   // Coordinate loading screen with data fetching
-  // Wait for BOTH animation (2s) AND all data to be ready
-  const { isLoading: showLoadingScreen, setDataReady } = useLoadingState({
-    minLoadingTime: 2000 // Minimum 2 seconds for branding
+  // Wait for BOTH animation (500ms minimum) AND all data to be ready
+  const { isLoading: showLoadingScreen, setDataReady } = usePageLoading({
+    minLoadingTime: 800 // Minimum 800ms for smooth loading animation
   });
   
   const [data, setData] = useState<DashboardData>({
@@ -227,7 +227,11 @@ export default function DashboardPage() {
 
   // Show loading screen until both animation and data are ready
   if (showLoadingScreen) {
-    return <LoadingScreen />;
+    return (
+      <AdminShell>
+        <PageLoadingScreen />
+      </AdminShell>
+    );
   }
 
   return (
