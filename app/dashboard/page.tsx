@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import AdminShell from '@/components/layout/AdminShell';
 import DashboardKpiCards from '@/components/dashboard/DashboardKpiCards';
 import LogoBM from '@/components/LogoBM';
+import LoadingScreen from '@/components/LoadingScreen';
+import { useLoadingState } from '@/hooks/useLoadingState';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 
 // Lazy load heavy chart components to improve initial load time
@@ -84,6 +86,12 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
+  // Coordinate loading screen with data fetching
+  // Wait for BOTH animation (2s) AND all data to be ready
+  const { isLoading: showLoadingScreen, setDataReady } = useLoadingState({
+    minLoadingTime: 2000 // Minimum 2 seconds for branding
+  });
+  
   const [data, setData] = useState<DashboardData>({
     pnl: null,
     overheadCategories: [],
@@ -100,7 +108,7 @@ export default function DashboardPage() {
       setError(null);
 
       const dashboardStartTime = Date.now();
-      console.log('🚀 Dashboard: Starting data fetch...');
+      console.log('🚀 Dashboard: Starting background data fetch...');
 
       // PERFORMANCE: Fetch critical data first (P&L + Balance), then load charts after
       // This allows KPI cards to display immediately while charts load in background
@@ -152,6 +160,7 @@ export default function DashboardPage() {
       setLoading(false); // KPI cards ready - show them now!
 
       console.log(`✅ Dashboard KPIs ready in ${Date.now() - dashboardStartTime}ms`);
+      // Don't mark data as ready yet - wait for Phase 2 (charts + transactions)
 
       // Phase 2: Load chart data in background (non-blocking)
       const phase2Start = Date.now();
@@ -187,9 +196,13 @@ export default function DashboardPage() {
         }));
         
         console.log(`✅ Dashboard fully loaded in ${Date.now() - dashboardStartTime}ms`);
+        
+        // NOW mark data as ready - all phases complete (KPIs + Charts + Transactions)
+        setDataReady(true);
       }).catch(err => {
         console.warn('Chart data loading failed:', err);
-        // Don't set error - KPI cards are already showing
+        // Even if charts fail, mark as ready so loading screen doesn't hang forever
+        setDataReady(true);
       });
 
     } catch (err) {
@@ -200,6 +213,8 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    // Start fetching data immediately, even if loading screen is still showing
+    // This ensures data is ready by the time loading screen finishes
     fetchDashboardData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -209,6 +224,11 @@ export default function DashboardPage() {
     cash: data.balances.find(b => b.bankName.toLowerCase().includes('cash'))?.balance || 0,
     bank: data.balances.filter(b => !b.bankName.toLowerCase().includes('cash')).reduce((sum, b) => sum + b.balance, 0)
   };
+
+  // Show loading screen until both animation and data are ready
+  if (showLoadingScreen) {
+    return <LoadingScreen />;
+  }
 
   return (
     <AdminShell>
