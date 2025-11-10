@@ -77,9 +77,9 @@ export async function GET(req: NextRequest) {
     // TODO: Add authentication and filter by userId
     // For now, return all non-expired, non-revoked shares
     
+    // Query without orderBy to avoid composite index requirement
     const snapshot = await db.collection('sharedReports')
       .where('isRevoked', '==', false)
-      .orderBy('createdAt', 'desc')
       .limit(50)
       .get();
 
@@ -93,6 +93,13 @@ export async function GET(req: NextRequest) {
       sharedBy: doc.data().sharedBy,
       reportPeriod: doc.data().reportData?.period || null,
     }));
+    
+    // Sort by createdAt in-memory
+    shares.sort((a, b) => {
+      const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bDate - aDate; // desc order
+    });
 
     return NextResponse.json({ ok: true, shares });
 

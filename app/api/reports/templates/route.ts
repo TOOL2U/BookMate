@@ -17,17 +17,18 @@ export async function GET(req: NextRequest) {
     
     // Fetch templates from Firestore
     const templatesRef = db.collection('reportTemplates');
+    
+    // Query without orderBy to avoid composite index requirement
     const snapshot = await templatesRef
       .where('workspaceId', '==', workspaceId)
-      .orderBy('createdAt', 'desc')
       .get();
     
     // Also get default templates
     const defaultSnapshot = await templatesRef
       .where('isDefault', '==', true)
-      .orderBy('createdAt', 'desc')
       .get();
     
+    // Combine and convert to plain objects
     const templates = [
       ...defaultSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
       ...snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
@@ -37,6 +38,13 @@ export async function GET(req: NextRequest) {
     const uniqueTemplates = Array.from(
       new Map(templates.map(t => [t.id, t])).values()
     );
+    
+    // Sort by createdAt in-memory instead of in query
+    uniqueTemplates.sort((a: any, b: any) => {
+      const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bDate - aDate; // desc order
+    });
     
     return NextResponse.json({
       templates: uniqueTemplates,
