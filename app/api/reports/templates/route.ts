@@ -2,34 +2,45 @@
  * API Route: /api/reports/templates
  * 
  * Manages report templates (CRUD operations)
- * Updated to use Prisma database
+ * Updated to use Firestore for production compatibility
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { getAdminDb } from '@/lib/firebase/admin';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const workspaceId = searchParams.get('workspace') || searchParams.get('workspaceId') || 'default';
     
-    // Fetch templates from database
-    const templates = await prisma.reportTemplate.findMany({
-      where: {
-        OR: [
-          { workspaceId },
-          { isDefault: true },
-        ],
-      },
-      orderBy: [
-        { isDefault: 'desc' },
-        { createdAt: 'desc' },
-      ],
-    });
+    const db = getAdminDb();
+    
+    // Fetch templates from Firestore
+    const templatesRef = db.collection('reportTemplates');
+    const snapshot = await templatesRef
+      .where('workspaceId', '==', workspaceId)
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    // Also get default templates
+    const defaultSnapshot = await templatesRef
+      .where('isDefault', '==', true)
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    const templates = [
+      ...defaultSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+      ...snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    ];
+    
+    // Remove duplicates (in case workspace has default templates)
+    const uniqueTemplates = Array.from(
+      new Map(templates.map(t => [t.id, t])).values()
+    );
     
     return NextResponse.json({
-      templates,
-      count: templates.length,
+      templates: uniqueTemplates,
+      count: uniqueTemplates.length,
     });
   } catch (error) {
     console.error('Templates GET error:', error);
@@ -52,20 +63,25 @@ export async function POST(req: NextRequest) {
       );
     }
     
-    // Create new template in database
-    const template = await prisma.reportTemplate.create({
-      data: {
-        workspaceId: body.workspace || body.workspaceId || 'default',
-        name: body.name,
-        description: body.description || '',
-        type: body.type,
-        filters: body.filters || {},
-        sections: body.sections || {},
-        branding: body.brandingOverrides || body.branding || {},
-        isDefault: false,
-        createdBy: body.userId || 'system',
-      },
-    });
+    const db = getAdminDb();
+    
+    // Create new template in Firestore
+    const templateData = {
+      workspaceId: body.workspace || body.workspaceId || 'default',
+      name: body.name,
+      description: body.description || '',
+      type: body.type,
+      filters: body.filters || {},
+      sections: body.sections || {},
+      branding: body.brandingOverrides || body.branding || {},
+      isDefault: false,
+      createdBy: body.userId || 'system',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    const docRef = await db.collection('reportTemplates').add(templateData);
+    const template = { id: docRef.id, ...templateData };
     
     return NextResponse.json(template, { status: 201 });
   } catch (error) {
@@ -90,13 +106,13 @@ export async function PUT(req: NextRequest) {
     }
     
     const updates = await req.json();
+    const db = getAdminDb();
     
-    // Find template
-    const existing = await prisma.reportTemplate.findUnique({
-      where: { id },
-    });
+    // Find template in Firestore
+    const docRef = db.collection('reportTemplates').doc(id);
+    const doc = await docRef.get();
     
-    if (!existing) {
+    if (!doc.exists) {
       return NextResponse.json(
         { error: 'Template not found' },
         { status: 404 }
@@ -104,16 +120,18 @@ export async function PUT(req: NextRequest) {
     }
     
     // Update template
-    const template = await prisma.reportTemplate.update({
-      where: { id },
-      data: {
-        name: updates.name,
-        description: updates.description,
-        filters: updates.filters,
-        sections: updates.sections,
-        branding: updates.brandingOverrides || updates.branding,
-      },
-    });
+    const updateData = {
+      name: updates.name,
+      description: updates.description,
+      filters: updates.filters,
+      sections: updates.sections,
+      branding: updates.brandingOverrides || updates.branding,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    await docRef.update(updateData);
+    const updatedDoc = await docRef.get();
+    const template = { id: updatedDoc.id, ...updatedDoc.data() };
     
     return NextResponse.json(template);
   } catch (error) {
@@ -137,20 +155,23 @@ export async function DELETE(req: NextRequest) {
       );
     }
     
-    // Find template
-    const template = await prisma.reportTemplate.findUnique({
-      where: { id },
-    });
+    const db = getAdminDb();
     
-    if (!template) {
+    // Find template in Firestore
+    const docRef = db.collection('reportTemplates').doc(id);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
       return NextResponse.json(
         { error: 'Template not found' },
         { status: 404 }
       );
     }
     
+    const templateData = doc.data();
+    
     // Don't allow deletion of default templates
-    if (template.isDefault) {
+    if (templateData?.isDefault) {
       return NextResponse.json(
         { error: 'Cannot delete default templates' },
         { status: 403 }
@@ -158,11 +179,9 @@ export async function DELETE(req: NextRequest) {
     }
     
     // Delete template
-    const deleted = await prisma.reportTemplate.delete({
-      where: { id },
-    });
+    await docRef.delete();
     
-    return NextResponse.json({ success: true, deleted });
+    return NextResponse.json({ success: true, deleted: { id, ...templateData } });
   } catch (error) {
     console.error('Templates DELETE error:', error);
     return NextResponse.json(
