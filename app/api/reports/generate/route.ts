@@ -25,38 +25,66 @@ export async function POST(request: NextRequest) {
     const convertCurrency = (amount: number) => currency === 'USD' ? amount / exchangeRate : amount;
 
     // Fetch data from existing APIs (reusing existing logic)
-    const baseUrl = request.headers.get('host') || 'localhost:3000';
-    const protocol = request.headers.get('x-forwarded-proto') || 'http';
-    const apiBase = `${protocol}://${baseUrl}`;
-
-    console.log('📊 Fetching comprehensive report data from all APIs...');
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.FRONTEND_URL || 
+                    `${request.headers.get('x-forwarded-proto') || 'http'}://${request.headers.get('host') || 'localhost:3000'}`;
+    
+    console.log('📊 Fetching comprehensive report data from:', baseUrl);
 
     const [pnlRes, balancesRes, overheadRes, propertyRes, transactionsRes] = await Promise.all([
-      fetch(`${apiBase}/api/pnl`),
-      fetch(`${apiBase}/api/balance`),
-      fetch(`${apiBase}/api/pnl/overhead-expenses?period=month`),
-      fetch(`${apiBase}/api/pnl/property-person?period=month`),
-      fetch(`${apiBase}/api/inbox`) // Use inbox API for P&L transactions
-    ]);
+      fetch(`${baseUrl}/api/pnl`, { 
+        headers: { 'x-internal-request': 'true' },
+        cache: 'no-store'
+      }),
+      fetch(`${baseUrl}/api/balance`, { 
+        headers: { 'x-internal-request': 'true' },
+        cache: 'no-store'
+      }),
+      fetch(`${baseUrl}/api/pnl/overhead-expenses?period=month`, { 
+        headers: { 'x-internal-request': 'true' },
+        cache: 'no-store'
+      }),
+      fetch(`${baseUrl}/api/pnl/property-person?period=month`, { 
+        headers: { 'x-internal-request': 'true' },
+        cache: 'no-store'
+      }),
+      fetch(`${baseUrl}/api/inbox`, { 
+        headers: { 'x-internal-request': 'true' },
+        cache: 'no-store'
+      })
+    ]).catch(error => {
+      console.error('❌ Fetch error:', error);
+      throw new Error(`Failed to fetch data: ${error.message}`);
+    });
+
+    console.log('📊 API Response Status:', {
+      pnl: pnlRes.status,
+      balances: balancesRes.status,
+      overhead: overheadRes.status,
+      property: propertyRes.status,
+      transactions: transactionsRes.status
+    });
 
     if (!pnlRes.ok || !balancesRes.ok) {
+      const pnlError = !pnlRes.ok ? await pnlRes.text() : null;
+      const balanceError = !balancesRes.ok ? await balancesRes.text() : null;
+      console.error('❌ API Errors:', { pnlError, balanceError });
       return NextResponse.json(
-        { ok: false, error: 'Failed to fetch source data' },
+        { ok: false, error: 'Failed to fetch source data', details: { pnlError, balanceError } },
         { status: 500 }
       );
     }
 
-    const pnlData = await pnlRes.json();
-    const balancesData = await balancesRes.json();
-    const overheadData = await overheadRes.json();
-    const propertyData = await propertyRes.json();
-    const transactionsData = await transactionsRes.json();
+    const pnlData = await pnlRes.json().catch(() => ({ ok: false, data: null }));
+    const balancesData = await balancesRes.json().catch(() => ({ ok: false, items: [], totals: {} }));
+    const overheadData = await overheadRes.json().catch(() => ({ ok: false, data: [] }));
+    const propertyData = await propertyRes.json().catch(() => ({ ok: false, data: [] }));
+    const transactionsData = await transactionsRes.json().catch(() => ({ ok: false, data: [] }));
     
     console.log('✅ Data fetched:', {
       pnl: !!pnlData.data,
       balances: balancesData.items?.length || 0,
-      overhead: overheadData.data?.items?.length || 0,
-      property: propertyData.data?.items?.length || 0,
+      overhead: overheadData.data?.length || 0,
+      property: propertyData.data?.length || 0,
       transactions: transactionsData.data?.length || 0
     });
     
@@ -200,9 +228,14 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('Error generating report:', error);
+    console.error('❌ Error generating report:', error);
+    console.error('❌ Error stack:', error.stack);
     return NextResponse.json(
-      { ok: false, error: error.message || 'Internal server error' },
+      { 
+        ok: false, 
+        error: error.message || 'Internal server error',
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
