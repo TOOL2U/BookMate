@@ -69,3 +69,4 @@ CREATE_*.gs
 
 accounting-buddy-*.json
 config/google-credentials.json
+sendgrid.env
