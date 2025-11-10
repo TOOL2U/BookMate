@@ -1,0 +1,211 @@
+// BookMate Reports System - Production Database Schema
+// Phase 3 - Advanced Reports with Templates, Sharing, and Scheduling
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Report Templates - Reusable report configurations
+model ReportTemplate {
+  id            String   @id @default(uuid())
+  workspaceId   String   @map("workspace_id")
+  name          String
+  description   String?
+  type          String   // internal-summary, investor-update, bank-compliance, custom
+  
+  // JSONB configuration
+  filters       Json     // { dateRange, entities, currency }
+  sections      Json     // { kpis, charts, tables, aiSummary }
+  branding      Json?    // { logoUrl, primaryColor, footerText }
+  
+  // Metadata
+  isDefault     Boolean  @default(false) @map("is_default")
+  createdBy     String?  @map("created_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Indexes
+  @@index([workspaceId])
+  @@index([type])
+  @@index([isDefault])
+  @@map("report_templates")
+}
+
+// Shared Reports - Secure shareable links with access controls
+model SharedReport {
+  id              String    @id @default(uuid())
+  workspaceId     String    @map("workspace_id")
+  token           String    @unique
+  reportName      String    @map("report_name")
+  
+  // Report snapshot (frozen data)
+  snapshot        Json      // { period, generatedAt, data, pdfUrl, previewUrl }
+  
+  // Access controls
+  expiresAt       DateTime? @map("expires_at")
+  passcode        String?   // Hashed passcode
+  maxViews        Int?      @map("max_views")
+  viewCount       Int       @default(0) @map("view_count")
+  
+  // Metadata
+  createdBy       String?   @map("created_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  lastAccessedAt  DateTime? @map("last_accessed_at")
+
+  // Indexes
+  @@index([token])
+  @@index([workspaceId])
+  @@index([expiresAt])
+  @@index([createdAt])
+  @@map("shared_reports")
+}
+
+// Scheduled Reports - Automated report generation and delivery
+model ScheduledReport {
+  id              String    @id @default(uuid())
+  workspaceId     String    @map("workspace_id")
+  templateId      String?   @map("template_id")
+  
+  name            String
+  description     String?
+  
+  // Schedule configuration
+  scheduleConfig  Json      @map("schedule_config") // { frequency, dayOfWeek, dayOfMonth, time, timezone }
+  
+  // Recipients and delivery
+  recipients      Json      // [{ email, name }]
+  deliveryConfig  Json      @map("delivery_config") // { format, includeAI, emailSubject, customMessage }
+  
+  // Status and execution tracking
+  status          String    @default("active") // active, paused, failed
+  nextRun         DateTime? @map("next_run")
+  lastRun         DateTime? @map("last_run")
+  runCount        Int       @default(0) @map("run_count")
+  failureCount    Int       @default(0) @map("failure_count")
+  lastError       String?   @map("last_error")
+  
+  // Metadata
+  createdBy       String?   @map("created_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  deliveryLogs    EmailDeliveryLog[]
+
+  // Indexes
+  @@index([workspaceId])
+  @@index([status])
+  @@index([nextRun])
+  @@index([createdAt])
+  @@map("scheduled_reports")
+}
+
+// Email Delivery Logs - Audit trail for all email deliveries
+model EmailDeliveryLog {
+  id              String    @id @default(uuid())
+  workspaceId     String    @map("workspace_id")
+  scheduleId      String?   @map("schedule_id")
+  
+  reportName      String    @map("report_name")
+  reportPeriod    String    @map("report_period")
+  
+  // Recipients
+  recipients      Json      // [{ email, name }]
+  
+  // Delivery details
+  emailProvider   String    @default("sendgrid") @map("email_provider") // sendgrid, ses
+  messageId       String?   @map("message_id")
+  status          String    // sent, failed, bounced, delivered
+  error           String?
+  
+  // PDF details
+  pdfSize         Int?      @map("pdf_size") // bytes
+  pdfUrl          String?   @map("pdf_url")
+  
+  // Timestamps
+  sentAt          DateTime  @default(now()) @map("sent_at")
+  deliveredAt     DateTime? @map("delivered_at")
+  
+  // Metadata
+  userId          String?   @map("user_id")
+  metadata        Json?     // Additional metadata
+  
+  // Relations
+  schedule        ScheduledReport? @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+
+  // Indexes
+  @@index([workspaceId])
+  @@index([scheduleId])
+  @@index([status])
+  @@index([sentAt])
+  @@map("email_delivery_logs")
+}
+
+// Report Generation Jobs - Track async report generation
+model ReportJob {
+  id              String    @id @default(uuid())
+  workspaceId     String    @map("workspace_id")
+  
+  // Job details
+  type            String    // generate, pdf, share, email
+  status          String    @default("pending") // pending, processing, completed, failed
+  progress        Int       @default(0) // 0-100
+  
+  // Input configuration
+  config          Json      // Report configuration
+  
+  // Output
+  result          Json?     // Generated report data or error
+  
+  // Execution details
+  startedAt       DateTime? @map("started_at")
+  completedAt     DateTime? @map("completed_at")
+  duration        Int?      // milliseconds
+  error           String?
+  
+  // Metadata
+  createdBy       String?   @map("created_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  // Indexes
+  @@index([workspaceId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("report_jobs")
+}
+
+// Report Analytics - Track usage and performance
+model ReportAnalytics {
+  id              String    @id @default(uuid())
+  workspaceId     String    @map("workspace_id")
+  
+  // Event details
+  eventType       String    @map("event_type") // generated, exported, shared, scheduled
+  reportType      String    @map("report_type") // monthly, quarterly, ytd, custom
+  
+  // Performance metrics
+  generationTime  Int?      @map("generation_time") // milliseconds
+  aiTokensUsed    Int?      @map("ai_tokens_used")
+  pdfSize         Int?      @map("pdf_size") // bytes
+  
+  // User context
+  userId          String?   @map("user_id")
+  templateId      String?   @map("template_id")
+  
+  // Timestamp
+  timestamp       DateTime  @default(now())
+  
+  // Metadata
+  metadata        Json?
+
+  // Indexes
+  @@index([workspaceId])
+  @@index([eventType])
+  @@index([timestamp])
+  @@map("report_analytics")
+}

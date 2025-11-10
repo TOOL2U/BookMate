@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Shield,
-  LogOut
+  LogOut,
+  FileText
 } from 'lucide-react';
 
 interface AdminShellProps {
@@ -30,6 +31,7 @@ const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'P&L', href: '/pnl', icon: TrendingUp },
   { name: 'Balances', href: '/balance', icon: Wallet },
+  { name: 'Reports', href: '/reports', icon: FileText },
   { name: 'Activity', href: '/activity', icon: Inbox },
   { name: 'Settings', href: '/settings', icon: Settings },
   { name: 'Admin', href: '/admin', icon: Shield },

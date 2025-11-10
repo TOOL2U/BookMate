@@ -1,0 +1,44 @@
+
+> bookmate@0.1.0 dev
+> next dev
+
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/shaunducker/pnpm-lock.yaml as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * /Users/shaunducker/Desktop/BookMate-webapp/package-lock.json
+
+   ▲ Next.js 15.5.6
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.118:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1263ms
+ ○ Compiling /api/reports/templates ...
+ ✓ Compiled /api/reports/templates in 932ms (345 modules)
+ GET /api/reports/templates 200 in 1056ms
+ GET /api/reports/templates 200 in 18ms
+ POST /api/reports/templates 201 in 13ms
+ ✓ Compiled /api/reports/share in 132ms (348 modules)
+ POST /api/reports/share 201 in 171ms
+ ✓ Compiled /api/reports/schedules in 77ms (350 modules)
+Scheduled report created: Weekly Test Schedule Next run: 2025-11-17T02:00:00.000Z
+ POST /api/reports/schedules 201 in 111ms
+ GET /api/reports/schedules?workspaceId=test-workspace-1 200 in 9ms
+ ✓ Compiled /api/reports/email in 463ms (532 modules)
+❌ SendGrid error: [Error: Forbidden] { code: 403, response: [Object] }
+ POST /api/reports/email 500 in 1381ms
+ ✓ Compiled /api/cron/reports in 106ms (534 modules)
+❌ Unauthorized cron request
+ GET /api/cron/reports 401 in 128ms
+ ○ Compiling /reports ...
+ ✓ Compiled /reports in 3.7s (2598 modules)
+ GET /reports 200 in 3990ms
+ ✓ Compiled in 998ms (2612 modules)
+ ✓ Compiled in 360ms (2612 modules)
+ ✓ Compiled in 369ms (2612 modules)
+ ✓ Compiled in 246ms (2612 modules)

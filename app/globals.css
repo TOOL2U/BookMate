@@ -64,36 +64,36 @@ body {
 /* Page-specific backgrounds removed - pure black everywhere */
 
 /* Toast Animations - Slowed down */
-@keyframes slide-up {
-  from {
-    transform: translateY(100%);
-    opacity: 0;
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes fade-out {
-  from {
-    opacity: 1;
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
-  to {
-    opacity: 0;
-  }
-}
 
 @keyframes slide-in-right {
   from {
@@ -108,9 +108,7 @@ body {
 
 .animate-slide-up {
   animation: slide-up 0.6s ease-out;
-}
-
-.animate-fade-in {
+}.animate-fade-in {
   animation: fade-in 1s ease-out forwards;
 }
 
@@ -301,24 +299,24 @@ button {
   font-size: 16px !important;
 }
 
-/* Ensure inputs maintain proper appearance despite 16px minimum */
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="tel"],
-input[type="date"],
-textarea,
-select {
-  font-size: 16px !important;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
+  /* Ensure inputs maintain proper appearance despite 16px minimum */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
 
-/* Prevent accidental double-tap zoom on buttons */
-button,
-a {
-  touch-action: manipulation;
-}
+  /* Prevent accidental double-tap zoom on buttons */
+  button,
+  a {
+    touch-action: manipulation;
+  }
 
 /* Ensure proper mobile touch behavior */
 * {
@@ -332,4 +330,21 @@ textarea,
 select {
   -webkit-user-select: text;
   user-select: text;
+}
+/* ===============================================
+   IMAGE EXPORT CLEAN-UP
+   Removes heavy artifacts for exports
+   =============================================== */
+.report-export-root,
+.report-export-root * {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.report-export-root table,
+.report-export-root table td,
+.report-export-root table th,
+.report-export-root [class*="border"] {
+  border-width: 1px !important;
+  border-color: #e5e7eb !important;
 }

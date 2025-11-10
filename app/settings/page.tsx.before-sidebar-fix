@@ -256,7 +256,7 @@ export default function SettingsPage() {
           {/* NEW: Revenue Management (Google Sheets Integration) */}
           <RevenueManager />
 
-          {/* NEW: Expense Categories (Google Sheets Integration) */}
+          {/* NEW: Expense Categoriess (Google Sheets Integration) */}
           <ExpenseCategoryManager onUpdate={fetchOptions} />
 
           {/* NEW: Property Management (Google Sheets Integration) */}

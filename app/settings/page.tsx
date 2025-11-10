@@ -339,7 +339,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="text-left">
                   <h3 className="text-lg font-semibold text-text-primary font-bebasNeue uppercase tracking-wide">
-                    Expense Categories
+                    Overhead Expenses Management
                   </h3>
                   <p className="text-sm text-text-secondary font-aileron">
                     Manage expense types and cost classifications
