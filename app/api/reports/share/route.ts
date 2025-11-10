@@ -2,11 +2,12 @@
  * API Route: /api/reports/share
  * 
  * Manages shareable report links
+ * Updated to use Firestore for production compatibility
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { generateShareToken, validateShareAccess } from '@/lib/reports/sharing';
-import prisma from '@/lib/prisma';
+import { getAdminDb } from '@/lib/firebase/admin';
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,26 +32,32 @@ export async function POST(req: NextRequest) {
     const token = generateShareToken();
     
     // Calculate expiry date
-    let expiresAt: Date | null = null;
+    let expiresAt: string | null = null;
     if (expiryDays) {
-      expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + expiryDays);
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + expiryDays);
+      expiresAt = expiryDate.toISOString();
     }
     
-    // Create shared report in database
-    const sharedReport = await prisma.sharedReport.create({
-      data: {
-        workspaceId: workspaceId || 'default',
-        token,
-        reportName,
-        snapshot,
-        expiresAt,
-        passcode: passcode || null,
-        maxViews: maxViews || null,
-        viewCount: 0,
-        createdBy: 'system', // TODO: Get from auth session
-      },
-    });
+    const db = getAdminDb();
+    
+    // Create shared report in Firestore
+    const sharedReportData = {
+      workspaceId: workspaceId || 'default',
+      token,
+      reportName,
+      snapshot,
+      expiresAt,
+      passcode: passcode || null,
+      maxViews: maxViews || null,
+      viewCount: 0,
+      createdBy: 'system', // TODO: Get from auth session
+      createdAt: new Date().toISOString(),
+      lastAccessedAt: null,
+    };
+    
+    const docRef = await db.collection('sharedReports').add(sharedReportData);
+    const sharedReport = { id: docRef.id, ...sharedReportData };
     
     // Generate shareable URL
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -84,23 +91,29 @@ export async function GET(req: NextRequest) {
       );
     }
     
-    // Find shared report in database
-    const sharedReport = await prisma.sharedReport.findUnique({
-      where: { token },
-    });
+    const db = getAdminDb();
     
-    if (!sharedReport) {
+    // Find shared report in Firestore by token
+    const snapshot = await db.collection('sharedReports')
+      .where('token', '==', token)
+      .limit(1)
+      .get();
+    
+    if (snapshot.empty) {
       return NextResponse.json(
         { error: 'Shared report not found' },
         { status: 404 }
       );
     }
     
+    const doc = snapshot.docs[0];
+    const sharedReport = { id: doc.id, ...doc.data() } as any;
+    
     // Validate access (expiry, view limits, passcode)
     const accessValidation = validateShareAccess(
       {
         access: {
-          expiresAt: sharedReport.expiresAt?.toISOString(),
+          expiresAt: sharedReport.expiresAt,
           passcode: sharedReport.passcode,
           viewCount: sharedReport.viewCount,
           maxViews: sharedReport.maxViews,
@@ -121,12 +134,9 @@ export async function GET(req: NextRequest) {
     }
     
     // Increment view count and update last accessed time
-    await prisma.sharedReport.update({
-      where: { id: sharedReport.id },
-      data: {
-        viewCount: sharedReport.viewCount + 1,
-        lastAccessedAt: new Date(),
-      },
+    await doc.ref.update({
+      viewCount: (sharedReport.viewCount || 0) + 1,
+      lastAccessedAt: new Date().toISOString(),
     });
     
     // Return report in the expected format
@@ -135,12 +145,12 @@ export async function GET(req: NextRequest) {
         reportName: sharedReport.reportName,
         snapshot: sharedReport.snapshot,
         access: {
-          expiresAt: sharedReport.expiresAt?.toISOString() || null,
+          expiresAt: sharedReport.expiresAt || null,
           maxViews: sharedReport.maxViews,
-          viewCount: sharedReport.viewCount + 1,
+          viewCount: (sharedReport.viewCount || 0) + 1,
           hasPasscode: !!sharedReport.passcode,
         },
-        createdAt: sharedReport.createdAt.toISOString(),
+        createdAt: sharedReport.createdAt,
       },
     });
   } catch (error) {
