@@ -52,24 +52,30 @@ export async function POST(req: NextRequest) {
     if (!process.env.SENDGRID_API_KEY) {
       console.warn('⚠️ SendGrid API key not configured - simulating email send');
       
-      // Mock delivery log for development
-      const mockLog = await prisma.emailDeliveryLog.create({
-        data: {
-          workspaceId: workspaceId || 'default',
-          reportName,
-          reportPeriod: reportPeriod || 'N/A',
-          recipients,
-          emailProvider: 'sendgrid',
-          messageId: `mock_${Date.now()}`,
-          status: 'sent',
-          pdfSize: pdfData ? Buffer.from(pdfData, 'base64').length : 0,
-        },
-      });
+      // Mock delivery log for development (optional - skip if database unavailable)
+      let mockMessageId = `mock_${Date.now()}`;
+      try {
+        const mockLog = await prisma.emailDeliveryLog.create({
+          data: {
+            workspaceId: workspaceId || 'default',
+            reportName,
+            reportPeriod: reportPeriod || 'N/A',
+            recipients,
+            emailProvider: 'sendgrid',
+            messageId: mockMessageId,
+            status: 'sent',
+            pdfSize: pdfData ? Buffer.from(pdfData, 'base64').length : 0,
+          },
+        });
+        mockMessageId = mockLog.messageId;
+      } catch (dbError) {
+        console.warn('Failed to log mock email (database unavailable):', dbError instanceof Error ? dbError.message : 'Unknown error');
+      }
       
       return NextResponse.json({
         success: true,
         message: 'Email simulated (SendGrid not configured)',
-        messageId: mockLog.messageId,
+        messageId: mockMessageId,
         recipients: recipients.length,
         warning: 'SendGrid API key not set - email not actually sent',
       });
@@ -205,23 +211,29 @@ export async function POST(req: NextRequest) {
       
       const response = await sgMail.send(emailData);
       
-      // Log successful delivery to database
-      const deliveryLog = await prisma.emailDeliveryLog.create({
-        data: {
-          workspaceId: workspaceId || 'default',
-          reportName,
-          reportPeriod: reportPeriod || 'N/A',
-          recipients,
-          emailProvider: 'sendgrid',
-          messageId: response[0].headers['x-message-id'] || `sg_${Date.now()}`,
-          status: 'sent',
-          pdfSize: pdfData ? Buffer.from(pdfData, 'base64').length : 0,
-          sentAt: new Date(),
-        },
-      });
+      // Log successful delivery to database (optional - skip if database unavailable)
+      let messageId = response[0].headers['x-message-id'] || `sg_${Date.now()}`;
+      try {
+        const deliveryLog = await prisma.emailDeliveryLog.create({
+          data: {
+            workspaceId: workspaceId || 'default',
+            reportName,
+            reportPeriod: reportPeriod || 'N/A',
+            recipients,
+            emailProvider: 'sendgrid',
+            messageId,
+            status: 'sent',
+            pdfSize: pdfData ? Buffer.from(pdfData, 'base64').length : 0,
+            sentAt: new Date(),
+          },
+        });
+        messageId = deliveryLog.messageId;
+      } catch (dbError) {
+        console.warn('Failed to log email delivery (database unavailable):', dbError instanceof Error ? dbError.message : 'Unknown error');
+      }
       
       console.log('✅ Email sent successfully:', {
-        messageId: deliveryLog.messageId,
+        messageId,
         recipients: recipients.length,
         reportName,
       });
@@ -229,9 +241,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Report sent successfully',
-        messageId: deliveryLog.messageId,
+        messageId,
         recipients: recipients.length,
-        deliveryLogId: deliveryLog.id,
       });
       
     } catch (sendGridError: any) {
@@ -242,19 +253,23 @@ export async function POST(req: NextRequest) {
         response: JSON.stringify(sendGridError.response?.body, null, 2),
       });
       
-      // Log failed delivery to database
-      await prisma.emailDeliveryLog.create({
-        data: {
-          workspaceId: workspaceId || 'default',
-          reportName,
-          reportPeriod: reportPeriod || 'N/A',
-          recipients,
-          emailProvider: 'sendgrid',
-          status: 'failed',
-          error: sendGridError.message || 'Unknown SendGrid error',
-          pdfSize: pdfData ? Buffer.from(pdfData, 'base64').length : 0,
-        },
-      });
+      // Log failed delivery to database (optional - skip if database unavailable)
+      try {
+        await prisma.emailDeliveryLog.create({
+          data: {
+            workspaceId: workspaceId || 'default',
+            reportName,
+            reportPeriod: reportPeriod || 'N/A',
+            recipients,
+            emailProvider: 'sendgrid',
+            status: 'failed',
+            error: sendGridError.message || 'Unknown SendGrid error',
+            pdfSize: pdfData ? Buffer.from(pdfData, 'base64').length : 0,
+          },
+        });
+      } catch (dbError) {
+        console.warn('Failed to log email delivery (database unavailable):', dbError instanceof Error ? dbError.message : 'Unknown error');
+      }
       
       return NextResponse.json(
         { 
