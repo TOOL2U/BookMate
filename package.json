@@ -11,6 +11,7 @@
     "test": "node test-all.js",
     "test:quick": "node test-all.js --skip-build",
     "test:verbose": "node test-all.js --verbose",
+    "test:sync": "tsx scripts/verify-data-sync.ts",
     "dev:persistent": "chmod +x scripts/persistent-server.sh && ./scripts/persistent-server.sh",
     "dev:status": "tail -f server.log",
     "dev:stop": "kill $(cat .server.pid 2>/dev/null) 2>/dev/null || echo 'No server running'",
