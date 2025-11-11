@@ -61,11 +61,25 @@ DESIGN_SYSTEM_PHASE1_COMPLETE.md
 PHASE*.md
 PNL_FEATURE_REPORT.md
 *_REPORT.md
+EMAIL_LOGO_UPDATE.md
+FIREBASE_FIXED_READY_TO_DEPLOY.md
+FIREBASE_FIX_COMPLETE.md
+PRODUCTION_ISSUES_FIXED.md
+VERCEL_ENV_SETUP_COMPLETE.md
+VERCEL_FIX_INSTRUCTIONS.md
 
 # Apps Script files (should be managed separately)
 APPS_SCRIPT_*.js
 CREATE_*.gs
 *_DEPLOYMENT_GUIDE.md
+
+# Test and utility scripts
+test-*.js
+convert-logo.js
+update-*-env.sh
+
+# Logo conversion files
+public/logo/*-base64.txt
 
 accounting-buddy-*.json
 config/google-credentials.json
