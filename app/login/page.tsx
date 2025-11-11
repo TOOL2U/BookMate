@@ -155,13 +155,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          {/* MVP Notice */}
-          <div className="mt-6 pt-6 border-t border-border-card">
-            <p className="text-xs text-text-secondary text-center font-aileron">
-              Demo Account: <span className="text-yellow">Shaun</span> / <span className="text-yellow">1234</span>
-            </p>
-          </div>
         </div>
 
         {/* Footer */}
