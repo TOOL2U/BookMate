@@ -1,105 +1,152 @@
-# dependencies
+# Dependencies
 /node_modules
 /.pnp
 .pnp.js
+/functions/node_modules
 
-# testing
+# Testing
 /coverage
+*.test.js
+*.spec.js
 
-# next.js
+# Next.js
 /.next/
 /out/
+.next
 
-# production
+# Production builds
 /build
+/dist
 
-# misc
+# Misc system files
 .DS_Store
 *.pem
+Thumbs.db
+*.log
 
-# debug
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# local env files
-.env*.local
+# Local env files (all patterns)
 .env
-.env.firebase-admin
-
-# Firebase service account keys
-firebase-admin-key.json
-*-service-account-key.json
-accounting-buddy-*.json
-bookmate-*-firebase-adminsdk-*.json
-
-# Environment files with secrets
+.env*.local
 .env.local
 .env.development
+.env.development.local
+.env.test
+.env.test.local
 .env.production
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# Development and testing files
-/scripts/
-/logs/
-.server.pid
-server.log
-*-backup.json
-config/enhanced-keywords.json
-config/options-backup.json
-
-# Testing and development documentation
-CLEANUP_REPORT.md
-DESIGN_SYSTEM.md
-DESIGN_SYSTEM_PHASE1_COMPLETE.md
-PHASE*.md
-PNL_FEATURE_REPORT.md
-*_REPORT.md
-EMAIL_LOGO_UPDATE.md
-FIREBASE_FIXED_READY_TO_DEPLOY.md
-FIREBASE_FIX_COMPLETE.md
-PRODUCTION_ISSUES_FIXED.md
-VERCEL_ENV_SETUP_COMPLETE.md
-VERCEL_FIX_INSTRUCTIONS.md
-
-# Apps Script files (should be managed separately)
-APPS_SCRIPT_*.js
-CREATE_*.gs
-*_DEPLOYMENT_GUIDE.md
-
-# Test and utility scripts
-test-*.js
-convert-logo.js
-update-*-env.sh
-
-# Logo conversion files
-public/logo/*-base64.txt
-
-accounting-buddy-*.json
-config/google-credentials.json
+.env.production.local
+.env.firebase-admin
 sendgrid.env
 
-# Private keys and sensitive environment files
+# Firebase Admin SDK & Service Account Keys
+firebase-admin-key.json
+*-service-account-key.json
+*-firebase-adminsdk-*.json
+bookmate-*.json
+accounting-buddy-*.json
+config/google-credentials.json
+
+# Google Cloud credentials
+*credentials*.json
+service-account*.json
+gcloud-*.json
+
+# Private keys and secrets
 *PRIVATE_KEY*.txt
+*SECRET*.txt
+*API_KEY*.txt
 *VERCEL_KEY*.txt
 VERCEL_ENV_VALUES.txt
 COPY_THIS_TO_VERCEL.txt
 COPY_TO_VERCEL.txt
-firebase-private-key-one-line.txt
+firebase-private-key*.txt
+
+# Vercel
+.vercel
+.vercel.json
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs and editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Development files
+/logs/
+*.pid
+.server.pid
+.dev-server.pid
+server.log
+dev-server.log
+
+# Backup files
+*-backup.json
+*.backup
+*.bak
+*.tmp
+*.old
+*~
+.pre-fix-backup
+config/enhanced-keywords.json
+config/options-backup.json
 
 # Database files
 *.db
 *.db-*
+*.sqlite
+*.sqlite3
+/prisma/*.db
+/prisma/*.db-journal
 
-# Temporary and backup files
-*.bak
-*.tmp
-
-# Script files with environment updates
+# Test and development scripts
+test-*.js
+test-*.sh
+convert-*.js
+verify-*.sh
 update-*-env.sh
+setup-*.sh
+
+# Apps Script files (managed separately)
+APPS_SCRIPT_*.js
+CREATE_*.gs
+*.gs
+
+# Logo conversion artifacts
+public/logo/*-base64.txt
+
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/
