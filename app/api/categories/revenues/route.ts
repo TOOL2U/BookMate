@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling, APIErrors } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 import { google } from 'googleapis';
 
 const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID!;
@@ -12,7 +15,7 @@ function getCredentials() {
   return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
 }
 
-export async function GET() {
+async function getHandler() {
   try {
     console.log('[REVENUES] Fetching revenue items from Google Sheets...');
     
@@ -57,7 +60,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = await request.json();
     const { action, newValue, oldValue, index } = body;
@@ -185,3 +188,19 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+// Apply middleware: security headers → rate limiting → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(getHandler),
+    RATE_LIMITS.read
+  )
+);
+
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(postHandler),
+    RATE_LIMITS.write
+  )
+);

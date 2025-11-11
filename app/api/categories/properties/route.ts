@@ -12,6 +12,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling, APIErrors } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
 // ============================================================================
 // CONSTANTS
@@ -62,7 +65,7 @@ function getCredentials() {
 // GET HANDLER - Fetch all properties
 // ============================================================================
 
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   try {
     console.log('[PROPERTIES] Fetching properties from Google Sheets...');
 
@@ -121,7 +124,7 @@ export async function GET(request: NextRequest) {
 // POST HANDLER - Add, Edit, or Delete properties
 // ============================================================================
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = await request.json();
     const { action, oldValue, newValue, index } = body;
@@ -264,3 +267,19 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+// Apply middleware: security headers → rate limiting → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(getHandler),
+    RATE_LIMITS.read
+  )
+);
+
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(postHandler),
+    RATE_LIMITS.write
+  )
+);

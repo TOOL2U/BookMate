@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling, APIErrors } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
@@ -32,7 +35,7 @@ const DATA_CATEGORY_COL = 2; // Column B (0-indexed: A=1, B=2)
  * GET /api/categories/expenses
  * List all expense categories from Data!B30:B
  */
-export async function GET(request: NextRequest) {
+async function getHandler(request: NextRequest) {
   try {
     console.log('[EXPENSES] Fetching expense categories from Google Sheets...');
 
@@ -92,7 +95,7 @@ export async function GET(request: NextRequest) {
  * POST /api/categories/expenses
  * Add, edit, or delete an expense category
  */
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body: ExpenseCategoryAction = await request.json();
     const { action, oldValue, newValue, index } = body;
@@ -344,3 +347,19 @@ function getCredentials() {
     'See EXPENSE_CATEGORY_MANAGEMENT.md for setup.'
   );
 }
+
+
+// Apply middleware: security headers → rate limiting → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(getHandler),
+    RATE_LIMITS.read
+  )
+);
+
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(postHandler),
+    RATE_LIMITS.write
+  )
+);

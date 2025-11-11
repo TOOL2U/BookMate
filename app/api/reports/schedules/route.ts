@@ -7,8 +7,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calculateNextRun } from '@/lib/reports/sharing';
 import prisma from '@/lib/prisma';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
-export async function GET(req: NextRequest) {
+async function getSchedulesHandler(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const workspaceId = searchParams.get('workspace') || searchParams.get('workspaceId') || 'default';
@@ -32,7 +35,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+async function createScheduleHandler(req: NextRequest) {
   try {
     const body = await req.json();
     
@@ -76,7 +79,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
+async function updateScheduleHandler(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
@@ -131,7 +134,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
+async function deleteScheduleHandler(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
@@ -171,3 +174,32 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+
+// Apply middleware: security headers → rate limiting → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(getSchedulesHandler),
+    RATE_LIMITS.read
+  )
+);
+
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(createScheduleHandler),
+    RATE_LIMITS.write
+  )
+);
+
+export const PUT = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(updateScheduleHandler),
+    RATE_LIMITS.write
+  )
+);
+
+export const DELETE = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(deleteScheduleHandler),
+    RATE_LIMITS.write
+  )
+);

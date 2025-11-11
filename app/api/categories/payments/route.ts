@@ -12,6 +12,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling, APIErrors } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
 // ============================================================================
 // CONSTANTS
@@ -62,7 +65,7 @@ function getCredentials() {
 // GET HANDLER - Fetch all payment types
 // ============================================================================
 
-export async function GET(request: NextRequest) {
+async function getPaymentTypesHandler(request: NextRequest) {
   try {
     console.log('[PAYMENTS] Fetching payment types from Google Sheets...');
 
@@ -121,7 +124,7 @@ export async function GET(request: NextRequest) {
 // POST HANDLER - Add, Edit, or Delete payment types
 // ============================================================================
 
-export async function POST(request: NextRequest) {
+async function updatePaymentTypesHandler(request: NextRequest) {
   try {
     const body = await request.json();
     const { action, oldValue, newValue, index } = body;
@@ -264,3 +267,18 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Apply middleware: security headers → rate limiting → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(getPaymentTypesHandler),
+    RATE_LIMITS.read
+  )
+);
+
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(updatePaymentTypesHandler),
+    RATE_LIMITS.write
+  )
+);

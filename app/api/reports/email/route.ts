@@ -9,13 +9,16 @@ import sgMail from '@sendgrid/mail';
 import { formatEmailSubject, generateEmailMessage } from '@/lib/reports/sharing';
 import prisma from '@/lib/prisma';
 import { validateRequest, SendEmailSchema } from '@/lib/validation/reports';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
 // Initialize SendGrid
 if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
 
-export async function POST(req: NextRequest) {
+async function emailReportHandler(req: NextRequest) {
   try {
     const body = await req.json();
     
@@ -410,7 +413,7 @@ export async function POST(req: NextRequest) {
 }
 
 // GET endpoint to check email delivery status
-export async function GET(req: NextRequest) {
+async function getEmailStatusHandler(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const emailId = searchParams.get('id');
@@ -451,3 +454,18 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+// Apply middleware: security headers → rate limiting (write tier for sending emails) → error handling
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(emailReportHandler),
+    RATE_LIMITS.write
+  )
+);
+
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(getEmailStatusHandler),
+    RATE_LIMITS.read
+  )
+);
