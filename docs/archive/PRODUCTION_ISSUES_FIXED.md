@@ -44,7 +44,7 @@ TypeError: Invalid character in header content ["Authorization"]
 **Solution**:
 - Used `printf` to update SendGrid env vars without extra characters:
   ```bash
-  printf '%s' "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" | vercel env add SENDGRID_API_KEY production --force
+  printf '%s' "[REDACTED - SENDGRID_API_KEY]" | vercel env add SENDGRID_API_KEY production --force
   printf '%s' "shaunducker1@gmail.com" | vercel env add SENDGRID_FROM_EMAIL production --force
   printf '%s' "BookMate Reports" | vercel env add SENDGRID_FROM_NAME production --force
   ```
