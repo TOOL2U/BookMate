@@ -1,0 +1,79 @@
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  
+  // Capture Replay for 10% of all sessions,
+  // plus for 100% of sessions with an error
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  
+  // Environment
+  environment: process.env.NODE_ENV || 'development',
+  
+  // Release tracking
+  release: process.env.VERCEL_GIT_COMMIT_SHA,
+  
+  // Filter out sensitive data
+  beforeSend(event, hint) {
+    // Filter sensitive headers
+    if (event.request?.headers) {
+      delete event.request.headers['authorization'];
+      delete event.request.headers['cookie'];
+    }
+    
+    // Filter environment variables
+    if (event.contexts?.runtime?.env) {
+      const env: any = event.contexts.runtime.env;
+      Object.keys(env).forEach(key => {
+        if (key.includes('KEY') || key.includes('SECRET') || key.includes('TOKEN')) {
+          env[key] = '[REDACTED]';
+        }
+      });
+    }
+    
+    return event;
+  },
+  
+  // Ignore certain errors
+  ignoreErrors: [
+    // Browser extensions
+    'top.GLOBALS',
+    // Random plugins/extensions
+    'originalCreateNotification',
+    'canvas.contentDocument',
+    'MyApp_RemoveAllHighlights',
+    // Network errors
+    'NetworkError',
+    'Failed to fetch',
+    // Timeout errors (not critical)
+    'AbortError',
+  ],
+  
+  // Tag events with additional context
+  initialScope: {
+    tags: {
+      deployment: process.env.VERCEL_ENV || 'local',
+    },
+  },
+  
+  // Debug mode
+  debug: process.env.NODE_ENV === 'development',
+  
+  // Enable performance monitoring
+  integrations: [
+    new Sentry.BrowserTracing({
+      // Adjust this value in production
+      tracingOrigins: ['localhost', 'accounting.siamoon.com'],
+    }),
+    new Sentry.Replay({
+      // Mask all text content by default
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
+});
