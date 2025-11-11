@@ -39,6 +39,7 @@ export default function PropertyManager() {
 
   useEffect(() => {
     fetchProperties();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStartEdit = (index: number, currentValue: string) => {

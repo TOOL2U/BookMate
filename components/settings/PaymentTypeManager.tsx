@@ -39,6 +39,7 @@ export default function PaymentTypeManager() {
 
   useEffect(() => {
     fetchPaymentTypes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStartEdit = (index: number, currentValue: string) => {

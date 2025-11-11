@@ -14,10 +14,6 @@ export default function ScheduledReportsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSchedules();
-  }, []);
-
   const fetchSchedules = async () => {
     setIsLoading(true);
     try {
@@ -34,6 +30,11 @@ export default function ScheduledReportsPage() {
       setDataReady(true); // Mark page data as ready
     }
   };
+
+  useEffect(() => {
+    fetchSchedules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleToggleStatus = async (scheduleId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'paused' : 'active';
