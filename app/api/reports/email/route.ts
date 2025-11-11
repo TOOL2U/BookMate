@@ -94,43 +94,110 @@ export async function POST(req: NextRequest) {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${reportName}</title>
         </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: #FFF02B; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
-            <h1 style="margin: 0; color: #000; font-size: 28px; font-weight: bold;">📊 BookMate Financial Report</h1>
-          </div>
-          
-          <div style="background: #fff; padding: 40px 30px; border: 1px solid #e0e0e0; border-top: none;">
-            <h2 style="color: #000; margin-top: 0; font-size: 20px;">${reportName}</h2>
-            ${reportPeriod ? `<p style="color: #666; font-size: 14px; margin-bottom: 20px;"><strong>Period:</strong> ${reportPeriod}</p>` : ''}
-            
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 25px 0;">
-              <p style="margin: 0; font-size: 16px; line-height: 1.8;">${baseMessage}</p>
-            </div>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${shareUrl}" style="display: inline-block; background: #FFF02B; color: #000; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: bold; text-transform: uppercase;">
-                View Report
-              </a>
-            </div>
-            
-            <div style="margin: 30px 0; padding: 20px; background: #fff9e6; border-left: 4px solid #FFF02B; border-radius: 4px;">
-              <p style="margin: 0; font-size: 14px; color: #666;">
-                <strong>🔒 Secure Link:</strong> This link will expire in 30 days. Click the button above to view your report online.
-              </p>
-            </div>
-            
-            <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              If you have any questions about this report, please don't hesitate to reach out.
-            </p>
-          </div>
-          
-          <div style="background: #f5f5f5; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; margin-top: 0;">
-            <p style="margin: 0; font-size: 12px; color: #999;">
-              © ${new Date().getFullYear()} BookMate. All rights reserved.<br>
-              This is an automated message from BookMate Reports. Please do not reply to this email.
-            </p>
-          </div>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 0; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                  
+                  <!-- Header -->
+                  <tr>
+                    <td style="background-color: #000000; padding: 40px 40px; text-align: center;">
+                      <!-- Logo -->
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td align="center" style="padding-bottom: 16px;">
+                            <img src="https://accounting.siamoon.com/logo/bm-logo-email.png" alt="BookMate Logo" width="80" height="80" style="display: block; margin: 0 auto; border-radius: 12px; max-width: 80px; height: auto;" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center">
+                            <h1 style="margin: 0 0 8px 0; color: #FFFFFF; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; font-family: Arial, sans-serif;">BOOKMATE</h1>
+                            <p style="margin: 0; color: #9CA3AF; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Financial Analytics</p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  
+                  <!-- Yellow Accent Bar -->
+                  <tr>
+                    <td style="background-color: #FFF02B; height: 4px; padding: 0;"></td>
+                  </tr>
+                  
+                  <!-- Main Content -->
+                  <tr>
+                    <td style="padding: 50px 40px; background-color: #ffffff;">
+                      
+                      <!-- Status Badge -->
+                      <table cellpadding="0" cellspacing="0" align="center" style="margin-bottom: 30px;">
+                        <tr>
+                          <td style="background-color: #000000; border-radius: 6px; padding: 8px 20px;">
+                            <p style="margin: 0; color: #FFF02B; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Your Report is Ready</p>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Report Title -->
+                      <h2 style="margin: 0 0 8px 0; color: #000000; font-size: 26px; font-weight: 700; text-align: center;">${reportName}</h2>
+                      ${reportPeriod ? `
+                        <p style="margin: 0 0 30px 0; color: #6B7280; font-size: 14px; text-align: center; font-weight: 500;">${reportPeriod}</p>
+                      ` : '<div style="margin-bottom: 30px;"></div>'}
+                      
+                      <!-- Divider -->
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                        <tr>
+                          <td style="border-bottom: 1px solid #E5E7EB;"></td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Message -->
+                      <p style="margin: 0 0 36px 0; font-size: 15px; line-height: 1.7; color: #374151; text-align: center;">${baseMessage}</p>
+                      
+                      <!-- CTA Button -->
+                      <table cellpadding="0" cellspacing="0" align="center">
+                        <tr>
+                          <td style="border-radius: 8px; background-color: #000000;">
+                            <a href="${shareUrl}" style="display: inline-block; padding: 16px 48px; color: #FFF02B; text-decoration: none; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">
+                              View Report
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Security Notice -->
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px; background-color: #F9FAFB; border-left: 3px solid #000000; border-radius: 4px;">
+                        <tr>
+                          <td style="padding: 20px 24px;">
+                            <p style="margin: 0 0 6px 0; color: #000000; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;">SECURE ACCESS</p>
+                            <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.6;">
+                              This link expires in 30 days. Your data is protected with enterprise-grade encryption.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #000000; padding: 30px 40px; text-align: center;">
+                      <p style="margin: 0 0 8px 0; font-size: 11px; color: #9CA3AF; line-height: 1.6;">
+                        &copy; ${new Date().getFullYear()} BookMate. All rights reserved.
+                      </p>
+                      <p style="margin: 0; font-size: 10px; color: #6B7280;">
+                        Automated message - please do not reply
+                      </p>
+                    </td>
+                  </tr>
+                  
+                </table>
+              </td>
+            </tr>
+          </table>
         </body>
       </html>
     ` : `
@@ -139,37 +206,99 @@ export async function POST(req: NextRequest) {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${reportName}</title>
         </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: #FFF02B; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
-            <h1 style="margin: 0; color: #000; font-size: 28px; font-weight: bold;">📊 BookMate Financial Report</h1>
-          </div>
-          
-          <div style="background: #fff; padding: 40px 30px; border: 1px solid #e0e0e0; border-top: none;">
-            <h2 style="color: #000; margin-top: 0; font-size: 20px;">${reportName}</h2>
-            ${reportPeriod ? `<p style="color: #666; font-size: 14px; margin-bottom: 20px;"><strong>Period:</strong> ${reportPeriod}</p>` : ''}
-            
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 25px 0;">
-              <p style="margin: 0; font-size: 16px; line-height: 1.8;">${baseMessage}</p>
-            </div>
-            
-            <div style="margin: 30px 0; padding: 20px; background: #fff9e6; border-left: 4px solid #FFF02B; border-radius: 4px;">
-              <p style="margin: 0; font-size: 14px; color: #666;">
-                <strong>📎 Attachment:</strong> Your report is attached as a PDF file.
-              </p>
-            </div>
-            
-            <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              If you have any questions about this report, please don't hesitate to reach out.
-            </p>
-          </div>
-          
-          <div style="background: #f5f5f5; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; margin-top: 0;">
-            <p style="margin: 0; font-size: 12px; color: #999;">
-              © ${new Date().getFullYear()} BookMate. All rights reserved.<br>
-              This is an automated message from BookMate Reports. Please do not reply to this email.
-            </p>
-          </div>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 0; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                  
+                  <!-- Header -->
+                  <tr>
+                    <td style="background-color: #000000; padding: 40px 40px; text-align: center;">
+                      <!-- Logo -->
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td align="center" style="padding-bottom: 16px;">
+                            <img src="https://accounting.siamoon.com/logo/bm-logo-email.png" alt="BookMate Logo" width="80" height="80" style="display: block; margin: 0 auto; border-radius: 12px; max-width: 80px; height: auto;" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td align="center">
+                            <h1 style="margin: 0 0 8px 0; color: #FFFFFF; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; font-family: Arial, sans-serif;">BOOKMATE</h1>
+                            <p style="margin: 0; color: #9CA3AF; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Financial Analytics</p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  
+                  <!-- Yellow Accent Bar -->
+                  <tr>
+                    <td style="background-color: #FFF02B; height: 4px; padding: 0;"></td>
+                  </tr>
+                  
+                  <!-- Main Content -->
+                  <tr>
+                    <td style="padding: 50px 40px; background-color: #ffffff;">
+                      
+                      <!-- Status Badge -->
+                      <table cellpadding="0" cellspacing="0" align="center" style="margin-bottom: 30px;">
+                        <tr>
+                          <td style="background-color: #000000; border-radius: 6px; padding: 8px 20px;">
+                            <p style="margin: 0; color: #FFF02B; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Report Generated</p>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Report Title -->
+                      <h2 style="margin: 0 0 8px 0; color: #000000; font-size: 26px; font-weight: 700; text-align: center;">${reportName}</h2>
+                      ${reportPeriod ? `
+                        <p style="margin: 0 0 30px 0; color: #6B7280; font-size: 14px; text-align: center; font-weight: 500;">${reportPeriod}</p>
+                      ` : '<div style="margin-bottom: 30px;"></div>'}
+                      
+                      <!-- Divider -->
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                        <tr>
+                          <td style="border-bottom: 1px solid #E5E7EB;"></td>
+                        </tr>
+                      </table>
+                      
+                      <!-- Message -->
+                      <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.7; color: #374151; text-align: center;">${baseMessage}</p>
+                      
+                      <!-- Security Notice -->
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 40px; background-color: #F9FAFB; border-left: 3px solid #000000; border-radius: 4px;">
+                        <tr>
+                          <td style="padding: 20px 24px;">
+                            <p style="margin: 0 0 6px 0; color: #000000; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;">SECURE DELIVERY</p>
+                            <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.6;">
+                              Your financial report has been securely generated. All data is protected with enterprise-grade encryption.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                      
+                    </td>
+                  </tr>
+                  
+                  <!-- Footer -->
+                  <tr>
+                    <td style="background-color: #000000; padding: 30px 40px; text-align: center;">
+                      <p style="margin: 0 0 8px 0; font-size: 11px; color: #9CA3AF; line-height: 1.6;">
+                        &copy; ${new Date().getFullYear()} BookMate. All rights reserved.
+                      </p>
+                      <p style="margin: 0; font-size: 10px; color: #6B7280;">
+                        Automated message - please do not reply
+                      </p>
+                    </td>
+                  </tr>
+                  
+                </table>
+              </td>
+            </tr>
+          </table>
         </body>
       </html>
     `;
@@ -187,26 +316,12 @@ export async function POST(req: NextRequest) {
         text: baseMessage + (shareUrl ? `\n\nView your report: ${shareUrl}` : ''),
         html: htmlContent,
       };
-
-      // Only add attachments if PDF data is provided
-      if (pdfData) {
-        emailData.attachments = [
-          {
-            content: pdfData,
-            filename: `${reportName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${reportPeriod?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'report'}.pdf`,
-            type: 'application/pdf',
-            disposition: 'attachment',
-          },
-        ];
-      }
       
       console.log('📧 Sending email via SendGrid:', {
         from: emailData.from,
         to: recipients.map(r => r.email),
         subject,
-        hasAttachment: !!pdfData,
         hasShareLink: !!shareUrl,
-        attachmentSize: pdfData ? Math.round((pdfData.length * 3) / 4 / 1024) + ' KB' : 'N/A',
       });
       
       const response = await sgMail.send(emailData);
