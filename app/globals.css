@@ -1,0 +1,350 @@
+@import "tailwindcss";
+
+/* ===============================================
+   BOOKMATE BRAND KIT
+   Fonts loaded via Next.js localFont in layout.tsx
+   =============================================== */
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  /* ===== BOOKMATE BRAND COLORS ===== */
+  
+  /* Primary Brand Yellow */
+  --color-yellow: #FFF02B;
+  --color-accent: #FFF02B;
+  
+  /* Backgrounds */
+  --color-bg-app: #121212;
+  --color-bg-card: #171717;
+  --color-black: #000000;
+  
+  /* Greys */
+  --color-grey: #4D4D4D;
+  --color-grey-dark: #121212;
+  
+  /* Text Colors */
+  --color-text-primary: #f3f3f3;
+  --color-text-secondary: #b5b5b5;
+  --color-text-muted: #4D4D4D;
+  
+  /* Borders */
+  --color-border-card: #2a2a2a;
+  --color-border-light: #2a2a2a;
+  
+  /* Status Colors */
+  --color-success: #00ff88;
+  --color-error: #ff3366;
+  --color-warning: #FFF02B;
+  --color-info: #FFF02B;
+  
+  /* Shadows - Yellow Glow */
+  --shadow-glow: 0 0 24px rgba(255, 240, 43, 0.25);
+  --shadow-glow-sm: 0 0 12px rgba(255, 240, 43, 0.20);
+  --shadow-glow-lg: 0 0 36px rgba(255, 240, 43, 0.30);
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: var(--font-aileron), ui-sans-serif, system-ui, sans-serif;
+  background-color: #121212;
+  color: #f3f3f3;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Page-specific backgrounds removed - pure black everywhere */
+
+/* Toast Animations - Slowed down */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out;
+}.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+
+.animate-fade-out {
+  animation: fade-out 0.5s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Page Transitions - Slowed down */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: page-fade-in 0.8s ease-out;
+}
+
+/* Smooth transitions for interactive elements */
+button, a, input, textarea, select {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Focus ring for accessibility - Yellow accent */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 240, 43, 0.6);
+}
+
+/* Accent gradient text (yellow) */
+.gradient-text {
+  background: linear-gradient(to right, #FFF02B, #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Loading spinner pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Logo Scaler Animation - 2.9s duration */
+@keyframes logo-scale {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-logo-scale {
+  animation: logo-scale 2.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Logo Loading Animation - Continuous pulse/breathe effect */
+@keyframes logo-loading {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.animate-logo-loading {
+  animation: logo-loading 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Logo Loading with Glow - Yellow glow pulse */
+@keyframes logo-loading-glow {
+  0%, 100% {
+    transform: scale(0.95);
+    filter: drop-shadow(0 0 6px rgba(255, 240, 43, 0.2));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 12px rgba(255, 240, 43, 0.4));
+  }
+}
+
+.animate-logo-loading-glow {
+  animation: logo-loading-glow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Shimmer animation for skeleton loaders */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+/* ===== BOOKMATE BRAND GLOW EFFECTS ===== */
+
+/* Primary CTA Button - Yellow gradient with glow */
+.btn-primary-accent {
+  background: linear-gradient(to right, #FFF02B 0%, #FFD700 100%);
+  color: #000000;
+  border: none;
+  box-shadow: 0 0 16px rgba(255, 240, 43, 0.3);
+  transition: all 0.3s ease;
+  font-weight: 700;
+}
+
+.btn-primary-accent:hover {
+  box-shadow: 0 0 25px rgba(255, 240, 43, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Input focus - Yellow glow */
+.input-glow:focus {
+  outline: none;
+  border-color: #FFF02B;
+  box-shadow: 0 0 12px rgba(255, 240, 43, 0.3);
+}
+
+/* Yellow glow animation for active states */
+@keyframes yellow-glow {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(255, 240, 43, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 240, 43, 0.25);
+  }
+}
+
+.animate-yellow-glow {
+  animation: yellow-glow 3s ease-in-out infinite;
+}
+
+/* Neon border-left indicators */
+.border-neon-yellow {
+  border-left: 4px solid #FFF02B;
+}
+
+.border-neon-green {
+  border-left: 4px solid #00FF88;
+}
+
+.border-neon-pink {
+  border-left: 4px solid #FF3366;
+}
+
+/* ============================================
+   Mobile Viewport Fixes - Prevent iOS Zoom
+   ============================================ */
+
+/* Prevent iOS Safari from zooming in on input focus
+   iOS Safari auto-zooms when input font-size < 16px */
+input,
+select,
+textarea,
+button {
+  font-size: 16px !important;
+}
+
+  /* Ensure inputs maintain proper appearance despite 16px minimum */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Prevent accidental double-tap zoom on buttons */
+  button,
+  a {
+    touch-action: manipulation;
+  }
+
+/* Ensure proper mobile touch behavior */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+}
+
+/* Allow text selection for inputs only */
+input,
+textarea,
+select {
+  -webkit-user-select: text;
+  user-select: text;
+}
+/* ===============================================
+   IMAGE EXPORT CLEAN-UP
+   Removes heavy artifacts for exports
+   =============================================== */
+.report-export-root,
+.report-export-root * {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.report-export-root table,
+.report-export-root table td,
+.report-export-root table th,
+.report-export-root [class*="border"] {
+  border-width: 1px !important;
+  border-color: #e5e7eb !important;
+}

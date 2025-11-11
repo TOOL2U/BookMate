@@ -1,0 +1,147 @@
+/**
+ * Print-Optimized Styles for Shared Reports
+ * 
+ * These styles ensure perfect PDF exports when users click "Save as PDF" in their browser
+ * Applies to /reports/share/[token] route
+ */
+
+/* Hide screen-only elements when printing */
+@media print {
+  /* Hide all non-print elements */
+  .non-print,
+  .app-shell,
+  .sidebar,
+  .export-buttons,
+  button:not(.print-button),
+  nav,
+  header.non-print,
+  footer.non-print {
+    display: none !important;
+  }
+
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Reset page styles */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Optimize for A4 */
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  /* Report container */
+  .report-export-root,
+  #report-preview {
+    width: 190mm !important; /* A4 width minus margins */
+    max-width: 190mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-after: auto;
+  }
+
+  /* Prevent page breaks inside important elements */
+  .kpi-card,
+  .chart-container,
+  .table-row,
+  h1, h2, h3,
+  .insight-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Ensure charts and images print properly */
+  canvas,
+  img,
+  svg {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Optimize table printing */
+  table {
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Optimize text rendering */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Ensure backgrounds and colors print */
+  .bg-yellow,
+  .bg-green,
+  .bg-red,
+  .bg-blue,
+  [style*="background"],
+  [style*="backgroundColor"] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Remove shadows for cleaner print */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Optimize spacing */
+  .section-spacing {
+    margin-bottom: 8mm !important;
+  }
+
+  /* Ensure links are visible in print */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  /* Print footer on last page */
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 5mm;
+    border-top: 1px solid #e5e7eb;
+    font-size: 10pt;
+  }
+}
+
+/* Screen-only styles (default) */
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+
+  .non-print {
+    display: block;
+  }
+}

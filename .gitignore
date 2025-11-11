@@ -1,0 +1,152 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+/functions/node_modules
+
+# Testing
+/coverage
+*.test.js
+*.spec.js
+
+# Next.js
+/.next/
+/out/
+.next
+
+# Production builds
+/build
+/dist
+
+# Misc system files
+.DS_Store
+*.pem
+Thumbs.db
+*.log
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local env files (all patterns)
+.env
+.env*.local
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.firebase-admin
+sendgrid.env
+
+# Firebase Admin SDK & Service Account Keys
+firebase-admin-key.json
+*-service-account-key.json
+*-firebase-adminsdk-*.json
+bookmate-*.json
+accounting-buddy-*.json
+config/google-credentials.json
+
+# Google Cloud credentials
+*credentials*.json
+service-account*.json
+gcloud-*.json
+
+# Private keys and secrets
+*PRIVATE_KEY*.txt
+*SECRET*.txt
+*API_KEY*.txt
+*VERCEL_KEY*.txt
+VERCEL_ENV_VALUES.txt
+COPY_THIS_TO_VERCEL.txt
+COPY_TO_VERCEL.txt
+firebase-private-key*.txt
+
+# Vercel
+.vercel
+.vercel.json
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs and editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Development files
+/logs/
+*.pid
+.server.pid
+.dev-server.pid
+server.log
+dev-server.log
+
+# Backup files
+*-backup.json
+*.backup
+*.bak
+*.tmp
+*.old
+*~
+.pre-fix-backup
+config/enhanced-keywords.json
+config/options-backup.json
+
+# Database files
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+/prisma/*.db
+/prisma/*.db-journal
+
+# Test and development scripts
+test-*.js
+test-*.sh
+convert-*.js
+verify-*.sh
+update-*-env.sh
+setup-*.sh
+
+# Apps Script files (managed separately)
+APPS_SCRIPT_*.js
+CREATE_*.gs
+*.gs
+
+# Logo conversion artifacts
+public/logo/*-base64.txt
+
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+/temp/

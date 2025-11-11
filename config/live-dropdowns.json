@@ -1,0 +1,100 @@
+{
+  "property": [
+    "Sia Moon - Land - General",
+    "Alesia House",
+    "Lanna House",
+    "Parents House",
+    "Shaun Ducker - Personal",
+    "Maria Ren - Personal",
+    "Family",
+    "3"
+  ],
+  "typeOfOperation": [
+    "Revenue - Commision ",
+    "Revenue - Sales ",
+    "Revenue - Services",
+    "Revenue - Rental Income",
+    "1",
+    "EXP - Utilities - Gas",
+    "EXP - Utilities - Water",
+    "EXP - Utilities  - Electricity",
+    "EXP - Administration & General - License & Certificates",
+    "EXP - Construction - Structure",
+    "EXP - Construction - Overheads/General/Unclassified",
+    "EXP - HR - Employees Salaries",
+    "EXP - Construction - Electric Supplies ",
+    "EXP - Construction - Wall",
+    "EXP - Administration & General - Legal",
+    "EXP - Administration & General - Professional fees",
+    "EXP - Administration & General - Office supplies",
+    "EXP - Administration & General  - Subscription, Software & Membership",
+    "EXP - Windows, Doors, Locks & Hardware",
+    "EXP - Repairs & Maintenance  - Furniture & Decorative Items ",
+    "EXP - Repairs & Maintenance  - Waste removal",
+    "EXP - Repairs & Maintenance - Tools & Equipment ",
+    "EXP - Repairs & Maintenance - Painting & Decoration",
+    "EXP - Repairs & Maintenance - Electrical & Mechanical",
+    "EXP - Repairs & Maintenance - Landscaping",
+    "EXP - Sales & Marketing -  Professional Marketing Services",
+    "EXP - Appliances & Electronics",
+    "EXP - Other Expenses",
+    "EXP - Personal - Massage",
+    "EXP - Household - Alcohol",
+    "EXP - Household - Groceries",
+    "EXP - Household - Nappies",
+    "EXP - Household - Toiletries",
+    "2"
+  ],
+  "typeOfPayment": [
+    "Bank Transfer - Bangkok Bank - Shaun Ducker",
+    "Bank Transfer - Bangkok Bank - Maria Ren",
+    "Bank transfer - Krung Thai Bank - Family Account",
+    "Cash - Family",
+    "Cash - Alesia",
+    "4"
+  ],
+  "extractedAt": "2025-10-30T09:38:11.977Z",
+  "source": "synced_from_sheets_new_structure",
+  "ranges": {
+    "property": "Data!A40:A46",
+    "typeOfOperation": "Data!A4:A7,Data!A10:A37",
+    "typeOfPayment": "Data!A49:A52",
+    "month": "Data!A56:A67"
+  },
+  "filtered": {
+    "headers": [
+      "REVENUES",
+      "Fixed Costs",
+      "FIXED COSTS",
+      "EXPENSES",
+      "Property"
+    ],
+    "testValues": [
+      "test",
+      "TEST",
+      "Test",
+      "demo",
+      "DEMO",
+      "Demo",
+      "sample",
+      "SAMPLE",
+      "Sample"
+    ]
+  },
+  "fetchedAt": "2025-11-04T03:00:00.000Z",
+  "month": [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ],
+  "lastSyncedFromSheets": "2025-11-04T03:00:00.000Z"
+}

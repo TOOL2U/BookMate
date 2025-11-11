@@ -1,0 +1,73 @@
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  
+  // Environment
+  environment: process.env.NODE_ENV || 'development',
+  
+  // Release tracking
+  release: process.env.VERCEL_GIT_COMMIT_SHA,
+  
+  // Filter out sensitive data
+  beforeSend(event, hint) {
+    // Remove sensitive request data
+    if (event.request) {
+      // Remove authorization headers
+      if (event.request.headers) {
+        delete event.request.headers['authorization'];
+        delete event.request.headers['cookie'];
+      }
+      
+      // Remove sensitive query params
+      if (event.request.query_string) {
+        const params = new URLSearchParams(event.request.query_string);
+        if (params.has('token')) params.delete('token');
+        if (params.has('apiKey')) params.delete('apiKey');
+        event.request.query_string = params.toString();
+      }
+    }
+    
+    // Filter environment variables
+    if (event.contexts?.runtime?.env) {
+      const env: any = event.contexts.runtime.env;
+      Object.keys(env).forEach(key => {
+        if (key.includes('KEY') || key.includes('SECRET') || key.includes('TOKEN') || key.includes('PRIVATE')) {
+          env[key] = '[REDACTED]';
+        }
+      });
+    }
+    
+    return event;
+  },
+  
+  // Ignore certain errors
+  ignoreErrors: [
+    // Database connection pool errors (handled by retry logic)
+    'ECONNREFUSED',
+    'ETIMEDOUT',
+    // Expected API errors
+    'RATE_LIMIT',
+    'INVALID_INPUT',
+  ],
+  
+  // Tag events with additional context
+  initialScope: {
+    tags: {
+      deployment: process.env.VERCEL_ENV || 'local',
+      runtime: 'node',
+    },
+  },
+  
+  // Debug mode
+  debug: process.env.NODE_ENV === 'development',
+  
+  // Enable performance monitoring
+  integrations: [
+    new Sentry.Integrations.Http({ tracing: true }),
+  ],
+});
