@@ -26,9 +26,9 @@ function generatePlaceholderData(monthData: PnLPeriodData | null): any[] {
   const currentMonth = new Date().getMonth();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  // Generate last 6 months of data (placeholder - will be replaced with real data)
+  // Generate all 12 months of data (placeholder - will be replaced with real data)
   const data = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = 11; i >= 0; i--) {
     const monthIndex = (currentMonth - i + 12) % 12;
     const monthName = months[monthIndex];
     
@@ -95,7 +95,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
       <div className="mb-6">
         <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-2">Revenue vs Expenses Trend</h2>
         <p className="font-aileron text-sm text-text-secondary">
-          Last 6 months performance overview
+          12-month performance overview
           <span className="ml-2 text-xs text-text-secondary">(Historical data coming soon)</span>
         </p>
       </div>
@@ -116,6 +116,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
             <YAxis 
               stroke="#94a3b8"
               style={{ fontSize: '12px' }}
+              domain={[-500000, 2000000]}
               tickFormatter={(value) => `฿${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip content={<CustomTooltip />} />
