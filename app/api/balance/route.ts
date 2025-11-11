@@ -5,6 +5,9 @@ export const maxDuration = 60;              // ask Vercel for max allowed (Pro p
 
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling, APIErrors } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
 // In-memory cache for balance data (60 seconds)
 interface BalanceCacheEntry {
@@ -67,7 +70,7 @@ function buildAuth() {
   });
 }
 
-export async function GET(req: Request) {
+async function balanceHandler(req: Request) {
   const url = new URL(req.url);
   const month = (url.searchParams.get('month') || 'ALL').toUpperCase();
   const skipCache = url.searchParams.has('t'); // Cache-busting: if ?t= param exists, skip cache
@@ -193,3 +196,11 @@ export async function GET(req: Request) {
     }, { status: isTimeout ? 504 : 500 });
   }
 }
+
+// Apply middleware: security headers → rate limiting → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(balanceHandler),
+    RATE_LIMITS.read
+  )
+);

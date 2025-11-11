@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling, validateRequired, APIErrors } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
+import { buildAIPrompt, type ReportTone } from '@/lib/ai/tone-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -6,11 +10,12 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/reports/generate
  * Generate a financial report from existing data sources
+ * Supports AI tone personalization: standard, investor, casual, executive
  */
-export async function POST(request: NextRequest) {
+async function generateReportHandler(request: NextRequest) {
   try {
     const body = await request.json();
-    const { type, dateRange, currency = 'THB' } = body;
+    const { type, dateRange, currency = 'THB', tone = 'standard' } = body;
 
     // Validate input
     if (!['monthly', 'quarterly', 'ytd', 'custom'].includes(type)) {
@@ -290,3 +295,11 @@ function calculatePercentage(value: number, total: number): number {
   if (total === 0) return 0;
   return (value / total) * 100;
 }
+
+// Apply middleware: security headers → rate limiting (reports tier) → error handling
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(generateReportHandler),
+    RATE_LIMITS.reports
+  )
+);

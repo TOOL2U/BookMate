@@ -9,15 +9,20 @@ export const runtime = 'nodejs';
  * - Header rows found
  * - Basic counts (first 50 rows)
  * - Any warnings or missing tabs
+ * 
+ * Mobile app friendly: Returns "Data Synced" status with simplified metrics
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getSheetMeta } from '@/utils/sheetMetaDetector';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+async function healthBalanceHandler(request: NextRequest) {
   const startTime = Date.now();
   
   try {
@@ -255,3 +260,11 @@ export async function GET(request: NextRequest) {
     });
   }
 }
+
+// Apply middleware: security headers → rate limiting (health tier) → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(healthBalanceHandler),
+    RATE_LIMITS.health
+  )
+);

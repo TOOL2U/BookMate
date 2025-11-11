@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling, validateRequired, APIErrors } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
 /**
  * POST /api/balance/save
@@ -9,7 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * - balance: number
  * - note: optional string
  */
-export async function POST(request: NextRequest) {
+async function saveBalanceHandler(request: NextRequest) {
   try {
     const body = await request.json();
     const { bankName, balance, note, bankBalance, cashBalance } = body;
@@ -169,3 +172,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Apply middleware: security headers → rate limiting (write tier) → error handling
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(saveBalanceHandler),
+    RATE_LIMITS.write
+  )
+);

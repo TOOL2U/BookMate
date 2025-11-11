@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
 /**
  * P&L Data API Route
@@ -34,7 +37,7 @@ const CACHE_DURATION_MS = 60 * 1000; // 60 seconds
  * GET /api/pnl
  * Returns P&L KPI data from Google Sheets
  */
-export async function GET(request: NextRequest) {
+async function pnlHandler(request: NextRequest) {
   try {
     // Check cache first
     const now = Date.now();
@@ -215,3 +218,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Apply middleware: security headers → rate limiting → error handling
+export const GET = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(pnlHandler),
+    RATE_LIMITS.read
+  )
+);
