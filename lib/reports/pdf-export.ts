@@ -117,19 +117,21 @@ export async function exportReportToPDF(
     convertOklchToRgb(clonedElement);
 
     // Allow charts/fonts to fully render before capture
-    await new Promise((res) => setTimeout(res, 1000));
+    await new Promise((res) => setTimeout(res, 500)); // Reduced from 1000ms to 500ms
 
     // 🔑 Key fix: Use scrollWidth/scrollHeight for full content capture
     const canvas = await html2canvas(clonedElement, {
-      scale: 3,                           // 3x resolution for sharp exports
-      useCORS: true,                      // Handle external resources
-      backgroundColor: '#ffffff',         // Solid white background
-      width: clonedElement.scrollWidth,         // Full width (no horizontal crop)
-      height: clonedElement.scrollHeight,       // Full height (no vertical crop)
+      scale: window.devicePixelRatio * 2,  // 2x device pixel ratio for retina displays
+      useCORS: true,                        // Handle external resources
+      backgroundColor: '#ffffff',           // Solid white background
+      width: clonedElement.scrollWidth,     // Full width (no horizontal crop)
+      height: clonedElement.scrollHeight,   // Full height (no vertical crop)
       windowWidth: clonedElement.scrollWidth,   // Prevent viewport constraints
       windowHeight: clonedElement.scrollHeight, // Capture everything
-      logging: true,                      // Enable logging to debug
-      imageTimeout: 0,                    // Wait for all images
+      logging: false,                       // Disable logging for performance
+      imageTimeout: 15000,                  // 15s timeout for images
+      allowTaint: false,                    // Prevent tainted canvas
+      foreignObjectRendering: false,        // Better compatibility
       onclone: (clonedDoc) => {
         // This runs after cloning, before rendering
         // Force all elements to use computed RGB values
@@ -141,6 +143,11 @@ export async function exportReportToPDF(
             el.style.color = computed.color;
             el.style.backgroundColor = computed.backgroundColor;
             el.style.borderColor = computed.borderColor;
+            
+            // Fix border thickness issue - reduce thick borders
+            if (parseFloat(computed.borderWidth) > 2) {
+              el.style.borderWidth = '1px';
+            }
           }
         });
       },

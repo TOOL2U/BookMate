@@ -2,12 +2,16 @@
  * API Route: /api/reports/ai-insights
  * 
  * Generates AI-powered narrative insights for financial reports
+ * Supports 4 tones: standard, investor, casual, executive
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { generateAIInsights, AIInsightsInput } from '@/lib/reports/ai-insights';
+import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
+import { withErrorHandling } from '@/lib/api/errors';
+import { withSecurityHeaders } from '@/lib/api/security';
 
-export async function POST(req: NextRequest) {
+async function aiInsightsHandler(req: NextRequest) {
   try {
     const input: AIInsightsInput = await req.json();
 
@@ -40,3 +44,11 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+// Apply middleware: security headers → rate limiting (reports tier) → error handling
+export const POST = withSecurityHeaders(
+  withRateLimit(
+    withErrorHandling(aiInsightsHandler),
+    RATE_LIMITS.reports
+  )
+);

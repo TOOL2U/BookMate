@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { Sparkles, Building2, Target } from 'lucide-react';
 import { OrganizationProfile } from '@/lib/reports/templates';
+import { type ReportTone } from '@/lib/ai/tone-config';
 
 interface AIControlsProps {
-  tone: 'standard' | 'investor' | 'internal' | 'founder' | 'simple';
-  onToneChange: (tone: AIControlsProps['tone']) => void;
+  tone: ReportTone;
+  onToneChange: (tone: ReportTone) => void;
   organizationProfile?: OrganizationProfile;
   onProfileChange: (profile: OrganizationProfile) => void;
 }
@@ -32,12 +33,12 @@ export default function AIControls({
     setShowProfileEditor(false);
   };
 
+  // Updated to match standardized tone config
   const toneOptions = [
     { value: 'standard', label: 'Standard / Neutral', description: 'Professional, balanced tone' },
     { value: 'investor', label: 'Investor Update', description: 'Focus on growth and ROI' },
-    { value: 'internal', label: 'Internal Finance', description: 'Technical and detailed' },
-    { value: 'founder', label: 'Founder Summary', description: 'Strategic and action-oriented' },
-    { value: 'simple', label: 'Simple / Non-Technical', description: 'Plain language, no jargon' },
+    { value: 'casual', label: 'Casual / Conversational', description: 'Simplified, jargon-free' },
+    { value: 'executive', label: 'Executive Summary', description: 'Brief and action-oriented' },
   ] as const;
 
   return (

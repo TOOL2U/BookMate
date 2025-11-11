@@ -3,15 +3,19 @@
  * 
  * Uses OpenAI to generate narrative summaries and insights
  * WITHOUT altering any financial calculations.
+ * 
+ * Integrated with tone-config.ts for consistent AI tone across the app
  */
 
 import OpenAI from 'openai';
+import { TONE_PROMPTS, buildAIPrompt, type ReportTone } from '@/lib/ai/tone-config';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export type AITone = 'standard' | 'investor' | 'internal' | 'founder' | 'simple';
+// Use standardized tones from tone-config
+export type AITone = ReportTone;
 
 export interface AIInsightsInput {
   period: {
@@ -74,7 +78,9 @@ export async function generateAIInsights(
         },
       ],
       response_format: { type: 'json_object' },
-      temperature: input.tone === 'simple' ? 0.5 : 0.7,
+      // Use different temperature based on tone
+      // casual: more creative (0.7), investor/executive: more precise (0.5), standard: balanced (0.6)
+      temperature: input.tone === 'casual' ? 0.7 : input.tone === 'investor' || input.tone === 'executive' ? 0.5 : 0.6,
       max_tokens: 1500,
     });
 
@@ -107,9 +113,12 @@ export async function generateAIInsights(
 }
 
 function buildSystemPrompt(
-  tone?: 'standard' | 'investor' | 'internal' | 'founder' | 'simple',
+  tone: ReportTone = 'standard',
   organizationProfile?: AIInsightsInput['organizationProfile']
 ): string {
+  // Get standardized tone configuration
+  const toneConfig = TONE_PROMPTS[tone];
+  
   let basePrompt = `You are a financial analyst providing insights for BookMate, a property management financial platform.
 
 CRITICAL RULES:
@@ -118,53 +127,13 @@ CRITICAL RULES:
 3. Keep insights concise (2-3 sentences max per point)
 4. Focus on actionable takeaways
 5. Return ONLY valid JSON in the exact format specified
-6. If data is missing or unavailable, acknowledge it rather than fabricating`;
+6. If data is missing or unavailable, acknowledge it rather than fabricating
 
-  // Add tone-specific instructions
-  switch (tone) {
-    case 'investor':
-      basePrompt += `\n\nTONE: Investor Update
-- Use professional, confident language suitable for investors
-- Focus on growth metrics, ROI, and financial health
-- Highlight opportunities and strategic initiatives
-- Be transparent about risks while maintaining confidence
-- Use terms like "portfolio performance", "capital efficiency", "market position"`;
-      break;
+${toneConfig.systemPrompt}
 
-    case 'internal':
-      basePrompt += `\n\nTONE: Internal Finance Team
-- Use technical financial terminology
-- Be direct and detailed about operational metrics
-- Focus on process improvements and efficiency gains
-- Highlight areas requiring immediate attention
-- Use terms like "variance analysis", "cash flow optimization", "cost control"`;
-      break;
-
-    case 'founder':
-      basePrompt += `\n\nTONE: Founder/Executive Summary
-- Use strategic, big-picture language
-- Connect financial performance to business goals
-- Emphasize growth trajectory and market position
-- Be concise and action-oriented
-- Use terms like "runway", "burn rate", "unit economics", "scaling"`;
-      break;
-
-    case 'simple':
-      basePrompt += `\n\nTONE: Simple/Non-Technical
-- Use plain language, avoid jargon
-- Explain financial concepts in accessible terms
-- Focus on what the numbers mean in practical terms
-- Use analogies and simple comparisons
-- Avoid complex financial terminology`;
-      break;
-
-    default: // standard
-      basePrompt += `\n\nTONE: Standard/Neutral
-- Use professional but accessible language
-- Balance technical accuracy with clarity
-- Suitable for general business audience
-- Focus on key insights and actionable recommendations`;
-  }
+STYLE: ${toneConfig.style}
+FOCUS AREAS: ${toneConfig.focusAreas.join(', ')}
+LANGUAGE GUIDELINES: ${toneConfig.language}`;
 
   // Add organization context if provided
   if (organizationProfile) {
