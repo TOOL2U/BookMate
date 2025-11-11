@@ -116,7 +116,7 @@ export default function PnLTrendChart({ monthData, yearData, isLoading }: PnLTre
             <YAxis 
               stroke="#94a3b8"
               style={{ fontSize: '12px' }}
-              domain={[-500000, 2000000]}
+              domain={[-500000, 1000000]}
               tickFormatter={(value) => `฿${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip content={<CustomTooltip />} />
