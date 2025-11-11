@@ -19,6 +19,7 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
   });
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
   
   const [emailSettings, setEmailSettings] = useState({
     recipients: '',
@@ -26,6 +27,7 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
     message: '',
   });
   const [emailSent, setEmailSent] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
   
   const [scheduleSettings, setScheduleSettings] = useState({
     name: '',
@@ -37,10 +39,12 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
     includeAI: true,
   });
   const [scheduleCreated, setScheduleCreated] = useState(false);
+  const [isCreatingSchedule, setIsCreatingSchedule] = useState(false);
 
   const handleGenerateShareLink = async () => {
     if (!reportData) return;
 
+    setIsGeneratingLink(true);
     try {
       const response = await fetch('/api/reports/share', {
         method: 'POST',
@@ -64,6 +68,8 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
       }
     } catch (error) {
       console.error('Failed to generate share link:', error);
+    } finally {
+      setIsGeneratingLink(false);
     }
   };
 
@@ -85,6 +91,7 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
 
     if (recipients.length === 0) return;
 
+    setIsSendingEmail(true);
     try {
       // First, generate a share link
       const shareResponse = await fetch('/api/reports/share', {
@@ -132,6 +139,8 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
     } catch (error) {
       console.error('Failed to send email:', error);
       alert('Failed to send email. Please try again.');
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -145,6 +154,7 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
 
     if (recipients.length === 0) return;
 
+    setIsCreatingSchedule(true);
     try {
       const response = await fetch('/api/reports/schedules', {
         method: 'POST',
@@ -176,6 +186,8 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
       }
     } catch (error) {
       console.error('Failed to create schedule:', error);
+    } finally {
+      setIsCreatingSchedule(false);
     }
   };
 
@@ -274,10 +286,20 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
 
               <button
                 onClick={handleGenerateShareLink}
-                className="w-full bg-yellow text-black px-6 py-3 rounded-xl2 font-bebasNeue uppercase tracking-wide hover:bg-yellow/90 transition-colors flex items-center justify-center gap-2"
+                disabled={isGeneratingLink}
+                className="w-full bg-yellow text-black px-6 py-3 rounded-xl2 font-bebasNeue uppercase tracking-wide hover:bg-yellow/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Share2 className="w-5 h-5" />
-                Generate Share Link
+                {isGeneratingLink ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-black border-t-transparent" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-5 h-5" />
+                    Generate Share Link
+                  </>
+                )}
               </button>
 
               {shareUrl && (
@@ -357,11 +379,20 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
 
               <button
                 onClick={handleSendEmail}
-                disabled={!emailSettings.recipients.trim()}
+                disabled={!emailSettings.recipients.trim() || isSendingEmail}
                 className="w-full bg-yellow text-black px-6 py-3 rounded-xl2 font-bebasNeue uppercase tracking-wide hover:bg-yellow/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Mail className="w-5 h-5" />
-                Send Email with Link
+                {isSendingEmail ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-black border-t-transparent" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-5 h-5" />
+                    Send Email with Link
+                  </>
+                )}
               </button>
 
               {emailSent && (
@@ -457,11 +488,20 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
 
               <button
                 onClick={handleCreateSchedule}
-                disabled={!scheduleSettings.name.trim() || !scheduleSettings.recipients.trim()}
+                disabled={!scheduleSettings.name.trim() || !scheduleSettings.recipients.trim() || isCreatingSchedule}
                 className="w-full bg-yellow text-black px-6 py-3 rounded-xl2 font-bebasNeue uppercase tracking-wide hover:bg-yellow/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Calendar className="w-5 h-5" />
-                Create Schedule
+                {isCreatingSchedule ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-black border-t-transparent" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Calendar className="w-5 h-5" />
+                    Create Schedule
+                  </>
+                )}
               </button>
 
               {scheduleCreated && (

@@ -70,3 +70,22 @@ CREATE_*.gs
 accounting-buddy-*.json
 config/google-credentials.json
 sendgrid.env
+
+# Private keys and sensitive environment files
+*PRIVATE_KEY*.txt
+*VERCEL_KEY*.txt
+VERCEL_ENV_VALUES.txt
+COPY_THIS_TO_VERCEL.txt
+COPY_TO_VERCEL.txt
+firebase-private-key-one-line.txt
+
+# Database files
+*.db
+*.db-*
+
+# Temporary and backup files
+*.bak
+*.tmp
+
+# Script files with environment updates
+update-*-env.sh

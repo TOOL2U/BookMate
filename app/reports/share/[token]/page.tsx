@@ -113,7 +113,7 @@ export default function SharedReportPage() {
 
       {/* Screen-only controls */}
       <div className="non-print sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-border-card shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <LogoBM size={40} />
             <div>
@@ -145,7 +145,7 @@ export default function SharedReportPage() {
 
       {/* Report content */}
       <div className="non-print bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen py-8">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="mx-auto px-6">
           <div className="bg-white rounded-xl2 shadow-2xl overflow-hidden">
             <ReportPreview 
               reportData={reportData} 

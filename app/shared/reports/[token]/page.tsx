@@ -211,7 +211,7 @@ export default function SharedReportPage() {
       </div>
 
       {/* Report Content */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
+      <div className="mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
         {/* Expiry Warning */}
         {sharedReport.access.expiresAt && (
           <div className="bg-yellow/10 border border-yellow/30 rounded-xl2 p-3 sm:p-4 mb-4 sm:mb-6 flex items-start sm:items-center gap-2 sm:gap-3">

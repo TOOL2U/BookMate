@@ -100,56 +100,98 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
         backgroundColor: '#FFFFFF',
         color: '#111827',
         width: '100%', // Full width on mobile
-        maxWidth: '1240px', // Cap at 1240px on desktop
+        maxWidth: '1600px', // Wider on desktop
         padding: '0',
         margin: '0 auto', // Center on desktop
       }}
     >
-      {/* Report Header - Enhanced */}
-      <div className="p-4 sm:p-8 lg:p-12 border-b-2 sm:border-b-4" style={{ 
-        background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)',
-        borderBottomColor: '#FFF02B',
-        color: '#ffffff',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      {/* Report Header - Professional Layout */}
+      <div className="p-6 sm:p-10 lg:p-12" style={{ 
+        background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
+        borderBottom: '3px solid #FFF02B',
+        color: '#ffffff'
       }}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-4 sm:mb-8">
-          <div className="flex justify-center sm:justify-start">
-            <LogoBM size={60} className="sm:w-20 sm:h-20" />
-          </div>
-          <div className="text-center sm:text-right">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bebasNeue uppercase tracking-wider mb-2 sm:mb-3 leading-tight" style={{ 
-              color: '#ffffff',
-              letterSpacing: '0.05em'
-            }}>
-              Financial Performance
-            </h1>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bebasNeue uppercase mb-2" style={{ 
-              color: '#FFF02B',
-              letterSpacing: '0.1em'
-            }}>
-              #REPORT
-            </h2>
-            <div className="mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg inline-block" style={{ backgroundColor: 'rgba(255, 240, 43, 0.1)' }}>
-              <p className="text-lg sm:text-xl lg:text-2xl font-bebasNeue uppercase" style={{ color: '#FFF02B' }}>
-                {period.label}
+        {/* Top Section: Logo + Title */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 mb-8">
+          {/* Logo Section - Enhanced */}
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              {/* Logo container with glow effect */}
+              <div className="absolute inset-0 bg-yellow opacity-20 blur-xl rounded-full"></div>
+              <div className="relative bg-black border-2 border-yellow rounded-xl2 p-3" style={{
+                boxShadow: '0 0 20px rgba(255, 240, 43, 0.3)'
+              }}>
+                <LogoBM size={64} />
+              </div>
+            </div>
+            {/* Brand Text */}
+            <div className="hidden sm:block">
+              <h3 className="text-2xl font-bebasNeue uppercase tracking-wider text-yellow">
+                BookMate
+              </h3>
+              <p className="text-sm font-aileron text-gray-400">
+                Financial Analytics
               </p>
-              <p className="text-sm sm:text-base font-aileron mt-1" style={{ color: '#D1D5DB' }}>
-                {period.start} — {period.end}
+            </div>
+          </div>
+
+          {/* Title Section */}
+          <div className="text-center sm:text-right flex-1">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bebasNeue uppercase tracking-wider mb-2" style={{ 
+              color: '#ffffff',
+              letterSpacing: '0.08em',
+              lineHeight: '1.1'
+            }}>
+              Financial Report
+            </h1>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-yellow/10 border border-yellow/30 rounded-xl2 mt-2">
+              <div className="w-2 h-2 bg-yellow rounded-full animate-pulse"></div>
+              <p className="text-sm font-bebasNeue uppercase tracking-widest text-yellow">
+                Official Document
               </p>
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 pt-3 sm:pt-4 border-t" style={{ borderTopColor: 'rgba(255, 240, 43, 0.2)' }}>
-          <div className="text-xs sm:text-sm font-aileron text-center sm:text-left" style={{ color: '#9CA3AF' }}>
-            Generated: {new Date(reportData.generatedAt).toLocaleString('en-US', { 
-              dateStyle: 'long', 
-              timeStyle: 'short' 
-            })}
+
+        {/* Period Information - Prominent Card */}
+        <div className="bg-linear-to-br from-yellow/5 to-yellow/10 border border-white/10 rounded-xl2 p-5 sm:p-6 mb-6" style={{
+          boxShadow: '0 4px 12px rgba(255, 240, 43, 0.1)'
+        }}>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <p className="text-xs font-aileron uppercase tracking-wider text-gray-400 mb-1">
+                Reporting Period
+              </p>
+              <p className="text-2xl sm:text-3xl font-bebasNeue uppercase tracking-wide text-yellow">
+                {period.label}
+              </p>
+              <p className="text-sm font-aileron text-gray-300 mt-1">
+                {period.start} — {period.end}
+              </p>
+            </div>
+            <div className="text-center sm:text-right">
+              <p className="text-xs font-aileron uppercase tracking-wider text-gray-400 mb-1">
+                Generated On
+              </p>
+              <p className="text-base font-aileron text-white">
+                {new Date(reportData.generatedAt).toLocaleString('en-US', { 
+                  dateStyle: 'medium', 
+                  timeStyle: 'short' 
+                })}
+              </p>
+            </div>
           </div>
-          <div className="text-xs font-aileron px-4 py-2 rounded-xl2" style={{ 
-            backgroundColor: 'rgba(255, 240, 43, 0.15)',
-            color: '#FFF02B',
-            border: '1px solid rgba(255, 240, 43, 0.3)'
+        </div>
+
+        {/* Footer Metadata */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-5 sm:pt-6 border-t border-gray-800">
+          <div className="text-xs font-aileron text-center sm:text-left text-gray-500">
+            Document ID: {reportData.generatedAt ? new Date(reportData.generatedAt).getTime().toString(36).toUpperCase() : 'N/A'}
+          </div>
+          <div className="text-xs font-aileron px-3 py-1.5 rounded-xl2 border" style={{ 
+            backgroundColor: 'rgba(255, 240, 43, 0.05)',
+            borderColor: 'rgba(255, 240, 43, 0.3)',
+            color: '#FFF02B'
           }}>
             CONFIDENTIAL
           </div>
@@ -253,7 +295,7 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
       {/* Charts Section - Enhanced & Responsive */}
       <div className="p-4 sm:p-6 lg:p-10 space-y-4 sm:space-y-6 lg:space-y-8">
         {/* Revenue vs Expenses */}
-        <div className="bg-white rounded-xl2 p-4 sm:p-6 lg:p-8 border-2 border-gray-200" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+        <div className="bg-white rounded-xl2 p-4 sm:p-6 lg:p-8 border border-gray-200/60" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
           <h3 className="text-xl sm:text-2xl lg:text-3xl font-bebasNeue uppercase mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3" style={{ color: '#111827' }}>
             <span className="w-1 sm:w-2 h-8 sm:h-10 rounded-xl2" style={{ backgroundColor: '#FFF02B' }}></span>
             Balance of Expenses
@@ -311,14 +353,14 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
           
           {/* Balance Summary Cards - Enhanced & Responsive */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2 border-gray-300" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)' }}>
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border border-gray-200/60" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)' }}>
               <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide mb-1 sm:mb-2" style={{ color: '#6B7280' }}>Opening Balance</p>
               <p className="text-base sm:text-xl lg:text-2xl font-bold font-bebasNeue" style={{ color: '#111827' }}>
                 {formatCurrency(reportData.balances.totalOpening || 0)}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: '#6EE7B7',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: 'rgba(110, 231, 183, 0.4)',
               backgroundColor: '#D1FAE5',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
@@ -327,8 +369,8 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                 +{formatCurrency(reportData.balances.totalInflow || 0)}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: '#FCA5A5',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: 'rgba(252, 165, 165, 0.4)',
               backgroundColor: '#FEE2E2',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
@@ -337,8 +379,8 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                 -{formatCurrency(reportData.balances.totalOutflow || 0)}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: '#93C5FD',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: 'rgba(147, 197, 253, 0.4)',
               backgroundColor: '#DBEAFE',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
@@ -350,7 +392,7 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
           </div>
 
           {/* Detailed Balance Table - Enhanced & Responsive */}
-          <div className="rounded-xl2 overflow-x-auto border-2 border-gray-200" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+          <div className="rounded-xl2 overflow-x-auto border border-gray-200/60" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
             <table className="w-full bg-white min-w-[800px]">
               <thead style={{ backgroundColor: '#111827', color: '#ffffff' }}>
                 <tr>
@@ -413,14 +455,14 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
           </h2>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2 border-gray-200" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)' }}>
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border border-gray-200/60" style={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)' }}>
               <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide mb-1 sm:mb-2" style={{ color: '#6B7280' }}>Total Transactions</p>
               <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-bebasNeue" style={{ color: '#111827' }}>
                 {reportData.transactionStats.totalCount.toLocaleString()}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: '#6EE7B7',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: 'rgba(110, 231, 183, 0.4)',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
               <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide mb-1 sm:mb-2" style={{ color: '#065F46' }}>Income Entries</p>
@@ -428,8 +470,8 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                 {reportData.transactionStats.incomeCount.toLocaleString()}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: '#FCA5A5',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: 'rgba(252, 165, 165, 0.4)',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
               <p className="text-xs sm:text-sm font-semibold uppercase tracking-wide mb-1 sm:mb-2" style={{ color: '#991B1B' }}>Expense Entries</p>
@@ -437,8 +479,8 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                 {reportData.transactionStats.expenseCount.toLocaleString()}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: '#6EE7B7',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: 'rgba(110, 231, 183, 0.4)',
               backgroundColor: '#D1FAE5',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
@@ -447,8 +489,8 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                 {formatCurrency(reportData.transactionStats.totalCredits)}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: '#FCA5A5',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: 'rgba(252, 165, 165, 0.4)',
               backgroundColor: '#FEE2E2',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
@@ -457,8 +499,8 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                 {formatCurrency(reportData.transactionStats.totalDebits)}
               </p>
             </div>
-            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border-2" style={{ 
-              borderColor: reportData.transactionStats.netPosition >= 0 ? '#6EE7B7' : '#FCA5A5',
+            <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl2 border" style={{ 
+              borderColor: reportData.transactionStats.netPosition >= 0 ? 'rgba(110, 231, 183, 0.4)' : 'rgba(252, 165, 165, 0.4)',
               backgroundColor: reportData.transactionStats.netPosition >= 0 ? '#D1FAE5' : '#FEE2E2',
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
             }}>
@@ -486,10 +528,10 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {/* Overhead Expenses - Enhanced & Responsive */}
             {expenses.overhead.length > 0 && (
-              <div className="bg-white rounded-xl2 border-2 border-gray-200 overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                <div className="p-4 sm:p-5 lg:p-6 border-b-2" style={{ 
+              <div className="bg-white rounded-xl2 border border-gray-200/60 overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+                <div className="p-4 sm:p-5 lg:p-6 border-b" style={{ 
                   backgroundColor: '#FEF3C7',
-                  borderBottomColor: '#FCD34D'
+                  borderBottomColor: 'rgba(252, 211, 77, 0.4)'
                 }}>
                   <h3 className="text-xl sm:text-2xl font-bebasNeue uppercase tracking-wide" style={{ color: '#92400E' }}>
                     Overhead Expenses
@@ -498,7 +540,7 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                     {formatCurrency(expenses.overheadTotal || expenses.overhead.reduce((sum, e) => sum + e.amount, 0))}
                   </p>
                 </div>
-                <div className="divide-y-2 divide-gray-100">
+                <div className="divide-y divide-gray-100">
                   {expenses.overhead.map((expense, i) => (
                     <div key={i} className="p-3 sm:p-4 lg:p-5 flex justify-between items-center hover:bg-gray-50 transition-colors">
                       <div className="flex-1">
@@ -515,7 +557,7 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                     </div>
                   ))}
                 </div>
-                <div className="p-4 sm:p-5 lg:p-6 border-t-4 border-gray-300" style={{ backgroundColor: '#FEF2F2' }}>
+                <div className="p-4 sm:p-5 lg:p-6 border-t border-gray-300/60" style={{ backgroundColor: '#FEF2F2' }}>
                   <div className="flex justify-between items-center">
                     <p className="font-bold font-bebasNeue uppercase text-base sm:text-lg lg:text-xl tracking-wide" style={{ color: '#111827' }}>Subtotal</p>
                     <p className="font-bold font-bebasNeue text-xl sm:text-2xl lg:text-3xl" style={{ color: '#DC2626' }}>
@@ -528,10 +570,10 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
 
             {/* Property/Person Expenses - Enhanced & Responsive */}
             {expenses.propertyPerson.length > 0 && (
-              <div className="bg-white rounded-xl2 border-2 border-gray-200 overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                <div className="p-4 sm:p-5 lg:p-6 border-b-2" style={{ 
+              <div className="bg-white rounded-xl2 border border-gray-200/60 overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+                <div className="p-4 sm:p-5 lg:p-6 border-b" style={{ 
                   backgroundColor: '#DBEAFE',
-                  borderBottomColor: '#93C5FD'
+                  borderBottomColor: 'rgba(147, 197, 253, 0.4)'
                 }}>
                   <h3 className="text-xl sm:text-2xl font-bebasNeue uppercase tracking-wide" style={{ color: '#1E40AF' }}>
                     Property / Person Expenses
@@ -540,7 +582,7 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                     {formatCurrency(expenses.propertyPersonTotal || expenses.propertyPerson.reduce((sum, e) => sum + e.amount, 0))}
                   </p>
                 </div>
-                <div className="divide-y-2 divide-gray-100">
+                <div className="divide-y divide-gray-100">
                   {expenses.propertyPerson.map((expense, i) => (
                     <div key={i} className="p-3 sm:p-4 lg:p-5 flex justify-between items-center hover:bg-gray-50 transition-colors">
                       <div className="flex-1">
@@ -557,7 +599,7 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
                     </div>
                   ))}
                 </div>
-                <div className="p-4 sm:p-5 lg:p-6 border-t-4 border-gray-300" style={{ backgroundColor: '#FEF2F2' }}>
+                <div className="p-4 sm:p-5 lg:p-6 border-t border-gray-300/60" style={{ backgroundColor: '#FEF2F2' }}>
                   <div className="flex justify-between items-center">
                     <p className="font-bold font-bebasNeue uppercase text-base sm:text-lg lg:text-xl tracking-wide" style={{ color: '#111827' }}>Subtotal</p>
                     <p className="font-bold font-bebasNeue text-xl sm:text-2xl lg:text-3xl" style={{ color: '#DC2626' }}>
@@ -570,7 +612,7 @@ export default function ReportPreview({ reportData, aiInsights, isLoadingAI }: R
           </div>
 
           {/* Grand Total - Enhanced & Responsive */}
-          <div className="mt-4 sm:mt-6 lg:mt-8 rounded-xl2 p-4 sm:p-6 lg:p-8 border-4" style={{ 
+          <div className="mt-4 sm:mt-6 lg:mt-8 rounded-xl2 p-4 sm:p-6 lg:p-8 border-2" style={{ 
             background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
             borderColor: '#FFF02B',
             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.2)'
