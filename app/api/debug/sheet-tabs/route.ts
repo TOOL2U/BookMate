@@ -5,6 +5,7 @@ export const runtime = 'nodejs';
  * GET /api/debug/sheet-tabs
  * 
  * Shows ALL tabs in the spreadsheet with their headers
+ * ⚠️ DISABLED IN PRODUCTION FOR SECURITY
  */
 
 import { NextResponse } from 'next/server';
@@ -13,6 +14,14 @@ import { google } from 'googleapis';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  // Disable debug endpoints in production
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+    return NextResponse.json({
+      error: 'Debug endpoints are disabled in production',
+      code: 'FORBIDDEN',
+    }, { status: 403 });
+  }
+
   try {
     const credentialsJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
     if (!credentialsJson) {

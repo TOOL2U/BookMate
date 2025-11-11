@@ -1,11 +1,21 @@
 /**
  * Debug endpoint to verify Firebase environment variables
  * GET /api/debug/firebase-env
+ * 
+ * ⚠️ DISABLED IN PRODUCTION FOR SECURITY
  */
 
 import { NextResponse } from 'next/server';
 
 export async function GET() {
+  // Disable debug endpoints in production
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+    return NextResponse.json({
+      error: 'Debug endpoints are disabled in production',
+      code: 'FORBIDDEN',
+    }, { status: 403 });
+  }
+
   try {
     const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
