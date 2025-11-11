@@ -19,8 +19,8 @@ import {
 export const queryKeys = {
   pnl: ['pnl'] as const,
   balances: ['balances'] as const,
-  overheadCategories: ['overhead-categories'] as const,
-  propertyCategories: ['property-categories'] as const,
+  overheadCategories: (period: 'month' | 'year') => ['overhead-categories', period] as const,
+  propertyCategories: (period: 'month' | 'year') => ['property-categories', period] as const,
   transactions: ['transactions'] as const,
   options: ['options'] as const,
   dashboard: ['dashboard'] as const,
@@ -45,19 +45,19 @@ export function useBalances() {
 }
 
 // Overhead Categories Hook
-export function useOverheadCategories() {
+export function useOverheadCategories(period: 'month' | 'year' = 'month') {
   return useQuery({
-    queryKey: queryKeys.overheadCategories,
-    queryFn: fetchOverheadCategories,
+    queryKey: queryKeys.overheadCategories(period),
+    queryFn: () => fetchOverheadCategories(period),
     staleTime: 60_000, // 1 minute
   });
 }
 
 // Property Categories Hook
-export function usePropertyCategories() {
+export function usePropertyCategories(period: 'month' | 'year' = 'month') {
   return useQuery({
-    queryKey: queryKeys.propertyCategories,
-    queryFn: fetchPropertyCategories,
+    queryKey: queryKeys.propertyCategories(period),
+    queryFn: () => fetchPropertyCategories(period),
     staleTime: 60_000, // 1 minute
   });
 }

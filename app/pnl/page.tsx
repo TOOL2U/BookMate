@@ -34,12 +34,12 @@ export default function PnLPage() {
   const {
     data: overheadCategories,
     isLoading: isOverheadsLoading,
-  } = useOverheadCategories();
+  } = useOverheadCategories(period);
 
   const {
     data: propertyCategories,
     isLoading: isPropertyLoading,
-  } = usePropertyCategories();
+  } = usePropertyCategories(period);
 
   // Check if ANY data is still loading
   const isLoading = isPnLLoading || isOverheadsLoading || isPropertyLoading;
@@ -58,8 +58,8 @@ export default function PnLPage() {
   // Handle manual refresh - invalidate all P&L related queries
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.pnl });
-    queryClient.invalidateQueries({ queryKey: queryKeys.overheadCategories });
-    queryClient.invalidateQueries({ queryKey: queryKeys.propertyCategories });
+    queryClient.invalidateQueries({ queryKey: queryKeys.overheadCategories(period) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.propertyCategories(period) });
   };
 
   // Get last updated time

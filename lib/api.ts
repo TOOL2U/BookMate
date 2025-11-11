@@ -147,14 +147,14 @@ export async function fetchBalances(): Promise<BalanceSummary> {
 }
 
 // Overhead Categories API
-export async function fetchOverheadCategories(): Promise<OverheadCategory[]> {
-  const response = await fetchAPI<{ ok: boolean; data: OverheadCategory[] }>('/pnl/overhead-expenses?period=month');
+export async function fetchOverheadCategories(period: 'month' | 'year' = 'month'): Promise<OverheadCategory[]> {
+  const response = await fetchAPI<{ ok: boolean; data: OverheadCategory[] }>(`/pnl/overhead-expenses?period=${period}`);
   return response.data;
 }
 
 // Property Categories API
-export async function fetchPropertyCategories(): Promise<PropertyCategory[]> {
-  const response = await fetchAPI<{ ok: boolean; data: PropertyCategory[] }>('/pnl/property-person?period=month');
+export async function fetchPropertyCategories(period: 'month' | 'year' = 'month'): Promise<PropertyCategory[]> {
+  const response = await fetchAPI<{ ok: boolean; data: PropertyCategory[] }>(`/pnl/property-person?period=${period}`);
   return response.data;
 }
 
