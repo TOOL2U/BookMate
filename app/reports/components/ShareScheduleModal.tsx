@@ -173,7 +173,7 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
           recipients,
-          delivery: {
+          deliveryConfig: {
             format: 'pdf',
             includeAI: scheduleSettings.includeAI,
           },
@@ -183,9 +183,14 @@ export default function ShareScheduleModal({ reportData, pdfData, onClose }: Sha
       if (response.ok) {
         setScheduleCreated(true);
         setTimeout(() => setScheduleCreated(false), 3000);
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Failed to create schedule:', errorData);
+        alert(`Failed to create schedule: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to create schedule:', error);
+      alert(`Failed to create schedule: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsCreatingSchedule(false);
     }
