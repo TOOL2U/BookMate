@@ -15,6 +15,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 
 // ============================================================================
 // CONSTANTS
@@ -76,11 +77,9 @@ async function getHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-
-    if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID environment variable not set');
-    }
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
 
     // Read properties from Data!C2:C
     const response = await sheets.spreadsheets.values.get({
@@ -145,11 +144,9 @@ async function postHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-
-    if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID environment variable not set');
-    }
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
 
     // First, get current properties
     const response = await sheets.spreadsheets.values.get({

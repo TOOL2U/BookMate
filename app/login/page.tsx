@@ -26,25 +26,38 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
 
-    // Simple local authentication (easily replaceable with Firebase)
-    // TODO: Replace with Firebase Authentication
-    const validCredentials = {
-      username: 'Shaun',
-      password: '1234'
-    };
+    try {
+      // Call the authentication API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: username, // Using username field as email
+          password: password,
+        }),
+      });
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+      const data = await response.json();
 
-    if (username === validCredentials.username && password === validCredentials.password) {
-      // Store authentication state (localStorage for MVP, will be replaced with Firebase auth)
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('username', username);
-      
-      // Navigate to dashboard
-      router.push('/dashboard');
-    } else {
-      setError('Invalid username or password');
+      if (response.ok && data.success) {
+        // Store authentication tokens
+        localStorage.setItem('accessToken', data.tokens.accessToken);
+        localStorage.setItem('refreshToken', data.tokens.refreshToken);
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('username', data.user.name || data.user.email);
+        localStorage.setItem('userId', data.user.id);
+        
+        // Navigate to dashboard
+        router.push('/dashboard');
+      } else {
+        setError(data.error || 'Invalid username or password');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred. Please try again.');
       setIsLoading(false);
     }
   };
@@ -85,10 +98,10 @@ export default function LoginPage() {
         {/* Login Form */}
         <div className="bg-bg-card border border-border-card rounded-xl2 p-8 backdrop-blur-sm animate-fade-in opacity-0" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Username Field */}
+            {/* Email Field */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-text-primary mb-2 font-aileron">
-                Username
+                Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -96,11 +109,11 @@ export default function LoginPage() {
                 </div>
                 <input
                   id="username"
-                  type="text"
+                  type="email"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 bg-black border border-border-card rounded-xl2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow focus:border-transparent transition-all font-aileron"
-                  placeholder="Enter your username"
+                  placeholder="Enter your email"
                   required
                   disabled={isLoading}
                 />

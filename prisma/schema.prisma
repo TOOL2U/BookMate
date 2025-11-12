@@ -38,6 +38,16 @@ model User {
   workspaceId       String?   @map("workspace_id")
   organizationId    String?   @map("organization_id")
   
+  // Google Sheets Integration
+  spreadsheetId        String?   @unique @map("spreadsheet_id") // User's personal spreadsheet ID
+  spreadsheetUrl       String?   @map("spreadsheet_url")        // Direct link to their sheet
+  spreadsheetCreatedAt DateTime? @map("spreadsheet_created_at") // When spreadsheet was created
+  
+  // Google OAuth Tokens
+  googleAccessToken    String?   @map("google_access_token")    // OAuth access token
+  googleRefreshToken   String?   @map("google_refresh_token")   // OAuth refresh token
+  googleTokenExpiry    DateTime? @map("google_token_expiry")    // Token expiration time
+  
   // Security
   lastLoginAt       DateTime? @map("last_login_at")
   lastLoginIp       String?   @map("last_login_ip")
@@ -61,6 +71,7 @@ model User {
   // Indexes
   @@index([email])
   @@index([firebaseUid])
+  @@index([spreadsheetId])
   @@index([workspaceId])
   @@index([status])
   @@index([role])

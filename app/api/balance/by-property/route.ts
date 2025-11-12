@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import path from 'path';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 
 /**
  * ⚠️ DEPRECATED - Use /api/balance instead
@@ -90,7 +91,7 @@ function clearPropertyBalanceCache() {
  * Fetch uploaded balances from "Bank & Cash Balance" sheet
  * Returns the most recent balance for each bank
  */
-async function fetchUploadedBalances(): Promise<Map<string, UploadedBalance>> {
+async function fetchUploadedBalances(request: NextRequest): Promise<Map<string, UploadedBalance>> {
   try {
     // Use environment variable for credentials (works in both local and production)
     const credentialsJson = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
@@ -112,7 +113,9 @@ async function fetchUploadedBalances(): Promise<Map<string, UploadedBalance>> {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID || '1UnCopzurl27VRqVDSIgrro5KyAfuP9T0GRePrtljAR8';
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
 
     // Fetch all balance entries from "Bank & Cash Balance" sheet
     // Expected columns: timestamp, bankName, balance, note
@@ -242,7 +245,7 @@ export async function POST(request: NextRequest) {
 
     // Step 1: Fetch uploaded balances
     console.log('  → Fetching uploaded balances from Google Sheets...');
-    const uploadedBalances = await fetchUploadedBalances();
+    const uploadedBalances = await fetchUploadedBalances(request);
     console.log(`  ✓ Found ${uploadedBalances.size} uploaded balances`);
 
     // Step 2: Fetch all transactions

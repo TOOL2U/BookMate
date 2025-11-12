@@ -15,6 +15,7 @@ export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 import { getSheetMeta } from '@/utils/sheetMetaDetector';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling } from '@/lib/api/errors';
@@ -37,19 +38,14 @@ async function healthBalanceHandler(request: NextRequest) {
       }, { status: 500 });
     }
 
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-    if (!spreadsheetId) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Missing GOOGLE_SHEET_ID environment variable'
-      }, { status: 500 });
-    }
-
     const credentials = JSON.parse(credentialsJson);
     const auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     });
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
 
     // Detect sheet structure
     console.log('[Health/Balance] Detecting sheet structure...');

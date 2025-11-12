@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { google } from 'googleapis';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -132,11 +133,9 @@ export async function GET(request: NextRequest) {
           scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
         });
         const sheets = google.sheets({ version: 'v4', auth });
-        const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-        if (!spreadsheetId) {
-          console.error('[OPTIONS] Missing GOOGLE_SHEET_ID env');
-          throw new Error('Missing GOOGLE_SHEET_ID');
-        }
+        
+        // Get user's spreadsheet ID from authenticated request
+        const spreadsheetId = await getUserSpreadsheetId(request);
 
         console.log('[OPTIONS] Fetching all data from Google Sheets...');
         

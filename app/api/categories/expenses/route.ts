@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
@@ -47,11 +48,9 @@ async function getHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-
-    if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID not configured');
-    }
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
 
     // Read all expense categories from Data!B30:B (open-ended range)
     const response = await sheets.spreadsheets.values.get({
@@ -118,11 +117,9 @@ async function postHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-
-    if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID not configured');
-    }
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
 
     // Get current categories
     const currentResponse = await sheets.spreadsheets.values.get({

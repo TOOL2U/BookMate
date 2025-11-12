@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 
 /**
  * ⚠️ DEPRECATED - Use /api/balance instead

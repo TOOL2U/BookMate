@@ -89,10 +89,20 @@ async function fetchAPI<T>(endpoint: string): Promise<T> {
   const startTime = performance.now();
   
   try {
+    // Get JWT token from localStorage (stored as 'accessToken' after login)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add Authorization header if token exists
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     const response = await fetch(`${API_BASE}${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
 
     if (!response.ok) {

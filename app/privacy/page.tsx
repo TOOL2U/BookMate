@@ -66,6 +66,69 @@ export default function PrivacyPage() {
           </section>
 
           <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">3.5 Google Services Integration</h2>
+            <p className="mb-4">
+              BookMate integrates with Google Sheets and Google Drive to provide accounting functionality. 
+              Here&apos;s exactly how we use Google APIs:
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">What We Access</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Google Sheets API:</strong> We create and manage a personal accounting spreadsheet in your Google Drive</li>
+              <li><strong>Google Drive API:</strong> We access only the spreadsheet we create for you (using drive.file scope)</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">Why We Need This Access</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>To create your personal accounting spreadsheet during registration</li>
+              <li>To read and write your financial transactions to the spreadsheet</li>
+              <li>To generate reports and analytics based on your data</li>
+              <li>To keep your data synchronized between the app and spreadsheet</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">What We Do NOT Do</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>❌ We do NOT access other files in your Google Drive</li>
+              <li>❌ We do NOT share your spreadsheet with anyone else</li>
+              <li>❌ We do NOT read your personal or private files</li>
+              <li>❌ We do NOT use your Google data for advertising</li>
+              <li>❌ We ONLY access the single spreadsheet we create for BookMate</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">Your Ownership and Control</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>✅ YOU own the spreadsheet (it lives in YOUR Google Drive)</li>
+              <li>✅ YOU can view and edit the spreadsheet directly in Google Sheets</li>
+              <li>✅ YOU can revoke our access anytime at <a href="https://myaccount.google.com/permissions" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Google Account Permissions</a></li>
+              <li>✅ YOU can delete the spreadsheet anytime</li>
+              <li>✅ YOU can export your data anytime</li>
+            </ul>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
+              <h4 className="font-semibold text-blue-900 mb-2">🔒 Google OAuth Security</h4>
+              <p className="text-blue-800 text-sm">
+                We use OAuth 2.0 (Google&apos;s recommended authorization protocol) to access your spreadsheet. 
+                This means we never see your Google password, and you can revoke our access at any time without 
+                affecting your Google account or other apps.
+              </p>
+            </div>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">OAuth Token Storage</h3>
+            <p className="mb-4">
+              When you authorize BookMate to access Google Sheets, we store:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Access Token:</strong> Stored encrypted in our database, expires after 1 hour</li>
+              <li><strong>Refresh Token:</strong> Stored encrypted in our database, used to renew access</li>
+              <li><strong>Spreadsheet ID:</strong> The identifier of your personal accounting spreadsheet</li>
+            </ul>
+            <p className="mt-4 text-sm text-gray-600">
+              These tokens are encrypted at rest and in transit. If you revoke access via Google Account settings, 
+              these tokens become invalid immediately.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Data Storage and Security</h2>
             
             <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">4.1 Where We Store Data</h3>

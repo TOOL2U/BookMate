@@ -3,11 +3,12 @@ export const runtime = 'nodejs';            // ensure Node (googleapis works bes
 export const dynamic = 'force-dynamic';     // do not try to cache at build
 export const maxDuration = 60;              // ask Vercel for max allowed (Pro plans give more than 30s)
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 
 // In-memory cache for balance data (60 seconds)
 interface BalanceCacheEntry {
@@ -39,7 +40,6 @@ function withTimeout<T>(p: Promise<T>, ms: number, label = 'timeout'): Promise<T
 }
 
 // read required env once
-const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SA_KEY_JSON = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 const CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
 const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
@@ -70,7 +70,7 @@ function buildAuth() {
   });
 }
 
-async function balanceHandler(req: Request) {
+async function balanceHandler(req: NextRequest) {
   const url = new URL(req.url);
   const month = (url.searchParams.get('month') || 'ALL').toUpperCase();
   const skipCache = url.searchParams.has('t'); // Cache-busting: if ?t= param exists, skip cache
@@ -98,6 +98,9 @@ async function balanceHandler(req: Request) {
   try {
     const auth = buildAuth();
     const sheets = google.sheets({ version: 'v4', auth });
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(req);
 
     // Read ONLY the cells we need from Balance Summary (fast ranges)
     // Headers are in row 3, data from row 4 down. A:H is the 8 columns we expose.
@@ -105,7 +108,7 @@ async function balanceHandler(req: Request) {
 
     const res = await withTimeout(
       sheets.spreadsheets.values.get({
-        spreadsheetId: SHEET_ID,
+        spreadsheetId,
         range: RANGE,
         valueRenderOption: 'UNFORMATTED_VALUE',
         dateTimeRenderOption: 'FORMATTED_STRING',

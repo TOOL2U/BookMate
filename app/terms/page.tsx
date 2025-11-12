@@ -140,26 +140,87 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Third-Party Services</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Google Sheets Authorization</h2>
             <p className="mb-4">
-              BookMate integrates with third-party services like Google Sheets and Firebase. Your use of these services is subject to their respective terms and conditions. We are not responsible for the actions of third-party service providers.
+              BookMate is a cloud-based accounting platform that integrates with Google Sheets to provide accounting functionality.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">8.1 What We Access</h3>
+            <p className="mb-4">
+              By using BookMate, you authorize us to:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Create a Google Spreadsheet:</strong> We create a personal accounting spreadsheet in your Google Drive during initial setup</li>
+              <li><strong>Read and Write Data:</strong> We read and write your financial transactions, balances, and reports to your spreadsheet</li>
+              <li><strong>Access Spreadsheet Only:</strong> We ONLY access the spreadsheet we create for you (identified by spreadsheet ID in our database)</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">8.2 What We Do NOT Access</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>We do NOT access other files in your Google Drive</li>
+              <li>We do NOT read your personal documents, photos, or emails</li>
+              <li>We do NOT browse your Drive folders</li>
+              <li>We ONLY interact with the accounting spreadsheet we create</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">8.3 Your Ownership and Control</h3>
+            <p className="mb-4">
+              You maintain complete ownership and control:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>You Own the Spreadsheet:</strong> The spreadsheet is in YOUR Google Drive, you are the owner</li>
+              <li><strong>Revoke Access Anytime:</strong> You can revoke our access at <a href="https://myaccount.google.com/permissions" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">https://myaccount.google.com/permissions</a></li>
+              <li><strong>Delete Spreadsheet:</strong> You can delete the spreadsheet from your Drive at any time</li>
+              <li><strong>Export Your Data:</strong> You can download the spreadsheet as Excel, CSV, or PDF anytime</li>
+              <li><strong>Share with Others:</strong> You can share your spreadsheet with accountants, bookkeepers, or team members</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">8.4 Why We Use Google Sheets</h3>
+            <p className="mb-4">
+              We integrate with Google Sheets because:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>You own your data (it lives in YOUR Drive, not just our servers)</li>
+              <li>You can use spreadsheet formulas for custom calculations</li>
+              <li>You can access your data even if you cancel our service</li>
+              <li>You can collaborate with your accountant or team</li>
+              <li>You have full transparency into your financial data</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">8.5 OAuth Token Storage</h3>
+            <p className="mb-4">
+              When you authorize BookMate to access Google Sheets:
+            </p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>We receive OAuth access and refresh tokens from Google</li>
+              <li>These tokens are encrypted and stored securely in our database</li>
+              <li>We use these tokens to access your spreadsheet on your behalf</li>
+              <li>Tokens are automatically revoked when you delete your account</li>
+              <li>You can manually revoke tokens in your Google Account settings</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Other Third-Party Services</h2>
+            <p className="mb-4">
+              BookMate also integrates with Firebase for authentication. Your use of these services is subject to their respective terms and conditions. We are not responsible for the actions of third-party service providers.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Disclaimers and Limitations</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Disclaimers and Limitations</h2>
             
-            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">9.1 No Financial Advice</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">10.1 No Financial Advice</h3>
             <p>
               BookMate is a financial management tool, NOT a financial advisor. We do not provide financial, investment, tax, or legal advice. Consult with qualified professionals for financial decisions.
             </p>
 
-            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">9.2 Service Availability</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">10.2 Service Availability</h3>
             <p>
               We strive to keep BookMate available 24/7, but we do not guarantee uninterrupted access. The Service is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind.
             </p>
 
-            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">9.3 Limitation of Liability</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">10.3 Limitation of Liability</h3>
             <p className="mb-4">
               To the maximum extent permitted by law, BookMate and its affiliates shall not be liable for:
             </p>
@@ -173,28 +234,28 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Indemnification</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Indemnification</h2>
             <p>
               You agree to indemnify and hold harmless BookMate, its affiliates, and employees from any claims, damages, losses, or expenses (including legal fees) arising from your use of the Service or violation of these Terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Modifications to Service and Terms</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Modifications to Service and Terms</h2>
             
-            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">11.1 Service Changes</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">12.1 Service Changes</h3>
             <p>
               We reserve the right to modify, suspend, or discontinue any part of the Service at any time, with or without notice.
             </p>
 
-            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">11.2 Terms Updates</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">12.2 Terms Updates</h3>
             <p>
               We may update these Terms from time to time. We will notify you of significant changes via email or app notification. Your continued use after changes constitutes acceptance of the updated Terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Termination</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Termination</h2>
             <p className="mb-4">
               Either party may terminate this agreement at any time:
             </p>
@@ -208,14 +269,14 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Governing Law</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">14. Governing Law</h2>
             <p>
               These Terms shall be governed by and construed in accordance with the laws of the jurisdiction where Siamoon operates, without regard to conflict of law principles.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">14. Dispute Resolution</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">15. Dispute Resolution</h2>
             <p className="mb-4">
               For any disputes arising from these Terms:
             </p>
@@ -227,14 +288,14 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">15. Severability</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">16. Severability</h2>
             <p>
               If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will continue in full force and effect.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">16. Contact Information</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">17. Contact Information</h2>
             <p className="mb-4">For questions about these Terms of Service, contact us:</p>
             
             <div className="bg-gray-50 p-6 rounded-lg">

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { google } from 'googleapis';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 
 /**
  * POST /api/categories/sync
@@ -42,14 +43,9 @@ export async function POST(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-
-    if (!spreadsheetId) {
-      return NextResponse.json(
-        { ok: false, error: 'GOOGLE_SHEET_ID not configured in environment' },
-        { status: 500 }
-      );
-    }
+    
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
 
     // Get the ranges from config
     const ranges = config.ranges || {};

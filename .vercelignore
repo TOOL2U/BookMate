@@ -1,0 +1,13 @@
+# Exclude Firebase functions from Vercel build
+functions/
+FUNCTIONS/
+firebase-functions/
+
+# Exclude other unnecessary files
+*.md
+*.log
+screenshot_*.png
+cleanup-project.sh
+test-*.js
+set-google-credentials.sh
+setup-fonts.sh

@@ -1,0 +1,263 @@
+/**
+ * Example: Updated Registration Flow with OAuth
+ * This shows how to integrate OAuth into your registration
+ */
+
+// ============================================================================
+// OPTION 1: Redirect After Registration (Recommended)
+// ============================================================================
+
+// app/api/auth/register/route.ts
+export async function POST(request: NextRequest) {
+  try {
+    const { email, password, name, phone } = await request.json();
+
+    // Create user account
+    const result = await registerUser({ email, password, name, phone });
+
+    // Return success with OAuth redirect URL
+    return NextResponse.json({
+      success: true,
+      message: 'Account created! Please authorize Google Sheets access.',
+      redirectTo: `/api/auth/google/authorize?userId=${result.user.id}&returnUrl=/dashboard`,
+      user: {
+        id: result.user.id,
+        email: result.user.email,
+      }
+    });
+
+  } catch (error) {
+    // Handle errors...
+  }
+}
+
+// ============================================================================
+// OPTION 2: Automatic Redirect (Seamless)
+// ============================================================================
+
+// app/api/auth/register/route.ts
+export async function POST(request: NextRequest) {
+  try {
+    const { email, password, name, phone } = await request.json();
+
+    // Create user account
+    const result = await registerUser({ email, password, name, phone });
+
+    // Automatically redirect to OAuth flow
+    const authUrl = `/api/auth/google/authorize?userId=${result.user.id}&returnUrl=/dashboard`;
+    return NextResponse.redirect(new URL(authUrl, request.url));
+
+  } catch (error) {
+    // Handle errors...
+  }
+}
+
+// ============================================================================
+// FRONTEND: Handle Registration Response
+// ============================================================================
+
+// components/auth/RegisterForm.tsx
+async function handleSubmit(data: RegisterData) {
+  try {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (result.success && result.redirectTo) {
+      // Show loading message
+      setMessage('Redirecting to Google authorization...');
+      
+      // Redirect to OAuth flow
+      window.location.href = result.redirectTo;
+    }
+
+  } catch (error) {
+    // Handle errors...
+  }
+}
+
+// ============================================================================
+// DASHBOARD: Handle OAuth Callback
+// ============================================================================
+
+// app/dashboard/page.tsx
+'use client';
+
+import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+export default function Dashboard() {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const oauthSuccess = searchParams.get('oauth_success');
+    const spreadsheetCreated = searchParams.get('spreadsheet_created');
+    const oauthError = searchParams.get('oauth_error');
+
+    if (oauthSuccess === 'true') {
+      if (spreadsheetCreated === 'true') {
+        // Show success notification
+        toast.success('Your spreadsheet has been created!');
+      } else {
+        // OAuth succeeded but spreadsheet already existed
+        toast.success('Google Sheets access authorized!');
+      }
+      
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard');
+    }
+
+    if (oauthError) {
+      // Show error notification
+      if (oauthError === 'denied') {
+        toast.error('You denied access. Spreadsheet features will be limited.');
+      } else {
+        toast.error('Authorization failed. Please try again.');
+      }
+      
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, [searchParams]);
+
+  return (
+    <div>
+      {/* Dashboard content */}
+    </div>
+  );
+}
+
+// ============================================================================
+// HANDLING USERS WITHOUT OAUTH TOKENS
+// ============================================================================
+
+// middleware.ts or dashboard page
+async function checkSpreadsheetAccess(user: User) {
+  // Check if user has authorized Google access
+  if (!user.googleRefreshToken) {
+    // User hasn't completed OAuth flow
+    return {
+      needsAuth: true,
+      authUrl: `/api/auth/google/authorize?userId=${user.id}&returnUrl=${currentPath}`
+    };
+  }
+
+  // Check if user has a spreadsheet
+  if (!user.spreadsheetId) {
+    // Has token but no spreadsheet - trigger provisioning
+    return {
+      needsProvisioning: true,
+      message: 'Creating your spreadsheet...'
+    };
+  }
+
+  return { ready: true };
+}
+
+// ============================================================================
+// RETRY BUTTON FOR FAILED PROVISIONING
+// ============================================================================
+
+// components/SpreadsheetSetup.tsx
+export function SpreadsheetSetupButton({ userId }: { userId: string }) {
+  const [loading, setLoading] = useState(false);
+
+  async function retrySetup() {
+    setLoading(true);
+    try {
+      // Redirect to OAuth flow
+      window.location.href = `/api/auth/google/authorize?userId=${userId}&returnUrl=/dashboard`;
+    } catch (error) {
+      toast.error('Failed to start setup. Please try again.');
+      setLoading(false);
+    }
+  }
+
+  return (
+    <button
+      onClick={retrySetup}
+      disabled={loading}
+      className="btn btn-primary"
+    >
+      {loading ? 'Connecting...' : 'Set Up Google Sheets'}
+    </button>
+  );
+}
+
+// ============================================================================
+// MANUAL PROVISIONING ENDPOINT (Optional)
+// ============================================================================
+
+// app/api/spreadsheet/provision/route.ts
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getCurrentUser(request);
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user has OAuth token
+    if (!user.googleRefreshToken) {
+      return NextResponse.json({
+        error: 'OAuth authorization required',
+        authUrl: `/api/auth/google/authorize?userId=${user.id}&returnUrl=/dashboard`
+      }, { status: 403 });
+    }
+
+    // Check if already has spreadsheet
+    if (user.spreadsheetId) {
+      return NextResponse.json({
+        success: true,
+        message: 'Spreadsheet already exists',
+        spreadsheetId: user.spreadsheetId,
+        spreadsheetUrl: user.spreadsheetUrl
+      });
+    }
+
+    // Get valid access token (auto-refreshes if needed)
+    const accessToken = await getUserAccessToken(user.id);
+
+    // Provision spreadsheet
+    const result = await provisionUserSpreadsheet(
+      user.id,
+      user.email,
+      user.name || user.email,
+      accessToken
+    );
+
+    if (result.success) {
+      // Update user record
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          spreadsheetId: result.spreadsheetId,
+          spreadsheetUrl: result.spreadsheetUrl,
+          spreadsheetCreatedAt: new Date()
+        }
+      });
+
+      return NextResponse.json({
+        success: true,
+        spreadsheetId: result.spreadsheetId,
+        spreadsheetUrl: result.spreadsheetUrl
+      });
+    }
+
+    return NextResponse.json(
+      { error: result.error || 'Failed to create spreadsheet' },
+      { status: 500 }
+    );
+
+  } catch (error: any) {
+    console.error('Spreadsheet provisioning error:', error);
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+}

@@ -3,8 +3,8 @@ import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
 import { google } from 'googleapis';
+import { getUserSpreadsheetId } from '@/lib/middleware/auth';
 
-const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const DATA_REVENUE_START_ROW = 2;
 
 function getCredentials() {
@@ -15,7 +15,7 @@ function getCredentials() {
   return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
 }
 
-async function getHandler() {
+async function getHandler(request: NextRequest) {
   try {
     console.log('[REVENUES] Fetching revenue items from Google Sheets...');
     
@@ -26,10 +26,13 @@ async function getHandler() {
     });
     const sheets = google.sheets({ version: 'v4', auth });
 
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
+
     const range = `Data!A${DATA_REVENUE_START_ROW}:A`;
     
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: GOOGLE_SHEET_ID,
+      spreadsheetId,
       range,
     });
 
@@ -72,9 +75,12 @@ async function postHandler(request: NextRequest) {
     });
     const sheets = google.sheets({ version: 'v4', auth });
 
+    // Get user's spreadsheet ID from authenticated request
+    const spreadsheetId = await getUserSpreadsheetId(request);
+
     // Get current revenues
     const getResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: GOOGLE_SHEET_ID,
+      spreadsheetId,
       range: `Data!A${DATA_REVENUE_START_ROW}:A`,
     });
 
@@ -150,7 +156,7 @@ async function postHandler(request: NextRequest) {
     // Update the sheet
     const updateRange = `Data!A${DATA_REVENUE_START_ROW}:A${DATA_REVENUE_START_ROW + revenues.length - 1}`;
     await sheets.spreadsheets.values.update({
-      spreadsheetId: GOOGLE_SHEET_ID,
+      spreadsheetId,
       range: updateRange,
       valueInputOption: 'RAW',
       requestBody: {
@@ -163,7 +169,7 @@ async function postHandler(request: NextRequest) {
       const clearStart = DATA_REVENUE_START_ROW + revenues.length;
       const clearEnd = clearStart + 10;
       await sheets.spreadsheets.values.clear({
-        spreadsheetId: GOOGLE_SHEET_ID,
+        spreadsheetId,
         range: `Data!A${clearStart}:A${clearEnd}`,
       });
     }

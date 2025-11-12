@@ -56,6 +56,10 @@ config/google-credentials.json
 *credentials*.json
 service-account*.json
 gcloud-*.json
+client_secret*.json
+
+# Documentation with embedded secrets
+VERCEL_ENV_SETUP.md
 
 # Private keys and secrets
 *PRIVATE_KEY*.txt
