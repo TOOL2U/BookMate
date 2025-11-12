@@ -10,6 +10,155 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ============================================================================
+// AUTHENTICATION & USERS
+// ============================================================================
+
+// User Accounts - Authentication and profile management
+model User {
+  id                String    @id @default(uuid())
+  firebaseUid       String?   @unique @map("firebase_uid") // Firebase Auth UID
+  
+  // Profile Information
+  email             String    @unique
+  emailVerified     Boolean   @default(false) @map("email_verified")
+  name              String?
+  avatarUrl         String?   @map("avatar_url")
+  phone             String?
+  
+  // Authentication
+  passwordHash      String?   @map("password_hash") // For email/password auth
+  provider          String    @default("email") // email, google, apple, etc.
+  
+  // Account Status
+  status            String    @default("active") // active, suspended, deleted
+  role              String    @default("user") // user, admin, owner
+  
+  // Workspace & Organization
+  workspaceId       String?   @map("workspace_id")
+  organizationId    String?   @map("organization_id")
+  
+  // Security
+  lastLoginAt       DateTime? @map("last_login_at")
+  lastLoginIp       String?   @map("last_login_ip")
+  loginCount        Int       @default(0) @map("login_count")
+  failedLoginCount  Int       @default(0) @map("failed_login_count")
+  lockedUntil       DateTime? @map("locked_until")
+  
+  // Preferences
+  preferences       Json      @default("{}") // { theme, language, timezone, notifications }
+  
+  // Metadata
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+  
+  // Relations
+  sessions          Session[]
+  refreshTokens     RefreshToken[]
+  auditLogs         AuditLog[]
+  
+  // Indexes
+  @@index([email])
+  @@index([firebaseUid])
+  @@index([workspaceId])
+  @@index([status])
+  @@index([role])
+  @@map("users")
+}
+
+// Session Management - Track active user sessions
+model Session {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  
+  // Session data
+  token           String    @unique // Session token
+  deviceInfo      Json?     @map("device_info") // { browser, os, device }
+  ipAddress       String?   @map("ip_address")
+  userAgent       String?   @map("user_agent")
+  
+  // Expiry
+  expiresAt       DateTime  @map("expires_at")
+  lastActivityAt  DateTime  @default(now()) @map("last_activity_at")
+  
+  // Metadata
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Indexes
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// Refresh Tokens - JWT refresh token management
+model RefreshToken {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  
+  // Token data
+  token           String    @unique
+  deviceId        String?   @map("device_id") // Unique device identifier
+  
+  // Expiry
+  expiresAt       DateTime  @map("expires_at")
+  revoked         Boolean   @default(false)
+  revokedAt       DateTime? @map("revoked_at")
+  
+  // Metadata
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Indexes
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+// Audit Log - Track all user actions for security
+model AuditLog {
+  id              String    @id @default(uuid())
+  userId          String?   @map("user_id")
+  
+  // Action details
+  action          String    // login, logout, create, update, delete, etc.
+  resource        String?   // users, reports, templates, etc.
+  resourceId      String?   @map("resource_id")
+  
+  // Request data
+  ipAddress       String?   @map("ip_address")
+  userAgent       String?   @map("user_agent")
+  metadata        Json?     // Additional context
+  
+  // Result
+  success         Boolean   @default(true)
+  errorMessage    String?   @map("error_message")
+  
+  // Metadata
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Indexes
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// REPORTS SYSTEM
+// ============================================================================
+
 // Report Templates - Reusable report configurations
 model ReportTemplate {
   id            String   @id @default(uuid())
