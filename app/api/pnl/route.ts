@@ -30,8 +30,8 @@ interface CachedData {
   timestamp: number;
 }
 
-// In-memory cache (60 seconds)
-let cache: CachedData | null = null;
+// In-memory cache (60 seconds) - per user/spreadsheet
+const pnlCache = new Map<string, CachedData>();
 const CACHE_DURATION_MS = 60 * 1000; // 60 seconds
 
 /**
@@ -40,15 +40,20 @@ const CACHE_DURATION_MS = 60 * 1000; // 60 seconds
  */
 async function pnlHandler(request: NextRequest) {
   try {
-    // Check cache first
+    // Get user's spreadsheet ID first (for cache isolation)
+    const spreadsheetId = await getSpreadsheetId(request);
+    console.log('📊 Using spreadsheet:', spreadsheetId);
+    
+    // Check cache first (user-specific)
     const now = Date.now();
-    if (cache && (now - cache.timestamp) < CACHE_DURATION_MS) {
-      console.log('✅ Returning cached P&L data');
+    const cached = pnlCache.get(spreadsheetId);
+    if (cached && (now - cached.timestamp) < CACHE_DURATION_MS) {
+      console.log(`✅ Returning cached P&L data for ${spreadsheetId}`);
       return NextResponse.json({
         ok: true,
-        data: cache.data,
+        data: cached.data,
         cached: true,
-        cacheAge: Math.floor((now - cache.timestamp) / 1000)
+        cacheAge: Math.floor((now - cached.timestamp) / 1000)
       });
     }
 
@@ -80,9 +85,6 @@ async function pnlHandler(request: NextRequest) {
 
     console.log('📊 Fetching fresh P&L data from Google Sheets...');
     console.log('🔐 Using secret (first 10 chars):', secret?.substring(0, 10));
-
-    // Get user's spreadsheet ID (or default)
-    const spreadsheetId = await getSpreadsheetId(request);
     console.log('📊 Using spreadsheet:', spreadsheetId);
 
     // Fetch data from Apps Script endpoint
@@ -149,13 +151,13 @@ async function pnlHandler(request: NextRequest) {
       );
     }
 
-    // Update cache
-    cache = {
+    // Update cache (user-specific)
+    pnlCache.set(spreadsheetId, {
       data: result.data,
       timestamp: now
-    };
+    });
 
-    console.log('✅ P&L data fetched and cached successfully');
+    console.log(`✅ P&L data fetched and cached successfully for ${spreadsheetId}`);
 
     // Log warnings and computed fallbacks if present
     if (result.warnings && result.warnings.length > 0) {
@@ -196,8 +198,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     if (body.action === 'clearCache') {
-      cache = null;
-      console.log('🗑️ P&L cache cleared');
+      // Get user's spreadsheet ID
+      const spreadsheetId = await getSpreadsheetId(request);
+      
+      // Clear only this user's cache (or all if admin)
+      if (body.clearAll === true) {
+        pnlCache.clear();
+        console.log('🗑️ All P&L caches cleared');
+      } else {
+        pnlCache.delete(spreadsheetId);
+        console.log(`🗑️ P&L cache cleared for ${spreadsheetId}`);
+      }
+      
       return NextResponse.json({
         ok: true,
         message: 'Cache cleared successfully'

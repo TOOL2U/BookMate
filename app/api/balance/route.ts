@@ -15,19 +15,22 @@ interface BalanceCacheEntry {
   data: any;
   timestamp: number;
 }
+// Per-user cache to prevent data leakage between users
 const balanceCache = new Map<string, BalanceCacheEntry>();
 const CACHE_DURATION_MS = 60 * 1000; // 60 seconds
 
-function getCachedBalance(month: string): any | null {
-  const cached = balanceCache.get(month);
+function getCachedBalance(spreadsheetId: string, month: string): any | null {
+  const cacheKey = `${spreadsheetId}:${month}`;
+  const cached = balanceCache.get(cacheKey);
   if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION_MS) {
     return cached.data;
   }
   return null;
 }
 
-function setCachedBalance(month: string, data: any): void {
-  balanceCache.set(month, { data, timestamp: Date.now() });
+function setCachedBalance(spreadsheetId: string, month: string, data: any): void {
+  const cacheKey = `${spreadsheetId}:${month}`;
+  balanceCache.set(cacheKey, { data, timestamp: Date.now() });
 }
 
 // small helper: hard timeout
@@ -75,15 +78,18 @@ async function balanceHandler(req: NextRequest) {
   const month = (url.searchParams.get('month') || 'ALL').toUpperCase();
   const skipCache = url.searchParams.has('t'); // Cache-busting: if ?t= param exists, skip cache
 
+  // Get user's spreadsheet ID first (for cache isolation)
+  const spreadsheetId = await getSpreadsheetId(req);
+
   // Check cache first (unless cache-busting param is present)
   if (!skipCache) {
-    const cached = getCachedBalance(month);
+    const cached = getCachedBalance(spreadsheetId, month);
     if (cached) {
-      console.log(`✅ [Balance API] Returning cached data for month: ${month}`);
+      console.log(`✅ [Balance API] Returning cached data for ${spreadsheetId}:${month}`);
       return NextResponse.json({
         ...cached,
         cached: true,
-        cacheAge: Math.floor((Date.now() - balanceCache.get(month)!.timestamp) / 1000)
+        cacheAge: Math.floor((Date.now() - balanceCache.get(`${spreadsheetId}:${month}`)!.timestamp) / 1000)
       }, {
         headers: {
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
@@ -91,7 +97,7 @@ async function balanceHandler(req: NextRequest) {
       });
     }
   } else {
-    console.log(`🔄 [Balance API] Cache-busting enabled, fetching fresh data for month: ${month}`);
+    console.log(`🔄 [Balance API] Cache-busting enabled, fetching fresh data for ${spreadsheetId}:${month}`);
   }
 
   const start = Date.now();
@@ -99,8 +105,7 @@ async function balanceHandler(req: NextRequest) {
     const auth = buildAuth();
     const sheets = google.sheets({ version: 'v4', auth });
     
-    // Get spreadsheet ID with backward compatibility (user's or default)
-    const spreadsheetId = await getSpreadsheetId(req);
+    console.log('📊 Using spreadsheet:', spreadsheetId);
 
     // Read ONLY the cells we need from Balance Summary (fast ranges)
     // Headers are in row 3, data from row 4 down. A:H is the 8 columns we expose.
@@ -178,8 +183,8 @@ async function balanceHandler(req: NextRequest) {
       cached: false
     };
 
-    // Cache the response
-    setCachedBalance(month, responseData);
+    // Cache the response (user-specific)
+    setCachedBalance(spreadsheetId, month, responseData);
 
     return NextResponse.json(responseData, {
       headers: {

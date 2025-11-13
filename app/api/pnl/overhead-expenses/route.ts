@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSpreadsheetId } from '@/lib/middleware/auth';
 
-// Cache for overhead expenses data (60 seconds TTL)
-let cache: {
-  [key: string]: {
-    data: any;
-    timestamp: number;
-  };
-} | null = null;
+// Cache for overhead expenses data (60 seconds TTL) - per user
+const overheadCache = new Map<string, {
+  data: any;
+  timestamp: number;
+}>();
 
 const CACHE_DURATION_MS = 60000; // 60 seconds
 
@@ -23,16 +21,21 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Check cache first
-  const cacheKey = `overhead-${period}`;
+  // Get user's spreadsheet ID first (for cache isolation)
+  const spreadsheetId = await getSpreadsheetId(request);
+  console.log('📊 Using spreadsheet:', spreadsheetId);
+
+  // Check cache first (user-specific)
+  const cacheKey = `${spreadsheetId}:overhead-${period}`;
   const now = Date.now();
+  const cached = overheadCache.get(cacheKey);
   
-  if (cache && cache[cacheKey] && (now - cache[cacheKey].timestamp) < CACHE_DURATION_MS) {
-    console.log(`✅ Returning cached overhead expenses (${period}) - ${Date.now() - startTime}ms`);
+  if (cached && (now - cached.timestamp) < CACHE_DURATION_MS) {
+    console.log(`✅ Returning cached overhead expenses for ${spreadsheetId} (${period}) - ${Date.now() - startTime}ms`);
     return NextResponse.json({
-      ...cache[cacheKey].data,
+      ...cached.data,
       cached: true,
-      cacheAge: Math.floor((now - cache[cacheKey].timestamp) / 1000)
+      cacheAge: Math.floor((now - cached.timestamp) / 1000)
     });
   }
 
@@ -58,10 +61,6 @@ export async function GET(request: NextRequest) {
   try {
     console.log(`📊 Fetching overhead expenses (${period}) from Google Sheets...`);
     const fetchStart = Date.now();
-    
-    // Get user's spreadsheet ID (or default)
-    const spreadsheetId = await getSpreadsheetId(request);
-    console.log('📊 Using spreadsheet:', spreadsheetId);
     
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
     // because fetch() converts POST to GET when following redirects, losing the body
@@ -97,9 +96,8 @@ export async function GET(request: NextRequest) {
     const fetchTime = Date.now() - fetchStart;
     console.log(`⏱️ Overhead expenses (${period}) fetch took ${fetchTime}ms`);
 
-    // Update cache
-    if (!cache) cache = {};
-    cache[cacheKey] = {
+    // Update cache (user-specific)
+    overheadCache.set(cacheKey, {
       data: {
         ok: true,
         data: data.data || [],
@@ -108,9 +106,9 @@ export async function GET(request: NextRequest) {
         timestamp: new Date().toISOString(),
       },
       timestamp: now
-    };
+    });
 
-    console.log(`✅ Overhead expenses (${period}) loaded in ${Date.now() - startTime}ms`);
+    console.log(`✅ Overhead expenses (${period}) loaded for ${spreadsheetId} in ${Date.now() - startTime}ms`);
 
     return NextResponse.json({
       ok: true,

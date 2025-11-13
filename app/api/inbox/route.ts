@@ -9,10 +9,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 // Cache for inbox data (30 seconds TTL - balance between freshness and performance)
-let cache: {
+// Per-user cache to prevent data leakage between users
+const inboxCache = new Map<string, {
   data: any[];
   timestamp: number;
-} | null = null;
+}>();
 
 const CACHE_DURATION_MS = 30000; // 30 seconds
 
@@ -24,15 +25,20 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
   
   try {
-    // Check cache first
+    // Get user's spreadsheet ID first (for cache isolation)
+    const spreadsheetId = await getSpreadsheetId(request);
+    console.log('📊 Using spreadsheet:', spreadsheetId);
+    
+    // Check cache first (user-specific)
     const now = Date.now();
-    if (cache && (now - cache.timestamp) < CACHE_DURATION_MS) {
-      console.log(`✅ Returning cached inbox data (${Date.now() - startTime}ms)`);
+    const cached = inboxCache.get(spreadsheetId);
+    if (cached && (now - cached.timestamp) < CACHE_DURATION_MS) {
+      console.log(`✅ Returning cached inbox data for ${spreadsheetId} (${Date.now() - startTime}ms)`);
       return NextResponse.json({
         ok: true,
-        data: cache.data,
+        data: cached.data,
         cached: true,
-        cacheAge: Math.floor((now - cache.timestamp) / 1000)
+        cacheAge: Math.floor((now - cached.timestamp) / 1000)
       });
     }
 
@@ -65,10 +71,6 @@ export async function GET(request: NextRequest) {
     console.log('📥 Fetching fresh inbox data from Google Sheets...');
 
     const fetchStart = Date.now();
-    
-    // Get user's spreadsheet ID (or default)
-    const spreadsheetId = await getSpreadsheetId(request);
-    console.log('📊 Using spreadsheet:', spreadsheetId);
     
     // Fetch data from Apps Script endpoint
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
@@ -127,11 +129,11 @@ export async function GET(request: NextRequest) {
 
     console.log(`✅ Fetched ${data.count || 0} entries from Google Sheets (total: ${Date.now() - startTime}ms)`);
 
-    // Update cache
-    cache = {
+    // Update cache (user-specific)
+    inboxCache.set(spreadsheetId, {
       data: data.data || [],
       timestamp: now
-    };
+    });
 
     return NextResponse.json({
       ok: true,
@@ -190,7 +192,7 @@ export async function DELETE(request: NextRequest) {
 
     console.log(`🗑️ Deleting entry at row ${rowNumber}...`);
 
-    // Get user's spreadsheet ID (or default)
+    // Get user's spreadsheet ID (for cache invalidation)
     const spreadsheetId = await getSpreadsheetId(request);
     console.log('📊 Using spreadsheet:', spreadsheetId);
 
@@ -249,8 +251,8 @@ export async function DELETE(request: NextRequest) {
 
     console.log(`✅ Deleted entry at row ${rowNumber}`);
 
-    // Invalidate cache
-    cache = null;
+    // Invalidate cache for this user
+    inboxCache.delete(spreadsheetId);
 
     return NextResponse.json({
       ok: true,
