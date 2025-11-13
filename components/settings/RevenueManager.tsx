@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2, Edit2, Trash2, Plus, Check, X, AlertCircle, Info, Coins, TrendingUp } from 'lucide-react';
+import { fetchWithAuth, postWithAuth, deleteWithAuth } from '@/lib/api/client';
 
 export default function RevenueManager() {
   const [revenues, setRevenues] = useState<string[]>([]);
@@ -21,7 +22,7 @@ export default function RevenueManager() {
   const fetchRevenues = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/categories/revenues');
+      const res = await fetchWithAuth('/api/categories/revenues');
       const data = await res.json();
       if (data.ok) {
         setRevenues(data.data.revenues);
@@ -104,15 +105,11 @@ export default function RevenueManager() {
       setIsUpdating(true);
       showToast('Deleting revenue item...', 'info');
 
-      const res = await fetch('/api/categories/revenues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await postWithAuth('/api/categories/revenues', {
           action: 'delete',
           oldValue: value,
           index,
-        }),
-      });
+        });
 
       const result = await res.json();
 
@@ -151,13 +148,9 @@ export default function RevenueManager() {
       setIsUpdating(true);
       showToast('Adding revenue item...', 'info');
 
-      const res = await fetch('/api/categories/revenues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await postWithAuth('/api/categories/revenues', {
           action: 'add',
           newValue: newValue.trim(),
-        }),
       });
 
       const result = await res.json();

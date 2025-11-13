@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Inbox as InboxIcon, Zap, Trash2, AlertCircle } from 'lucide-react';
+import { fetchWithAuth, postWithAuth, deleteWithAuth } from '@/lib/api/client';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -53,7 +54,7 @@ export default function InboxPage() {
       console.log('📥 Activity Page: Fetching receipts...');
       const startTime = Date.now();
 
-      const response = await fetch('/api/inbox');
+      const response = await fetchWithAuth('/api/inbox');
       const data = await response.json();
 
       if (!data.ok) {
@@ -92,15 +93,7 @@ export default function InboxPage() {
     }
 
     try {
-      const response = await fetch('/api/inbox', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          rowNumber: receipt.rowNumber
-        })
-      });
+      const response = await deleteWithAuth('/api/inbox', { rowNumber: receipt.rowNumber });
 
       const data = await response.json();
 

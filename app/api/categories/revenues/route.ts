@@ -3,7 +3,7 @@ import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
 import { google } from 'googleapis';
-import { getUserSpreadsheetId } from '@/lib/middleware/auth';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 const DATA_REVENUE_START_ROW = 2;
 
@@ -27,7 +27,7 @@ async function getHandler(request: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
 
     // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(request);
+    const spreadsheetId = await getSpreadsheetId(request);
 
     const range = `Data!A${DATA_REVENUE_START_ROW}:A`;
     
@@ -76,7 +76,7 @@ async function postHandler(request: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
 
     // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(request);
+    const spreadsheetId = await getSpreadsheetId(request);
 
     // Get current revenues
     const getResponse = await sheets.spreadsheets.values.get({

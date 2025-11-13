@@ -8,7 +8,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
-import { getUserSpreadsheetId } from '@/lib/middleware/auth';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 // In-memory cache for balance data (60 seconds)
 interface BalanceCacheEntry {
@@ -99,8 +99,8 @@ async function balanceHandler(req: NextRequest) {
     const auth = buildAuth();
     const sheets = google.sheets({ version: 'v4', auth });
     
-    // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(req);
+    // Get spreadsheet ID with backward compatibility (user's or default)
+    const spreadsheetId = await getSpreadsheetId(req);
 
     // Read ONLY the cells we need from Balance Summary (fast ranges)
     // Headers are in row 3, data from row 4 down. A:H is the 8 columns we expose.

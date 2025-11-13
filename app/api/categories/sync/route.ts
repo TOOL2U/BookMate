@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { google } from 'googleapis';
-import { getUserSpreadsheetId } from '@/lib/middleware/auth';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 /**
  * POST /api/categories/sync
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
     
     // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(request);
+    const spreadsheetId = await getSpreadsheetId(request);
 
     // Get the ranges from config
     const ranges = config.ranges || {};

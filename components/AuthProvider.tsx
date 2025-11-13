@@ -16,13 +16,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const authStatus = localStorage.getItem('isAuthenticated') === 'true';
     setIsAuthenticated(authStatus);
 
-    // Redirect to login if not authenticated and not already on login page
-    if (!authStatus && pathname !== '/login') {
+    // Public routes that don't require authentication
+    const publicRoutes = ['/login', '/register'];
+    const isPublicRoute = publicRoutes.includes(pathname);
+
+    // Redirect to login if not authenticated and not on a public route
+    if (!authStatus && !isPublicRoute) {
       router.push('/login');
     }
 
-    // Redirect to dashboard if authenticated and on login page
-    if (authStatus && pathname === '/login') {
+    // Redirect to dashboard if authenticated and on login or register page
+    if (authStatus && (pathname === '/login' || pathname === '/register')) {
       router.push('/dashboard');
     }
   }, [pathname, router]);
@@ -44,8 +48,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     );
   }
 
-  // If authenticated or on login page, show content
-  if (isAuthenticated || pathname === '/login') {
+  // If authenticated or on a public route (login/register), show content
+  if (isAuthenticated || pathname === '/login' || pathname === '/register') {
     return <>{children}</>;
   }
 

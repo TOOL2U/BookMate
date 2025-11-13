@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2, Edit2, Trash2, Plus, Check, X, AlertCircle, Info, CreditCard } from 'lucide-react';
+import { fetchWithAuth, postWithAuth, deleteWithAuth } from '@/lib/api/client';
 
 export default function PaymentTypeManager() {
   const [paymentTypes, setPaymentTypes] = useState<string[]>([]);
@@ -21,7 +22,7 @@ export default function PaymentTypeManager() {
   const fetchPaymentTypes = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/categories/payments');
+      const res = await fetchWithAuth('/api/categories/payments');
       const result = await res.json();
 
       if (result.ok && result.data) {
@@ -100,15 +101,11 @@ export default function PaymentTypeManager() {
       setIsUpdating(true);
       showToast('Deleting payment type...', 'info');
 
-      const res = await fetch('/api/categories/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await postWithAuth('/api/categories/payments', {
           action: 'delete',
           oldValue: value,
           index,
-        }),
-      });
+        });
 
       const result = await res.json();
 
@@ -147,13 +144,9 @@ export default function PaymentTypeManager() {
       setIsUpdating(true);
       showToast('Adding payment type...', 'info');
 
-      const res = await fetch('/api/categories/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await postWithAuth('/api/categories/payments', {
           action: 'add',
           newValue: newValue.trim(),
-        }),
       });
 
       const result = await res.json();

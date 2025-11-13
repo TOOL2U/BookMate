@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 interface PropertyPersonItem {
   name: string;
@@ -6,7 +7,7 @@ interface PropertyPersonItem {
   percentage: number;
 }
 
-async function fetchPropertyPersonData(period: string) {
+async function fetchPropertyPersonData(period: string, request: NextRequest) {
   const scriptUrl = process.env.SHEETS_WEBHOOK_URL;
   const secret = process.env.SHEETS_WEBHOOK_SECRET;
 
@@ -14,11 +15,16 @@ async function fetchPropertyPersonData(period: string) {
     throw new Error('Google Apps Script configuration missing');
   }
 
+  // Get user's spreadsheet ID (or default)
+  const spreadsheetId = await getSpreadsheetId(request);
+
   console.log(`🔍 Fetching property/person data for period: ${period}`);
+  console.log('📊 Using spreadsheet:', spreadsheetId);
   console.log(`📤 Sending to Apps Script:`, {
     action: 'getPropertyPersonDetails',
     period: period,
-    secret: '[REDACTED]'
+    secret: '[REDACTED]',
+    spreadsheetId: spreadsheetId
   });
 
   // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
@@ -31,7 +37,8 @@ async function fetchPropertyPersonData(period: string) {
     body: JSON.stringify({
       action: 'getPropertyPersonDetails',
       period: period,
-      secret: secret
+      secret: secret,
+      spreadsheetId: spreadsheetId  // Pass user's spreadsheet ID
     }),
     redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
   });
@@ -79,7 +86,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const result = await fetchPropertyPersonData(period);
+    const result = await fetchPropertyPersonData(period, request);
     return NextResponse.json(result);
 
   } catch (error) {
@@ -112,7 +119,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await fetchPropertyPersonData(period);
+    const result = await fetchPropertyPersonData(period, request);
     return NextResponse.json(result);
 
   } catch (error) {

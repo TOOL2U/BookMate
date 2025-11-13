@@ -14,7 +14,8 @@ import {
   X,
   Shield,
   LogOut,
-  FileText
+  FileText,
+  User
 } from 'lucide-react';
 
 interface AdminShellProps {
@@ -34,6 +35,7 @@ const navItems: NavItem[] = [
   { name: 'Reports', href: '/reports', icon: FileText },
   { name: 'Activity', href: '/activity', icon: Inbox },
   { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Account', href: '/account', icon: User },
   { name: 'Admin', href: '/admin', icon: Shield },
 ];
 

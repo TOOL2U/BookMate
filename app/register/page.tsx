@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import LogoBM from '@/components/LogoBM';
+import { Loader2, UserPlus, User, Mail, Lock, CheckCircle2 } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,11 +15,13 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     // Validation
     if (!formData.name || !formData.email || !formData.password) {
@@ -56,17 +60,24 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Registration successful - redirect to OAuth flow
-      console.log('Registration successful, redirecting to OAuth...');
+      // Registration successful! Store tokens and redirect to dashboard
+      console.log('✅ Registration successful! Spreadsheet auto-created.');
       
-      // The API returns the OAuth authorization URL
-      if (data.oauthUrl) {
-        window.location.href = data.oauthUrl;
-      } else {
-        // Fallback: construct OAuth URL manually
-        const userId = data.user.id;
-        window.location.href = `/api/auth/google/authorize?userId=${userId}&returnUrl=/dashboard`;
-      }
+      // Store authentication tokens
+      localStorage.setItem('accessToken', data.tokens.accessToken);
+      localStorage.setItem('refreshToken', data.tokens.refreshToken);
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('username', data.user.name || data.user.email);
+      localStorage.setItem('userId', data.user.id);
+      
+      // Show success message
+      setSuccess('Account created successfully! Redirecting to dashboard...');
+      
+      // Redirect to dashboard after brief delay
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1500);
+      
     } catch (err) {
       console.error('Registration error:', err);
       setError(err instanceof Error ? err.message : 'Registration failed');
@@ -82,134 +93,181 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-          <p className="text-gray-600">Join BookMate - Your Personal Accounting Assistant</p>
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo and Header */}
+        <div className="text-center mb-8 animate-fade-in opacity-0" style={{ animationFillMode: 'forwards' }}>
+          <div className="mb-6 inline-block">
+            <LogoBM size={120} />
+          </div>
+          <h1 className="text-4xl font-bebasNeue uppercase text-text-primary tracking-wide mb-2">
+            Create Account
+          </h1>
+          <p className="text-text-secondary font-aileron">
+            Join BookMate - Your Personal Accounting Assistant
+          </p>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
-            <p className="text-sm">{error}</p>
+        {/* Success Message */}
+        {success && (
+          <div className="mb-6 bg-success/10 border border-success/30 rounded-xl2 p-4 animate-in slide-in-from-top-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-success" />
+              <p className="text-success text-sm font-aileron">{success}</p>
+            </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="John Doe"
-              disabled={loading}
-            />
-          </div>
+        {/* Registration Form */}
+        <div className="bg-bg-card border border-border-card rounded-xl2 p-8 backdrop-blur-sm animate-fade-in opacity-0" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name Field */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2 font-aileron">
+                Full Name
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-text-secondary" />
+                </div>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-3 py-3 bg-black border border-border-card rounded-xl2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow focus:border-transparent transition-all font-aileron"
+                  placeholder="John Doe"
+                  disabled={loading}
+                />
+              </div>
+            </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="john@example.com"
-              disabled={loading}
-            />
-          </div>
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2 font-aileron">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-text-secondary" />
+                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-3 py-3 bg-black border border-border-card rounded-xl2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow focus:border-transparent transition-all font-aileron"
+                  placeholder="john@example.com"
+                  disabled={loading}
+                />
+              </div>
+            </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="••••••••"
-              disabled={loading}
-            />
-            <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
-          </div>
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2 font-aileron">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-text-secondary" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-3 py-3 bg-black border border-border-card rounded-xl2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow focus:border-transparent transition-all font-aileron"
+                  placeholder="••••••••"
+                  disabled={loading}
+                />
+              </div>
+              <p className="mt-2 text-xs text-text-secondary font-aileron">Must be at least 8 characters</p>
+            </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm Password
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="••••••••"
-              disabled={loading}
-            />
-          </div>
+            {/* Confirm Password Field */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary mb-2 font-aileron">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-text-secondary" />
+                </div>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="block w-full pl-10 pr-3 py-3 bg-black border border-border-card rounded-xl2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow focus:border-transparent transition-all font-aileron"
+                  placeholder="••••••••"
+                  disabled={loading}
+                />
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Creating account...
-              </span>
-            ) : (
-              'Create Account & Authorize Google Sheets'
+            {/* Error Message */}
+            {error && (
+              <div className="bg-error/10 border border-error/30 rounded-xl2 p-3 animate-in slide-in-from-top-2">
+                <p className="text-error text-sm font-aileron">{error}</p>
+              </div>
             )}
-          </button>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-            <p className="text-sm text-blue-800">
-              📝 <strong>Next Step:</strong> After registration, you&apos;ll be asked to authorize Google Sheets access. 
-              This allows BookMate to create and manage your personal accounting spreadsheet.
-            </p>
-          </div>
-        </form>
+            {/* Register Button */}
+            <button
+              type="submit"
+              disabled={loading || !!success}
+              className="w-full bg-yellow hover:bg-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold py-3 px-4 rounded-xl2 transition-all duration-200 flex items-center justify-center gap-2 font-aileron shadow-glow-yellow"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Creating your account...</span>
+                </>
+              ) : success ? (
+                <>
+                  <CheckCircle2 className="w-5 h-5" />
+                  <span>Account Created!</span>
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-5 h-5" />
+                  <span>Create Account</span>
+                </>
+              )}
+            </button>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600 text-sm">
+            {/* Info Box */}
+            <div className="bg-yellow/5 border border-yellow/20 rounded-xl2 p-4">
+              <p className="text-sm text-text-primary font-aileron">
+                ✨ <strong className="text-yellow">Instant Setup:</strong> Your personal accounting spreadsheet will be created automatically!
+              </p>
+            </div>
+          </form>
+        </div>
+
+        {/* Sign In Link */}
+        <div className="text-center mt-8 animate-fade-in opacity-0" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
+          <p className="text-text-secondary text-sm font-aileron">
             Already have an account?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-semibold">
+            <Link href="/login" className="text-yellow hover:text-yellow/80 font-semibold transition-colors">
               Sign in
             </Link>
           </p>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">
-            By creating an account, you agree to our{' '}
-            <Link href="/terms" className="text-blue-600 hover:underline">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link href="/privacy" className="text-blue-600 hover:underline">
-              Privacy Policy
-            </Link>
+        {/* Footer */}
+        <div className="text-center mt-6 animate-fade-in opacity-0" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
+          <p className="text-text-secondary text-xs font-aileron">
+            © 2025 BookMate. All rights reserved.
           </p>
         </div>
       </div>

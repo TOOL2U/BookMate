@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 // Cache for overhead expenses data (60 seconds TTL)
 let cache: {
@@ -58,6 +59,10 @@ export async function GET(request: NextRequest) {
     console.log(`📊 Fetching overhead expenses (${period}) from Google Sheets...`);
     const fetchStart = Date.now();
     
+    // Get user's spreadsheet ID (or default)
+    const spreadsheetId = await getSpreadsheetId(request);
+    console.log('📊 Using spreadsheet:', spreadsheetId);
+    
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
     // because fetch() converts POST to GET when following redirects, losing the body
     let response = await fetch(scriptUrl, {
@@ -69,6 +74,7 @@ export async function GET(request: NextRequest) {
         action: 'getOverheadExpensesDetails',
         secret: secret,
         period,
+        spreadsheetId: spreadsheetId  // Pass user's spreadsheet ID
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
     });

@@ -117,6 +117,39 @@ export async function registerUser(data: RegisterData): Promise<AuthResult> {
     }
   });
 
+  // Automatically provision spreadsheet using service account (no OAuth needed!)
+  console.log('📊 Auto-provisioning spreadsheet for new user...');
+  try {
+    const { provisionUserSpreadsheetAuto } = await import('@/lib/services/spreadsheet-provisioning');
+    
+    const result = await provisionUserSpreadsheetAuto(
+      user.id,
+      user.email,
+      name || user.email
+    );
+
+    if (result.success && result.spreadsheetId) {
+      // Update user with spreadsheet info
+      const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          spreadsheetId: result.spreadsheetId,
+          spreadsheetUrl: result.spreadsheetUrl,
+          spreadsheetCreatedAt: new Date(),
+        },
+      });
+      // Update the user object with the new data
+      Object.assign(user, updatedUser);
+      console.log('✅ Spreadsheet auto-created:', result.spreadsheetId);
+    } else {
+      console.error('⚠️  Failed to auto-create spreadsheet:', result.error);
+      // Continue registration anyway - user can retry later
+    }
+  } catch (error) {
+    console.error('⚠️  Error auto-provisioning spreadsheet:', error);
+    // Continue registration anyway - user can retry later
+  }
+
   // Generate tokens
   const tokens = generateTokenPair({
     userId: user.id,

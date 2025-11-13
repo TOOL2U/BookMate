@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2, Edit2, Trash2, Plus, Check, X, AlertCircle, Info, Building2 } from 'lucide-react';
+import { fetchWithAuth, postWithAuth } from '@/lib/api/client';
 
 export default function PropertyManager() {
   const [properties, setProperties] = useState<string[]>([]);
@@ -21,7 +22,7 @@ export default function PropertyManager() {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/categories/properties');
+      const res = await fetchWithAuth('/api/categories/properties');
       const result = await res.json();
 
       if (result.ok && result.data) {
@@ -63,15 +64,11 @@ export default function PropertyManager() {
       setIsUpdating(true);
       showToast('Updating property...', 'info');
 
-      const res = await fetch('/api/categories/properties', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'edit',
-          oldValue,
-          newValue: editValue.trim(),
-          index: editingIndex,
-        }),
+      const res = await postWithAuth('/api/categories/properties', {
+        action: 'edit',
+        oldValue,
+        newValue: editValue.trim(),
+        index: editingIndex,
       });
 
       const result = await res.json();
@@ -100,14 +97,10 @@ export default function PropertyManager() {
       setIsUpdating(true);
       showToast('Deleting property...', 'info');
 
-      const res = await fetch('/api/categories/properties', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete',
-          oldValue: value,
-          index,
-        }),
+      const res = await postWithAuth('/api/categories/properties', {
+        action: 'delete',
+        oldValue: value,
+        index,
       });
 
       const result = await res.json();
@@ -147,13 +140,9 @@ export default function PropertyManager() {
       setIsUpdating(true);
       showToast('Adding property...', 'info');
 
-      const res = await fetch('/api/categories/properties', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'add',
-          newValue: newValue.trim(),
-        }),
+      const res = await postWithAuth('/api/categories/properties', {
+        action: 'add',
+        newValue: newValue.trim(),
       });
 
       const result = await res.json();

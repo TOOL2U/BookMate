@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Loader2, Edit2, Trash2, Plus, Check, X, AlertCircle, Info, BriefcaseBusiness } from 'lucide-react';
+import { fetchWithAuth, postWithAuth, deleteWithAuth } from '@/lib/api/client';
 
 interface ExpenseCategoryManagerProps {
   onUpdate?: () => void;
@@ -25,7 +26,7 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/categories/expenses');
+      const res = await fetchWithAuth('/api/categories/expenses');
       const result = await res.json();
 
       if (result.ok && result.data) {
@@ -62,14 +63,10 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
       setIsUpdating(true);
       showToast('Updating category...', 'info');
 
-      const res = await fetch('/api/categories/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await postWithAuth('/api/categories/expenses', {
           action: 'edit',
           oldValue,
           newValue: editValue.trim(),
-        }),
       });
 
       const result = await res.json();
@@ -99,15 +96,11 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
       setIsUpdating(true);
       showToast('Deleting category...', 'info');
 
-      const res = await fetch('/api/categories/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await postWithAuth('/api/categories/expenses', {
           action: 'delete',
           oldValue: value,
           index,
-        }),
-      });
+        });
 
       const result = await res.json();
 
@@ -147,13 +140,9 @@ export default function ExpenseCategoryManager({ onUpdate }: ExpenseCategoryMana
       setIsUpdating(true);
       showToast('Adding category...', 'info');
 
-      const res = await fetch('/api/categories/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const res = await postWithAuth('/api/categories/expenses', {
           action: 'add',
           newValue: newValue.trim(),
-        }),
       });
 
       const result = await res.json();

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
-import { getUserSpreadsheetId } from '@/lib/middleware/auth';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
@@ -49,8 +49,8 @@ async function getHandler(request: NextRequest) {
 
     const sheets = google.sheets({ version: 'v4', auth });
     
-    // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(request);
+    // Get spreadsheet ID with backward compatibility (user's or default)
+    const spreadsheetId = await getSpreadsheetId(request);
 
     // Read all expense categories from Data!B30:B (open-ended range)
     const response = await sheets.spreadsheets.values.get({
@@ -118,8 +118,8 @@ async function postHandler(request: NextRequest) {
 
     const sheets = google.sheets({ version: 'v4', auth });
     
-    // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(request);
+    // Get spreadsheet ID with backward compatibility (user's or default)
+    const spreadsheetId = await getSpreadsheetId(request);
 
     // Get current categories
     const currentResponse = await sheets.spreadsheets.values.get({

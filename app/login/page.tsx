@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import LogoBM from '@/components/LogoBM';
 import { Loader2, LogIn, User, Lock } from 'lucide-react';
 
@@ -168,6 +169,19 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Create Account Link */}
+          <div className="text-center pt-6 mt-6 border-t border-border-card">
+            <p className="text-text-secondary text-sm font-aileron mb-2">
+              Don&apos;t have an account?
+            </p>
+            <a
+              href="/register"
+              className="text-yellow hover:text-yellow/80 font-semibold font-aileron transition-colors duration-200 inline-block cursor-pointer"
+            >
+              Create Account →
+            </a>
+          </div>
         </div>
 
         {/* Footer */}

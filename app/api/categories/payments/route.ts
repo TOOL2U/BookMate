@@ -15,7 +15,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
-import { getUserSpreadsheetId } from '@/lib/middleware/auth';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 // ============================================================================
 // CONSTANTS
@@ -79,7 +79,7 @@ async function getPaymentTypesHandler(request: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
     
     // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(request);
+    const spreadsheetId = await getSpreadsheetId(request);
 
     // Read payment types from Data!D2:D
     const response = await sheets.spreadsheets.values.get({
@@ -146,7 +146,7 @@ async function updatePaymentTypesHandler(request: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
     
     // Get user's spreadsheet ID from authenticated request
-    const spreadsheetId = await getUserSpreadsheetId(request);
+    const spreadsheetId = await getSpreadsheetId(request);
 
     // First, get current payment types
     const response = await sheets.spreadsheets.values.get({

@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 // Cache for inbox data (30 seconds TTL - balance between freshness and performance)
 let cache: {
@@ -65,6 +66,10 @@ export async function GET(request: NextRequest) {
 
     const fetchStart = Date.now();
     
+    // Get user's spreadsheet ID (or default)
+    const spreadsheetId = await getSpreadsheetId(request);
+    console.log('📊 Using spreadsheet:', spreadsheetId);
+    
     // Fetch data from Apps Script endpoint
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
@@ -76,7 +81,8 @@ export async function GET(request: NextRequest) {
       },
       body: JSON.stringify({
         action: 'getInbox',
-        secret: secret
+        secret: secret,
+        spreadsheetId: spreadsheetId  // Pass user's spreadsheet ID
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
     });
@@ -184,6 +190,10 @@ export async function DELETE(request: NextRequest) {
 
     console.log(`🗑️ Deleting entry at row ${rowNumber}...`);
 
+    // Get user's spreadsheet ID (or default)
+    const spreadsheetId = await getSpreadsheetId(request);
+    console.log('📊 Using spreadsheet:', spreadsheetId);
+
     // Call Apps Script to delete the row
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
@@ -196,7 +206,8 @@ export async function DELETE(request: NextRequest) {
       body: JSON.stringify({
         action: 'deleteEntry',
         secret: secret,
-        rowNumber: rowNumber
+        rowNumber: rowNumber,
+        spreadsheetId: spreadsheetId  // Pass user's spreadsheet ID
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
     });

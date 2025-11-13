@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 /**
  * P&L Data API Route
@@ -80,6 +81,10 @@ async function pnlHandler(request: NextRequest) {
     console.log('📊 Fetching fresh P&L data from Google Sheets...');
     console.log('🔐 Using secret (first 10 chars):', secret?.substring(0, 10));
 
+    // Get user's spreadsheet ID (or default)
+    const spreadsheetId = await getSpreadsheetId(request);
+    console.log('📊 Using spreadsheet:', spreadsheetId);
+
     // Fetch data from Apps Script endpoint
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
@@ -91,7 +96,8 @@ async function pnlHandler(request: NextRequest) {
       },
       body: JSON.stringify({
         action: 'getPnL',
-        secret: secret
+        secret: secret,
+        spreadsheetId: spreadsheetId  // Pass user's spreadsheet ID
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
     });
