@@ -58,7 +58,10 @@ function buildAuth() {
     return new google.auth.JWT({
       email: creds.client_email,
       key: creds.private_key,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets.readonly',
+        'https://www.googleapis.com/auth/drive.readonly', // Required for Shared Drive access
+      ],
     });
   }
   if (!CLIENT_EMAIL || !PRIVATE_KEY) {
@@ -69,7 +72,10 @@ function buildAuth() {
   return new google.auth.JWT({
     email: CLIENT_EMAIL,
     key,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    scopes: [
+      'https://www.googleapis.com/auth/spreadsheets.readonly',
+      'https://www.googleapis.com/auth/drive.readonly', // Required for Shared Drive access
+    ],
   });
 }
 

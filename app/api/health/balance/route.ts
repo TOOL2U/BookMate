@@ -41,7 +41,10 @@ async function healthBalanceHandler(request: NextRequest) {
     const credentials = JSON.parse(credentialsJson);
     const auth = new google.auth.GoogleAuth({
       credentials,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets.readonly',
+        'https://www.googleapis.com/auth/drive.readonly', // Required for Shared Drive access
+      ],
     });
     
     // Get user's spreadsheet ID from authenticated request

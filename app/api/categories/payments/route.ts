@@ -73,7 +73,10 @@ async function getPaymentTypesHandler(request: NextRequest) {
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive.readonly', // Required for Shared Drive access
+      ],
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
@@ -140,7 +143,10 @@ async function updatePaymentTypesHandler(request: NextRequest) {
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      scopes: [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive.readonly', // Required for Shared Drive access
+      ],
     });
 
     const sheets = google.sheets({ version: 'v4', auth });

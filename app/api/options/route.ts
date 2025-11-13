@@ -145,7 +145,10 @@ export async function GET(request: NextRequest) {
         }
         const auth = new google.auth.GoogleAuth({
           credentials,
-          scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+          scopes: [
+            'https://www.googleapis.com/auth/spreadsheets.readonly',
+            'https://www.googleapis.com/auth/drive.readonly', // Required for Shared Drive access
+          ],
         });
         const sheets = google.sheets({ version: 'v4', auth });
         
