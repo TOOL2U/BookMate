@@ -81,7 +81,7 @@ export default function SettingsPage() {
   };
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.options });
+    queryClient.invalidateQueries({ queryKey: queryKeys.options() });
   };
 
   const fetchSyncStatus = async () => {
@@ -119,7 +119,7 @@ export default function SettingsPage() {
       }
 
       // Invalidate options query to refetch latest data
-      queryClient.invalidateQueries({ queryKey: queryKeys.options });
+      queryClient.invalidateQueries({ queryKey: queryKeys.options() });
 
       showToast(result.message, 'success');
       await fetchSyncStatus();

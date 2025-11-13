@@ -57,7 +57,7 @@ export default function PnLPage() {
 
   // Handle manual refresh - invalidate all P&L related queries
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.pnl });
+    queryClient.invalidateQueries({ queryKey: queryKeys.pnl() });
     queryClient.invalidateQueries({ queryKey: queryKeys.overheadCategories(period) });
     queryClient.invalidateQueries({ queryKey: queryKeys.propertyCategories(period) });
   };

@@ -2,28 +2,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { google } from 'googleapis';
-import { getUserSpreadsheetId } from '@/lib/middleware/auth';
+import { getSpreadsheetId } from '@/lib/middleware/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // In-memory cache for options data (5 minutes - options change infrequently)
+// Per-user cache to prevent data leakage between users
 interface OptionsCacheEntry {
   data: any;
   timestamp: number;
 }
-let optionsCache: OptionsCacheEntry | null = null;
+const optionsCache = new Map<string, OptionsCacheEntry>();
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
-function getCachedOptions(): any | null {
-  if (optionsCache && (Date.now() - optionsCache.timestamp) < CACHE_DURATION_MS) {
-    return optionsCache.data;
+function getCachedOptions(spreadsheetId: string): any | null {
+  const cached = optionsCache.get(spreadsheetId);
+  if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION_MS) {
+    return cached.data;
   }
   return null;
 }
 
-function setCachedOptions(data: any): void {
-  optionsCache = { data, timestamp: Date.now() };
+function setCachedOptions(spreadsheetId: string, data: any): void {
+  optionsCache.set(spreadsheetId, { data, timestamp: Date.now() });
 }
 
 /**
@@ -61,14 +63,27 @@ function setCachedOptions(data: any): void {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check cache first
-    const cached = getCachedOptions();
+    // Get user's spreadsheet ID first (for cache isolation)
+    // This route might be called before authentication, so handle gracefully
+    let spreadsheetId: string;
+    try {
+      spreadsheetId = await getSpreadsheetId(request);
+    } catch (error) {
+      // If no auth token, use a default key for unauthenticated requests
+      // These will get minimal data from config file only
+      spreadsheetId = 'unauthenticated';
+      console.log('[OPTIONS] No auth token, using config file only');
+    }
+    
+    // Check cache first (user-specific)
+    const cached = getCachedOptions(spreadsheetId);
     if (cached) {
-      console.log('✅ [OPTIONS] Returning cached data');
+      console.log(`✅ [OPTIONS] Returning cached data for ${spreadsheetId}`);
+      const cachedEntry = optionsCache.get(spreadsheetId)!;
       return new NextResponse(JSON.stringify({
         ...cached,
         cached: true,
-        cacheAge: Math.floor((Date.now() - optionsCache!.timestamp) / 1000)
+        cacheAge: Math.floor((Date.now() - cachedEntry.timestamp) / 1000)
       }), {
         status: 200,
         headers: {
@@ -134,10 +149,7 @@ export async function GET(request: NextRequest) {
         });
         const sheets = google.sheets({ version: 'v4', auth });
         
-        // Get user's spreadsheet ID from authenticated request
-        const spreadsheetId = await getUserSpreadsheetId(request);
-
-        console.log('[OPTIONS] Fetching all data from Google Sheets...');
+        console.log(`[OPTIONS] Fetching all data from Google Sheets for ${spreadsheetId}...`);
         
         // Add cache-busting timestamp to force fresh data from Google Sheets API
         // Google Sheets API caches responses for 5-10 minutes, this bypasses that cache
@@ -592,8 +604,8 @@ export async function GET(request: NextRequest) {
     console.log(`[OPTIONS] Plain: Properties=${properties.length}, Operations=${typeOfOperations.length}, Payments=${typeOfPayments.length}, Revenues=${(normalizedRevenues || []).length}`);
     console.log(`[OPTIONS] Rich: Properties=${propertiesRich.length}, Operations=${typeOfOperationsRich.length}, Payments=${typeOfPayments.length}, Revenues=${revenuesRich.length}`);
 
-    // Cache the response
-    setCachedOptions(response);
+    // Cache the response (user-specific)
+    setCachedOptions(spreadsheetId, response);
 
     return new NextResponse(JSON.stringify(response), {
       status: 200,

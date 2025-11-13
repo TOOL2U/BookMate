@@ -74,7 +74,7 @@ export default function DashboardPage() {
 
   // Handle manual refresh
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
   };
 
   // Balance data is already in correct format

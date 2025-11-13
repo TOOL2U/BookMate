@@ -84,8 +84,8 @@ function BalanceAnalyticsPage() {
   }, [balanceData]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.balances });
-    queryClient.invalidateQueries({ queryKey: queryKeys.options });
+    queryClient.invalidateQueries({ queryKey: queryKeys.balances() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.options() });
   };
 
   // Map balance data to component format

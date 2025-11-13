@@ -15,21 +15,31 @@ import {
   type OptionsData,
 } from '@/lib/api';
 
+/**
+ * Get current user ID from localStorage for cache isolation
+ * Each user gets their own React Query cache namespace
+ */
+function getUserId(): string {
+  if (typeof window === 'undefined') return 'server';
+  return localStorage.getItem('userId') || 'anonymous';
+}
+
 // Query Keys - centralized for cache management
+// IMPORTANT: All keys include userId for multi-tenant cache isolation
 export const queryKeys = {
-  pnl: ['pnl'] as const,
-  balances: ['balances'] as const,
-  overheadCategories: (period: 'month' | 'year') => ['overhead-categories', period] as const,
-  propertyCategories: (period: 'month' | 'year') => ['property-categories', period] as const,
-  transactions: ['transactions'] as const,
-  options: ['options'] as const,
-  dashboard: ['dashboard'] as const,
+  pnl: () => ['pnl', getUserId()] as const,
+  balances: () => ['balances', getUserId()] as const,
+  overheadCategories: (period: 'month' | 'year') => ['overhead-categories', period, getUserId()] as const,
+  propertyCategories: (period: 'month' | 'year') => ['property-categories', period, getUserId()] as const,
+  transactions: () => ['transactions', getUserId()] as const,
+  options: () => ['options', getUserId()] as const,
+  dashboard: () => ['dashboard', getUserId()] as const,
 };
 
 // P&L Hook
 export function usePnL() {
   return useQuery({
-    queryKey: queryKeys.pnl,
+    queryKey: queryKeys.pnl(),
     queryFn: fetchPnLData,
     staleTime: 60_000, // 1 minute
   });
@@ -38,7 +48,7 @@ export function usePnL() {
 // Balances Hook
 export function useBalances() {
   return useQuery({
-    queryKey: queryKeys.balances,
+    queryKey: queryKeys.balances(),
     queryFn: fetchBalances,
     staleTime: 60_000, // 1 minute
   });
@@ -65,7 +75,7 @@ export function usePropertyCategories(period: 'month' | 'year' = 'month') {
 // Transactions Hook
 export function useTransactions() {
   return useQuery({
-    queryKey: queryKeys.transactions,
+    queryKey: queryKeys.transactions(),
     queryFn: fetchTransactions,
     staleTime: 30_000, // 30 seconds (more dynamic data)
   });
@@ -74,7 +84,7 @@ export function useTransactions() {
 // Options Hook (Settings)
 export function useOptions() {
   return useQuery({
-    queryKey: queryKeys.options,
+    queryKey: queryKeys.options(),
     queryFn: fetchOptions,
     staleTime: 5 * 60_000, // 5 minutes (rarely changes)
   });
@@ -83,7 +93,7 @@ export function useOptions() {
 // Dashboard Hook - Parallel fetch all data
 export function useDashboard() {
   return useQuery({
-    queryKey: queryKeys.dashboard,
+    queryKey: queryKeys.dashboard(),
     queryFn: fetchDashboardData,
     staleTime: 60_000, // 1 minute
   });
