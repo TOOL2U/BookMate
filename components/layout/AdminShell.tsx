@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import LogoBM from '@/components/LogoBM';
@@ -27,20 +27,42 @@ interface NavItem {
   icon: typeof LayoutDashboard;
 }
 
-const navItems: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'P&L', href: '/pnl', icon: TrendingUp },
-  { name: 'Balances', href: '/balance', icon: Wallet },
-  { name: 'Reports', href: '/reports', icon: FileText },
-  { name: 'Activity', href: '/activity', icon: Inbox },
-  { name: 'Settings', href: '/settings', icon: Settings },
-  { name: 'Admin', href: '/admin', icon: Shield },
-];
-
 export default function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  // Fetch current user info
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          setUserEmail(data.user?.email || null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user info:', error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Base navigation items
+  const baseNavItems: NavItem[] = [
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'P&L', href: '/pnl', icon: TrendingUp },
+    { name: 'Balances', href: '/balance', icon: Wallet },
+    { name: 'Reports', href: '/reports', icon: FileText },
+    { name: 'Activity', href: '/activity', icon: Inbox },
+    { name: 'Settings', href: '/settings', icon: Settings },
+  ];
+
+  // Add Admin link only for admin@siamoon.com
+  const navItems: NavItem[] = userEmail === 'admin@siamoon.com'
+    ? [...baseNavItems, { name: 'Admin', href: '/admin/accounts/new', icon: Shield }]
+    : baseNavItems;
 
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');

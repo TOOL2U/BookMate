@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 interface PropertyPersonItem {
   name: string;
@@ -6,15 +7,44 @@ interface PropertyPersonItem {
   percentage: number;
 }
 
-async function fetchPropertyPersonData(period: string) {
-  const scriptUrl = process.env.SHEETS_WEBHOOK_URL;
-  const secret = process.env.SHEETS_WEBHOOK_SECRET;
+// In-memory cache for property/person data (5 minutes)
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
+interface CachedData {
+  data: any;
+  timestamp: number;
+  accountId: string; // Add account ID to cache
+}
+
+const cache = new Map<string, CachedData>();
+
+function getCachedData(accountId: string, period: string): any | null {
+  const cacheKey = `property-person-${accountId}-${period}`;
+  const cached = cache.get(cacheKey);
+  
+  if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION_MS) {
+    console.log(`✅ Returning cached property/person data for ${accountId} (${period}) - ${Date.now() - cached.timestamp}ms old`);
+    return cached.data;
+  }
+  
+  return null;
+}
+
+function setCachedData(accountId: string, period: string, data: any): void {
+  const cacheKey = `property-person-${accountId}-${period}`;
+  cache.set(cacheKey, {
+    data,
+    timestamp: Date.now(),
+    accountId
+  });
+}
+
+async function fetchPropertyPersonData(scriptUrl: string, secret: string, period: string, accountId: string) {
   if (!scriptUrl || !secret) {
     throw new Error('Google Apps Script configuration missing');
   }
 
-  console.log(`🔍 Fetching property/person data for period: ${period}`);
+  console.log(`🔍 Fetching property/person data for account ${accountId}, period: ${period}`);
   console.log(`📤 Sending to Apps Script:`, {
     action: 'getPropertyPersonDetails',
     period: period,
@@ -43,6 +73,20 @@ async function fetchPropertyPersonData(period: string) {
       console.log('📍 Following 302 redirect...');
       response = await fetch(location);
     }
+  }
+
+  // Handle rate limiting (429)
+  if (response.status === 429) {
+    console.warn('⚠️ Apps Script rate limit hit - using cached data if available');
+    const cached = getCachedData(accountId, period);
+    if (cached) {
+      return {
+        ...cached,
+        cached: true,
+        rateLimited: true
+      };
+    }
+    throw new Error('Rate limit exceeded and no cached data available');
   }
 
   if (!response.ok) {
@@ -79,11 +123,83 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const result = await fetchPropertyPersonData(period);
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
+    // Check if account has Apps Script URL configured
+    if (!account.scriptUrl || !account.scriptSecret) {
+      console.warn(`⚠️ Account ${account.accountId} missing Apps Script configuration`);
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'ACCOUNT_NOT_CONFIGURED',
+          message: 'Your account has been created but not fully configured yet. Please contact your administrator to complete the setup with your Google Sheet and Apps Script URL.',
+          data: []
+        },
+        { status: 503 } // Service Unavailable
+      );
+    }
+
+    // Check cache first (account-specific)
+    const cachedData = getCachedData(account.accountId, period);
+    if (cachedData) {
+      return NextResponse.json({
+        ...cachedData,
+        cached: true
+      });
+    }
+
+    // Fetch fresh data using account's Apps Script URL
+    const result = await fetchPropertyPersonData(
+      account.scriptUrl,
+      account.scriptSecret,
+      period,
+      account.accountId
+    );
+    
+    // Cache the result (account-specific)
+    setCachedData(account.accountId, period, result);
+    
     return NextResponse.json(result);
 
   } catch (error) {
     console.error('❌ Property/Person API Error:', error);
+
+    // Try to return cached data even if it's old
+    try {
+      const account = await getAccountFromSession();
+      const period = new URL(request.url).searchParams.get('period') || 'month';
+      const staleCache = cache.get(`property-person-${account.accountId}-${period}`);
+      
+      if (staleCache) {
+        console.log('⚠️ Returning stale cached data due to error');
+        return NextResponse.json({
+          ...staleCache.data,
+          cached: true,
+          stale: true,
+          warning: 'Using cached data due to API error'
+        });
+      }
+    } catch {
+      // Ignore errors getting account for fallback
+    }
 
     return NextResponse.json(
       {
@@ -112,7 +228,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await fetchPropertyPersonData(period);
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
+    // Fetch fresh data using account's Apps Script URL
+    const result = await fetchPropertyPersonData(
+      account.scriptUrl,
+      account.scriptSecret,
+      period,
+      account.accountId
+    );
+    
     return NextResponse.json(result);
 
   } catch (error) {

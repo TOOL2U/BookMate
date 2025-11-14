@@ -8,6 +8,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 // In-memory cache for balance data (60 seconds)
 interface BalanceCacheEntry {
@@ -39,7 +40,6 @@ function withTimeout<T>(p: Promise<T>, ms: number, label = 'timeout'): Promise<T
 }
 
 // read required env once
-const SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const SA_KEY_JSON = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 const CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
 const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
@@ -75,15 +75,36 @@ async function balanceHandler(req: Request) {
   const month = (url.searchParams.get('month') || 'ALL').toUpperCase();
   const skipCache = url.searchParams.has('t'); // Cache-busting: if ?t= param exists, skip cache
 
+  // Get account config for authenticated user
+  let account;
+  try {
+    account = await getAccountFromSession();
+  } catch (error) {
+    if (error instanceof NotAuthenticatedError) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    if (error instanceof NoAccountError) {
+      return NextResponse.json(
+        { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+        { status: 403 }
+      );
+    }
+    throw error;
+  }
+
   // Check cache first (unless cache-busting param is present)
+  const cacheKey = `${account.accountId}_${month}`;
   if (!skipCache) {
-    const cached = getCachedBalance(month);
+    const cached = getCachedBalance(cacheKey);
     if (cached) {
-      console.log(`✅ [Balance API] Returning cached data for month: ${month}`);
+      console.log(`✅ [Balance API] Returning cached data for ${account.companyName}, month: ${month}`);
       return NextResponse.json({
         ...cached,
         cached: true,
-        cacheAge: Math.floor((Date.now() - balanceCache.get(month)!.timestamp) / 1000)
+        cacheAge: Math.floor((Date.now() - balanceCache.get(cacheKey)!.timestamp) / 1000)
       }, {
         headers: {
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
@@ -91,7 +112,7 @@ async function balanceHandler(req: Request) {
       });
     }
   } else {
-    console.log(`🔄 [Balance API] Cache-busting enabled, fetching fresh data for month: ${month}`);
+    console.log(`🔄 [Balance API] Cache-busting enabled for ${account.companyName}, fetching fresh data for month: ${month}`);
   }
 
   const start = Date.now();
@@ -105,7 +126,7 @@ async function balanceHandler(req: Request) {
 
     const res = await withTimeout(
       sheets.spreadsheets.values.get({
-        spreadsheetId: SHEET_ID,
+        spreadsheetId: account.sheetId,
         range: RANGE,
         valueRenderOption: 'UNFORMATTED_VALUE',
         dateTimeRenderOption: 'FORMATTED_STRING',
@@ -175,8 +196,8 @@ async function balanceHandler(req: Request) {
       cached: false
     };
 
-    // Cache the response
-    setCachedBalance(month, responseData);
+    // Cache the response (with account-specific key)
+    setCachedBalance(cacheKey, responseData);
 
     return NextResponse.json(responseData, {
       headers: {

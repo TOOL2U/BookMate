@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
-// Cache for overhead expenses data (60 seconds TTL)
-let cache: {
-  [key: string]: {
-    data: any;
-    timestamp: number;
-  };
-} | null = null;
-
+// Cache for overhead expenses data (60 seconds TTL) - account-specific
+const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION_MS = 60000; // 60 seconds
 
 export async function GET(request: NextRequest) {
@@ -22,36 +17,54 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Check cache first
-  const cacheKey = `overhead-${period}`;
+  // Get account config for authenticated user
+  let account;
+  try {
+    account = await getAccountFromSession();
+  } catch (error) {
+    if (error instanceof NotAuthenticatedError) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    if (error instanceof NoAccountError) {
+      return NextResponse.json(
+        { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+        { status: 403 }
+      );
+    }
+    throw error;
+  }
+
+  // Check if account has Apps Script URL configured
+  if (!account.scriptUrl || !account.scriptSecret) {
+    console.warn(`⚠️ Account ${account.accountId} missing Apps Script configuration`);
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'ACCOUNT_NOT_CONFIGURED',
+        message: 'Your account has been created but not fully configured yet. Please contact your administrator to complete the setup with your Google Sheet and Apps Script URL.',
+        data: [],
+        period,
+        totalExpense: 0
+      },
+      { status: 503 } // Service Unavailable
+    );
+  }
+
+  // Check cache first (account-specific)
+  const cacheKey = `overhead-${account.accountId}-${period}`;
   const now = Date.now();
+  const cached = cache.get(cacheKey);
   
-  if (cache && cache[cacheKey] && (now - cache[cacheKey].timestamp) < CACHE_DURATION_MS) {
+  if (cached && (now - cached.timestamp) < CACHE_DURATION_MS) {
     console.log(`✅ Returning cached overhead expenses (${period}) - ${Date.now() - startTime}ms`);
     return NextResponse.json({
-      ...cache[cacheKey].data,
+      ...cached.data,
       cached: true,
-      cacheAge: Math.floor((now - cache[cacheKey].timestamp) / 1000)
+      cacheAge: Math.floor((now - cached.timestamp) / 1000)
     });
-  }
-
-  const scriptUrl = process.env.SHEETS_WEBHOOK_URL;
-  const secret = process.env.SHEETS_WEBHOOK_SECRET;
-
-  if (!scriptUrl) {
-    console.error('❌ SHEETS_WEBHOOK_URL is not defined in environment variables');
-    return NextResponse.json(
-      { ok: false, error: 'Apps Script URL not configured. Please set SHEETS_WEBHOOK_URL in environment variables.' },
-      { status: 500 }
-    );
-  }
-
-  if (!secret) {
-    console.error('❌ SHEETS_WEBHOOK_SECRET is not defined in environment variables');
-    return NextResponse.json(
-      { ok: false, error: 'Webhook secret not configured. Please set SHEETS_WEBHOOK_SECRET in environment variables.' },
-      { status: 500 }
-    );
   }
 
   try {
@@ -60,14 +73,14 @@ export async function GET(request: NextRequest) {
     
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
     // because fetch() converts POST to GET when following redirects, losing the body
-    let response = await fetch(scriptUrl, {
+    let response = await fetch(account.scriptUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         action: 'getOverheadExpensesDetails',
-        secret: secret,
+        secret: account.scriptSecret,
         period,
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
@@ -91,27 +104,24 @@ export async function GET(request: NextRequest) {
     const fetchTime = Date.now() - fetchStart;
     console.log(`⏱️ Overhead expenses (${period}) fetch took ${fetchTime}ms`);
 
-    // Update cache
-    if (!cache) cache = {};
-    cache[cacheKey] = {
-      data: {
-        ok: true,
-        data: data.data || [],
-        period,
-        totalExpense: data.totalExpense || 0,
-        timestamp: new Date().toISOString(),
-      },
-      timestamp: now
-    };
-
-    console.log(`✅ Overhead expenses (${period}) loaded in ${Date.now() - startTime}ms`);
-
-    return NextResponse.json({
+    // Update cache (account-specific)
+    const responseData = {
       ok: true,
       data: data.data || [],
       period,
       totalExpense: data.totalExpense || 0,
       timestamp: new Date().toISOString(),
+    };
+    
+    cache.set(cacheKey, {
+      data: responseData,
+      timestamp: now
+    });
+
+    console.log(`✅ Overhead expenses (${period}) loaded in ${Date.now() - startTime}ms`);
+
+    return NextResponse.json({
+      ...responseData,
       cached: false,
       fetchTime: fetchTime
     });
@@ -139,35 +149,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const scriptUrl = process.env.SHEETS_WEBHOOK_URL;
-    const secret = process.env.SHEETS_WEBHOOK_SECRET;
-
-    if (!scriptUrl) {
-      console.error('❌ SHEETS_WEBHOOK_URL is not defined in environment variables');
-      return NextResponse.json(
-        { ok: false, error: 'Apps Script URL not configured. Please set SHEETS_WEBHOOK_URL in environment variables.' },
-        { status: 500 }
-      );
-    }
-
-    if (!secret) {
-      console.error('❌ SHEETS_WEBHOOK_SECRET is not defined in environment variables');
-      return NextResponse.json(
-        { ok: false, error: 'Webhook secret not configured. Please set SHEETS_WEBHOOK_SECRET in environment variables.' },
-        { status: 500 }
-      );
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
     }
 
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
     // because fetch() converts POST to GET when following redirects, losing the body
-    let response = await fetch(scriptUrl, {
+    let response = await fetch(account.scriptUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         action: 'getOverheadExpensesDetails',
-        secret: secret,
+        secret: account.scriptSecret,
         period,
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow

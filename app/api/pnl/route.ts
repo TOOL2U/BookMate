@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 /**
  * P&L Data API Route
@@ -39,7 +40,28 @@ const CACHE_DURATION_MS = 60 * 1000; // 60 seconds
  */
 async function pnlHandler(request: NextRequest) {
   try {
-    // Check cache first
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
+    // Check cache first (using account-specific cache key)
+    const cacheKey = `pnl_${account.accountId}`;
     const now = Date.now();
     if (cache && (now - cache.timestamp) < CACHE_DURATION_MS) {
       console.log('✅ Returning cached P&L data');
@@ -51,47 +73,22 @@ async function pnlHandler(request: NextRequest) {
       });
     }
 
-    // Validate environment variables
-    const pnlUrl = process.env.SHEETS_PNL_URL;
-    const secret = process.env.SHEETS_WEBHOOK_SECRET;
-
-    if (!pnlUrl) {
-      console.error('❌ SHEETS_PNL_URL not configured');
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'P&L endpoint not configured. Please set SHEETS_PNL_URL in environment variables.' 
-        },
-        { status: 500 }
-      );
-    }
-
-    if (!secret) {
-      console.error('❌ SHEETS_WEBHOOK_SECRET not configured');
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'Authentication secret not configured.' 
-        },
-        { status: 500 }
-      );
-    }
-
     console.log('📊 Fetching fresh P&L data from Google Sheets...');
-    console.log('🔐 Using secret (first 10 chars):', secret?.substring(0, 10));
+    console.log(`🏢 Company: ${account.companyName}`);
+    console.log('🔐 Using account-specific script URL');
 
-    // Fetch data from Apps Script endpoint
+    // Fetch data from account's Apps Script endpoint
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
     // because fetch() converts POST to GET when following redirects, losing the body
-    let response = await fetch(pnlUrl, {
+    let response = await fetch(account.scriptUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
       },
       body: JSON.stringify({
         action: 'getPnL',
-        secret: secret
+        secret: account.scriptSecret
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
     });
@@ -115,6 +112,36 @@ async function pnlHandler(request: NextRequest) {
           error: `Failed to fetch P&L data: ${response.statusText}`
         },
         { status: response.status }
+      );
+    }
+
+    // Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const responseText = await response.text();
+      console.error('❌ Apps Script returned non-JSON response (likely HTML error page)');
+      console.error('Response preview:', responseText.substring(0, 200));
+      
+      // Check if it's an HTML error page
+      if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: 'Apps Script not properly deployed',
+            message: 'The Apps Script URL is returning an HTML page instead of data. Please ensure the script is deployed as a Web App with "Anyone" access.',
+            appsScriptUrl: account.appsScriptUrl
+          },
+          { status: 500 }
+        );
+      }
+      
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Invalid response from Apps Script',
+          message: 'Expected JSON but received: ' + contentType
+        },
+        { status: 500 }
       );
     }
 

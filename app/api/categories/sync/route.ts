@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { google } from 'googleapis';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 /**
  * POST /api/categories/sync
@@ -13,6 +14,26 @@ import { google } from 'googleapis';
 export async function POST(request: NextRequest) {
   try {
     console.log('[SYNC] Starting category sync to Google Sheets...');
+
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
 
     // Read current config
     const configPath = path.join(process.cwd(), 'config', 'live-dropdowns.json');
@@ -42,14 +63,17 @@ export async function POST(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-
+    
+    // Use account-specific sheet ID
+    const spreadsheetId = account.sheetId;
     if (!spreadsheetId) {
       return NextResponse.json(
-        { ok: false, error: 'GOOGLE_SHEET_ID not configured in environment' },
+        { ok: false, error: `Account ${account.accountId} missing Google Sheet ID` },
         { status: 500 }
       );
     }
+
+    console.log(`[SYNC] Syncing to Google Sheet for account: ${account.accountId}`);
 
     // Get the ranges from config
     const ranges = config.ranges || {};

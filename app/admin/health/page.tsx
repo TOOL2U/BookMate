@@ -90,8 +90,8 @@ export default function AdminHealthPage() {
       <AdminShell>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <Zap className="w-12 h-12 mx-auto mb-4 text-yellow animate-pulse" />
-            <p className="font-aileron text-text-secondary">Loading health metrics...</p>
+            <Zap className="w-12 h-12 mx-auto mb-4 text-blue-500 animate-pulse" />
+            <p className="text-gray-600">Loading health metrics...</p>
           </div>
         </div>
       </AdminShell>
@@ -102,8 +102,8 @@ export default function AdminHealthPage() {
     return (
       <AdminShell>
         <div className="p-6">
-          <div className="bg-error/10 border border-error/30 rounded-lg p-4">
-            <p className="font-aileron text-error">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-800">{error}</p>
           </div>
         </div>
       </AdminShell>
@@ -121,14 +121,14 @@ export default function AdminHealthPage() {
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-madeMirage text-4xl text-text-primary tracking-tight">System Health</h1>
-            <p className="font-aileron text-sm text-text-secondary mt-1">
+            <h1 className="text-2xl font-bold text-gray-900">System Health</h1>
+            <p className="text-sm text-gray-500 mt-1">
               Phase 2 telemetry and monitoring
             </p>
           </div>
           <button
             onClick={fetchHealth}
-            className="font-aileron px-4 py-2 bg-yellow text-black rounded-lg hover:opacity-90 transition-all shadow-glow hover:shadow-glow-lg font-medium"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Refresh
           </button>
@@ -136,118 +136,118 @@ export default function AdminHealthPage() {
 
         {/* System Info */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-bg-card border border-border-card rounded-lg p-4">
+          <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-aileron text-sm text-text-secondary">Uptime</p>
-                <p className="font-madeMirage text-3xl text-yellow">
+                <p className="text-sm text-gray-500">Uptime</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {data && formatUptime(data.system.uptime)}
                 </p>
               </div>
-              <Clock className="w-8 h-8 text-accent" />
+              <Clock className="w-8 h-8 text-blue-500" />
             </div>
           </div>
 
-          <div className="bg-bg-card border border-border-card rounded-lg p-4">
+          <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-aileron text-sm text-text-secondary">Node Version</p>
-                <p className="font-madeMirage text-3xl text-yellow">
+                <p className="text-sm text-gray-500">Node Version</p>
+                <p className="text-2xl font-bold text-gray-900">
                   {data?.system.nodeVersion}
                 </p>
               </div>
-              <Zap className="w-8 h-8 text-success" />
+              <Zap className="w-8 h-8 text-green-500" />
             </div>
           </div>
 
-          <div className="bg-bg-card border border-border-card rounded-lg p-4">
+          <div className="bg-white rounded-lg shadow p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-aileron text-sm text-text-secondary">Platform</p>
-                <p className="font-madeMirage text-3xl text-yellow capitalize">
+                <p className="text-sm text-gray-500">Platform</p>
+                <p className="text-2xl font-bold text-gray-900 capitalize">
                   {data?.system.platform}
                 </p>
               </div>
-              <Activity className="w-8 h-8 text-info" />
+              <Activity className="w-8 h-8 text-purple-500" />
             </div>
           </div>
         </div>
 
         {/* AI Check Metrics */}
-        <div className="bg-bg-card border border-border-card rounded-lg p-6">
-          <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-4">AI Consistency Checks</h2>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">AI Consistency Checks</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Last 24h</p>
-              <p className="font-madeMirage text-4xl text-yellow">
+              <p className="text-sm text-gray-500">Last 24h</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {data?.metrics.aiCheck.last24h.count || 0}
               </p>
-              <p className="font-aileron text-xs text-text-secondary">checks</p>
+              <p className="text-xs text-gray-500">checks</p>
             </div>
 
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Avg Latency</p>
-              <p className="font-madeMirage text-4xl text-yellow">
+              <p className="text-sm text-gray-500">Avg Latency</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {data?.metrics.aiCheck.last24h.avgLatency.toFixed(0) || 0}
                 <span className="text-sm">ms</span>
               </p>
             </div>
 
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Last Status</p>
-              <p className={`font-madeMirage text-4xl ${
-                data?.metrics.aiCheck.last24h.lastStatus === 'OK' ? 'text-success' :
-                data?.metrics.aiCheck.last24h.lastStatus === 'WARN' ? 'text-warning' :
-                'text-error'
+              <p className="text-sm text-gray-500">Last Status</p>
+              <p className={`text-3xl font-bold ${
+                data?.metrics.aiCheck.last24h.lastStatus === 'OK' ? 'text-green-600' :
+                data?.metrics.aiCheck.last24h.lastStatus === 'WARN' ? 'text-yellow-600' :
+                'text-red-600'
               }`}>
                 {data?.metrics.aiCheck.last24h.lastStatus || 'N/A'}
               </p>
             </div>
 
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Last 7d</p>
-              <p className="font-madeMirage text-4xl text-yellow">
+              <p className="text-sm text-gray-500">Last 7d</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {data?.metrics.aiCheck.last7d.count || 0}
               </p>
-              <p className="font-aileron text-xs text-text-secondary">checks</p>
+              <p className="text-xs text-gray-500">checks</p>
             </div>
           </div>
 
-          <div className="border-t border-border-card pt-4">
-            <p className="font-bebasNeue text-sm text-text-primary uppercase tracking-wide mb-2">Status Breakdown (24h)</p>
+          <div className="border-t pt-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">Status Breakdown (24h)</p>
             <div className="flex gap-4">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-success" />
-                <span className="font-aileron text-sm text-text-primary">OK: {data?.metrics.aiCheck.statusBreakdown.ok || 0}</span>
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-sm">OK: {data?.metrics.aiCheck.statusBreakdown.ok || 0}</span>
               </div>
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-warning" />
-                <span className="font-aileron text-sm text-text-primary">WARN: {data?.metrics.aiCheck.statusBreakdown.warn || 0}</span>
+                <AlertCircle className="w-4 h-4 text-yellow-600" />
+                <span className="text-sm">WARN: {data?.metrics.aiCheck.statusBreakdown.warn || 0}</span>
               </div>
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-error" />
-                <span className="font-aileron text-sm text-text-primary">FAIL: {data?.metrics.aiCheck.statusBreakdown.fail || 0}</span>
+                <AlertCircle className="w-4 h-4 text-red-600" />
+                <span className="text-sm">FAIL: {data?.metrics.aiCheck.statusBreakdown.fail || 0}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Activity Log Metrics */}
-        <div className="bg-bg-card border border-border-card rounded-lg p-6">
-          <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-4">Activity Log</h2>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Activity Log</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Requests (24h)</p>
-              <p className="font-madeMirage text-4xl text-yellow">
+              <p className="text-sm text-gray-500">Requests (24h)</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {data?.metrics.activityLog.last24h.requests || 0}
               </p>
             </div>
 
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Avg Response Time</p>
-              <p className="font-madeMirage text-4xl text-yellow">
+              <p className="text-sm text-gray-500">Avg Response Time</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {data?.metrics.activityLog.last24h.avgLatency.toFixed(0) || 0}
                 <span className="text-sm">ms</span>
               </p>
@@ -256,41 +256,41 @@ export default function AdminHealthPage() {
         </div>
 
         {/* Alerts */}
-        <div className="bg-bg-card border border-border-card rounded-lg p-6">
-          <h2 className="font-bebasNeue text-2xl text-text-primary uppercase tracking-wide mb-4">Alerts</h2>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Alerts</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Sent (24h)</p>
-              <p className="font-madeMirage text-4xl text-yellow">
+              <p className="text-sm text-gray-500">Sent (24h)</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {data?.metrics.alerts.last24h.sent || 0}
               </p>
             </div>
 
             <div className="text-center">
-              <p className="font-aileron text-sm text-text-secondary">Sent (7d)</p>
-              <p className="font-madeMirage text-4xl text-yellow">
+              <p className="text-sm text-gray-500">Sent (7d)</p>
+              <p className="text-3xl font-bold text-gray-900">
                 {data?.metrics.alerts.last7d.sent || 0}
               </p>
             </div>
           </div>
 
           {data?.recentAlerts && data.recentAlerts.length > 0 && (
-            <div className="border-t border-border-card pt-4">
-              <p className="font-bebasNeue text-sm text-text-primary uppercase tracking-wide mb-2">Recent Alerts</p>
+            <div className="border-t pt-4">
+              <p className="text-sm font-medium text-gray-700 mb-2">Recent Alerts</p>
               <div className="space-y-2">
                 {data.recentAlerts.map((alert, idx) => (
-                  <div key={idx} className="font-aileron flex items-center justify-between text-sm p-2 bg-bg-app/40 rounded border border-border-card">
+                  <div key={idx} className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded">
                     <div className="flex items-center gap-2">
                       <AlertCircle className={`w-4 h-4 ${
-                        alert.severity === 'critical' ? 'text-error' :
-                        alert.severity === 'warning' ? 'text-warning' :
-                        'text-info'
+                        alert.severity === 'critical' ? 'text-red-600' :
+                        alert.severity === 'warning' ? 'text-yellow-600' :
+                        'text-blue-600'
                       }`} />
-                      <span className="font-medium text-text-primary">{alert.type}</span>
-                      {alert.account && <span className="text-text-secondary">({alert.account})</span>}
+                      <span className="font-medium">{alert.type}</span>
+                      {alert.account && <span className="text-gray-500">({alert.account})</span>}
                     </div>
-                    <span className="text-xs text-text-tertiary">
+                    <span className="text-xs text-gray-500">
                       {new Date(alert.timestamp).toLocaleString()}
                     </span>
                   </div>

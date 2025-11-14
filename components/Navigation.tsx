@@ -4,29 +4,51 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Upload, Inbox, BarChart3, Settings, Sparkles, Wallet } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LogoBM from './LogoBM';
 
 export default function Navigation() {
   const pathname = usePathname();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const { scrollY } = useScroll();
 
   // Navbar background opacity increases on scroll
   const navBlur = useTransform(scrollY, [0, 100], [12, 20]);
+
+  // Fetch current user info
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          setUserEmail(data.user?.email || null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user info:', error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
   };
 
-  const navItems = [
+  // Base navigation items
+  const baseNavItems = [
     { href: '/upload', label: 'Upload', icon: Upload },
     { href: '/inbox', label: 'Activity', icon: Inbox },
     { href: '/pnl', label: 'P&L', icon: BarChart3 },
     { href: '/balance', label: 'Balance', icon: Wallet },
-    { href: '/admin', label: 'Admin', icon: Settings },
   ];
+
+  // Add Admin button only for admin@siamoon.com
+  const navItems = userEmail === 'admin@siamoon.com'
+    ? [...baseNavItems, { href: '/admin/accounts/new', label: 'Admin', icon: Settings }]
+    : baseNavItems;
 
   return (
     <motion.nav

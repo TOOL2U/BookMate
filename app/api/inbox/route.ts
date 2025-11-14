@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 // Cache for inbox data (30 seconds TTL - balance between freshness and performance)
 let cache: {
@@ -23,10 +24,31 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
   
   try {
-    // Check cache first
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
+    // Check cache first (account-specific)
+    const cacheKey = `inbox_${account.accountId}`;
     const now = Date.now();
     if (cache && (now - cache.timestamp) < CACHE_DURATION_MS) {
-      console.log(`✅ Returning cached inbox data (${Date.now() - startTime}ms)`);
+      console.log(`✅ Returning cached inbox data for ${account.companyName} (${Date.now() - startTime}ms)`);
       return NextResponse.json({
         ok: true,
         data: cache.data,
@@ -35,48 +57,22 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Validate environment variables
-    const webhookUrl = process.env.SHEETS_WEBHOOK_URL;
-    const secret = process.env.SHEETS_WEBHOOK_SECRET;
-
-    if (!webhookUrl) {
-      console.error('❌ SHEETS_WEBHOOK_URL not configured');
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'Webhook endpoint not configured. Please set SHEETS_WEBHOOK_URL in environment variables.' 
-        },
-        { status: 500 }
-      );
-    }
-
-    if (!secret) {
-      console.error('❌ SHEETS_WEBHOOK_SECRET not configured');
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'Authentication secret not configured.' 
-        },
-        { status: 500 }
-      );
-    }
-
-    console.log('📥 Fetching fresh inbox data from Google Sheets...');
+    console.log(`📥 Fetching fresh inbox data for ${account.companyName}...`);
 
     const fetchStart = Date.now();
     
-    // Fetch data from Apps Script endpoint
+    // Fetch data from account's Apps Script endpoint
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
     // because fetch() converts POST to GET when following redirects, losing the body
-    let response = await fetch(webhookUrl, {
+    let response = await fetch(account.scriptUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
       },
       body: JSON.stringify({
         action: 'getInbox',
-        secret: secret
+        secret: account.scriptSecret
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
     });
@@ -100,6 +96,36 @@ export async function GET(request: NextRequest) {
           error: `Failed to fetch inbox data: ${response.statusText}`
         },
         { status: response.status }
+      );
+    }
+
+    // Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const responseText = await response.text();
+      console.error('❌ Apps Script returned non-JSON response (likely HTML error page)');
+      console.error('Response preview:', responseText.substring(0, 200));
+      
+      // Check if it's an HTML error page
+      if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: 'Apps Script not properly deployed',
+            message: 'The Apps Script URL is returning an HTML page instead of data. Please ensure the script is deployed as a Web App with "Anyone" access.',
+            appsScriptUrl: account.appsScriptUrl
+          },
+          { status: 500 }
+        );
+      }
+      
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Invalid response from Apps Script',
+          message: 'Expected JSON but received: ' + contentType
+        },
+        { status: 500 }
       );
     }
 
@@ -167,35 +193,40 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Validate environment variables
-    const webhookUrl = process.env.SHEETS_WEBHOOK_URL;
-    const secret = process.env.SHEETS_WEBHOOK_SECRET;
-
-    if (!webhookUrl || !secret) {
-      console.error('❌ Webhook not configured');
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: 'Webhook not configured' 
-        },
-        { status: 500 }
-      );
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
     }
 
-    console.log(`🗑️ Deleting entry at row ${rowNumber}...`);
+    console.log(`🗑️ Deleting entry at row ${rowNumber} for ${account.companyName}...`);
 
     // Call Apps Script to delete the row
     // IMPORTANT: Use text/plain to avoid CORS preflight redirect (Google Apps Script requirement)
     // Apps Script returns HTTP 302 redirects - we must NOT follow them automatically
     // because fetch() converts POST to GET when following redirects, losing the body
-    let response = await fetch(webhookUrl, {
+    let response = await fetch(account.scriptUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
       },
       body: JSON.stringify({
         action: 'deleteEntry',
-        secret: secret,
+        secret: account.scriptSecret,
         rowNumber: rowNumber
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow

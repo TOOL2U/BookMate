@@ -2,27 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { google } from 'googleapis';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // In-memory cache for options data (5 minutes - options change infrequently)
+// Cache is now account-specific
 interface OptionsCacheEntry {
   data: any;
   timestamp: number;
+  accountId: string;
 }
-let optionsCache: OptionsCacheEntry | null = null;
+const optionsCache = new Map<string, OptionsCacheEntry>();
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
-function getCachedOptions(): any | null {
-  if (optionsCache && (Date.now() - optionsCache.timestamp) < CACHE_DURATION_MS) {
-    return optionsCache.data;
+function getCachedOptions(accountId: string): any | null {
+  const cached = optionsCache.get(accountId);
+  if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION_MS) {
+    return cached.data;
   }
   return null;
 }
 
-function setCachedOptions(data: any): void {
-  optionsCache = { data, timestamp: Date.now() };
+function setCachedOptions(accountId: string, data: any): void {
+  optionsCache.set(accountId, { data, timestamp: Date.now(), accountId });
 }
 
 /**
@@ -60,14 +64,35 @@ function setCachedOptions(data: any): void {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check cache first
-    const cached = getCachedOptions();
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
+    // Check cache first (account-specific)
+    const cached = getCachedOptions(account.accountId);
     if (cached) {
-      console.log('✅ [OPTIONS] Returning cached data');
+      console.log(`✅ [OPTIONS] Returning cached data for account ${account.accountId}`);
+      const cacheEntry = optionsCache.get(account.accountId);
       return new NextResponse(JSON.stringify({
         ...cached,
         cached: true,
-        cacheAge: Math.floor((Date.now() - optionsCache!.timestamp) / 1000)
+        cacheAge: cacheEntry ? Math.floor((Date.now() - cacheEntry.timestamp) / 1000) : 0
       }), {
         status: 200,
         headers: {
@@ -132,13 +157,15 @@ export async function GET(request: NextRequest) {
           scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
         });
         const sheets = google.sheets({ version: 'v4', auth });
-        const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+        
+        // Use account-specific sheet ID
+        const spreadsheetId = account.sheetId;
         if (!spreadsheetId) {
-          console.error('[OPTIONS] Missing GOOGLE_SHEET_ID env');
-          throw new Error('Missing GOOGLE_SHEET_ID');
+          console.error(`[OPTIONS] Account ${account.accountId} missing sheetId`);
+          throw new Error('Account missing Google Sheet ID');
         }
 
-        console.log('[OPTIONS] Fetching all data from Google Sheets...');
+        console.log(`[OPTIONS] Fetching all data from Google Sheets for account ${account.accountId}...`);
         
         // Add cache-busting timestamp to force fresh data from Google Sheets API
         // Google Sheets API caches responses for 5-10 minutes, this bypasses that cache
@@ -593,8 +620,8 @@ export async function GET(request: NextRequest) {
     console.log(`[OPTIONS] Plain: Properties=${properties.length}, Operations=${typeOfOperations.length}, Payments=${typeOfPayments.length}, Revenues=${(normalizedRevenues || []).length}`);
     console.log(`[OPTIONS] Rich: Properties=${propertiesRich.length}, Operations=${typeOfOperationsRich.length}, Payments=${typeOfPayments.length}, Revenues=${revenuesRich.length}`);
 
-    // Cache the response
-    setCachedOptions(response);
+    // Cache the response (account-specific)
+    setCachedOptions(account.accountId, response);
 
     return new NextResponse(JSON.stringify(response), {
       status: 200,

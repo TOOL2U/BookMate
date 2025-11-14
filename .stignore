@@ -1,0 +1,25 @@
+# --- Syncthing ignore file ---
+# You can keep or remove the comment section above.
+# Below are the actual patterns that make sync faster.
+
+# Ignore Markdown files (these are slowing sync)
+*.md
+
+# Ignore build and dependency folders
+node_modules
+.next
+dist
+build
+
+# Ignore hidden/system files
+.DS_Store
+.git
+.gitignore
+
+# Ignore VS Code workspace cache
+.vscode
+.history
+*.code-workspace
+
+# Ignore logs
+*.log

@@ -57,6 +57,9 @@ config/google-credentials.json
 service-account*.json
 gcloud-*.json
 
+# Google OAuth Client Secrets (never commit these!)
+client_secret_*.json
+
 # Private keys and secrets
 *PRIVATE_KEY*.txt
 *SECRET*.txt

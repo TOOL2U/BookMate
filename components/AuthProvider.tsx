@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import LogoBM from '@/components/LogoBM';
+import { AccountProvider } from '@/lib/context/AccountContext';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -44,8 +45,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     );
   }
 
-  // If authenticated or on login page, show content
-  if (isAuthenticated || pathname === '/login') {
+  // If authenticated, wrap with AccountProvider
+  if (isAuthenticated) {
+    return (
+      <AccountProvider>
+        {children}
+      </AccountProvider>
+    );
+  }
+
+  // If on login page, show content without AccountProvider
+  if (pathname === '/login') {
     return <>{children}</>;
   }
 

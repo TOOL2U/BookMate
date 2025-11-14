@@ -6,7 +6,7 @@
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const ACCESS_TOKEN_EXPIRY = '15m'; // 15 minutes
+const ACCESS_TOKEN_EXPIRY = '24h'; // 24 hours (extended for development)
 const REFRESH_TOKEN_EXPIRY = '7d'; // 7 days
 
 export interface TokenPayload {

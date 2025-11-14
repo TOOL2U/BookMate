@@ -4,42 +4,66 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifySession } from '@/lib/auth/service';
+import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get token from Authorization header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Try to get session token from cookies first
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('session')?.value;
+
+    // If no cookie, try Authorization header (for API clients)
+    let token = sessionToken;
+    if (!token) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+
+    if (!token) {
       return NextResponse.json(
-        { error: 'No authorization token provided' },
+        { error: 'Not authenticated' },
         { status: 401 }
       );
     }
 
-    const accessToken = authHeader.substring(7);
-    
-    // Verify session and get user
-    const user = await verifySession(accessToken);
-    
-    if (!user) {
+    // Verify JWT token
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('JWT_SECRET not configured');
       return NextResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 401 }
+        { error: 'Server configuration error' },
+        { status: 500 }
       );
     }
+
+    const decoded = jwt.verify(token, secret) as {
+      userId: string;
+      email: string;
+      role: string;
+    };
 
     return NextResponse.json({
+      ok: true,
       success: true,
-      user,
+      user: {
+        userId: decoded.userId,
+        email: decoded.email,
+        role: decoded.role,
+      },
     });
     
-  } catch (error) {
-    console.error('Get user error:', error);
+  } catch (error: any) {
+    // Don't log 401s - they're expected when not logged in
+    if (error.name !== 'TokenExpiredError' && error.name !== 'JsonWebTokenError') {
+      console.error('Get user error:', error);
+    }
     
     return NextResponse.json(
-      { error: 'Failed to get user profile' },
-      { status: 500 }
+      { error: 'Not authenticated' },
+      { status: 401 }
     );
   }
 }
