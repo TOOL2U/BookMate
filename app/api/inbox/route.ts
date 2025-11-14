@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 // Cache for inbox data (30 seconds TTL - balance between freshness and performance)
 let cache: {
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(
@@ -196,7 +196,7 @@ export async function DELETE(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(

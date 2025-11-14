@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 // Cache for overhead expenses data (60 seconds TTL) - account-specific
 const cache = new Map<string, { data: any; timestamp: number }>();
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   // Get account config for authenticated user
   let account;
   try {
-    account = await getAccountFromSession();
+    account = await getAccountFromRequest(request);
   } catch (error) {
     if (error instanceof NotAuthenticatedError) {
       return NextResponse.json(
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(

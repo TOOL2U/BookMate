@@ -3,12 +3,12 @@ export const runtime = 'nodejs';            // ensure Node (googleapis works bes
 export const dynamic = 'force-dynamic';     // do not try to cache at build
 export const maxDuration = 60;              // ask Vercel for max allowed (Pro plans give more than 30s)
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 // In-memory cache for balance data (60 seconds)
 interface BalanceCacheEntry {
@@ -70,7 +70,7 @@ function buildAuth() {
   });
 }
 
-async function balanceHandler(req: Request) {
+async function balanceHandler(req: NextRequest) {
   const url = new URL(req.url);
   const month = (url.searchParams.get('month') || 'ALL').toUpperCase();
   const skipCache = url.searchParams.has('t'); // Cache-busting: if ?t= param exists, skip cache
@@ -78,7 +78,7 @@ async function balanceHandler(req: Request) {
   // Get account config for authenticated user
   let account;
   try {
-    account = await getAccountFromSession();
+    account = await getAccountFromRequest(req);
   } catch (error) {
     if (error instanceof NotAuthenticatedError) {
       return NextResponse.json(

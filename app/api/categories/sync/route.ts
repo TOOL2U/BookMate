@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { google } from 'googleapis';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 /**
  * POST /api/categories/sync
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(

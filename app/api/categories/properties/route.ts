@@ -15,7 +15,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 // ============================================================================
 // CONSTANTS
@@ -73,7 +73,7 @@ async function getHandler(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(
@@ -160,7 +160,7 @@ async function postHandler(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(

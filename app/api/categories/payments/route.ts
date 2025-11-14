@@ -15,7 +15,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 // ============================================================================
 // CONSTANTS
@@ -71,7 +71,7 @@ async function getPaymentTypesHandler(request: NextRequest) {
     console.log('[PAYMENTS] Fetching payment types from Google Sheets...');
 
     // Get account-specific configuration
-    const account = await getAccountFromSession();
+    const account = await getAccountFromRequest(request);
     if (!account) {
       return NextResponse.json(
         { ok: false, error: 'Not authenticated' },
@@ -151,7 +151,7 @@ async function updatePaymentTypesHandler(request: NextRequest) {
     }
 
     // Get account-specific configuration
-    const account = await getAccountFromSession();
+    const account = await getAccountFromRequest(request);
     if (!account) {
       return NextResponse.json(
         { ok: false, error: 'Not authenticated' },

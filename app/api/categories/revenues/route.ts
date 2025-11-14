@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 import { google } from 'googleapis';
 
 const DATA_REVENUE_START_ROW = 2;
@@ -20,7 +20,7 @@ async function getHandler() {
     console.log('[REVENUES] Fetching revenue items from Google Sheets...');
     
     // Get account-specific configuration
-    const account = await getAccountFromSession();
+    const account = await getAccountFromRequest(request);
     if (!account) {
       return NextResponse.json(
         { ok: false, error: 'Not authenticated' },
@@ -82,7 +82,7 @@ async function postHandler(request: NextRequest) {
     const { action, newValue, oldValue, index } = body;
 
     // Get account-specific configuration
-    const account = await getAccountFromSession();
+    const account = await getAccountFromRequest(request);
     if (!account) {
       return NextResponse.json(
         { ok: false, error: 'Not authenticated' },

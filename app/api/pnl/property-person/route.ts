@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 interface PropertyPersonItem {
   name: string;
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(
@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
 
     // Try to return cached data even if it's old
     try {
-      const account = await getAccountFromSession();
+      const account = await getAccountFromRequest(request);
       const period = new URL(request.url).searchParams.get('period') || 'month';
       const staleCache = cache.get(`property-person-${account.accountId}-${period}`);
       
@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
     // Get account config for authenticated user
     let account;
     try {
-      account = await getAccountFromSession();
+      account = await getAccountFromRequest(request);
     } catch (error) {
       if (error instanceof NotAuthenticatedError) {
         return NextResponse.json(
