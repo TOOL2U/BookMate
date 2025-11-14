@@ -40,6 +40,10 @@
     "src",
     "assets",
     "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "scripts/**",
+    "docs/archive/**",
+    "tests/**",
+    "temp/**"
   ]
 }

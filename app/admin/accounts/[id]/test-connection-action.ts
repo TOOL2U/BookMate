@@ -146,6 +146,7 @@ export async function testConnectionAction(accountId: string): Promise<TestConne
         lastConnectionTestAt: timestamp,
         lastConnectionTestStatus: 'success',
         lastConnectionTestMessage: 'Connection successful',
+        updatedBy: 'system',
       });
 
       return {
@@ -171,6 +172,7 @@ export async function testConnectionAction(accountId: string): Promise<TestConne
         lastConnectionTestAt: timestamp,
         lastConnectionTestStatus: 'error',
         lastConnectionTestMessage: friendlyMessage,
+        updatedBy: 'system',
       });
 
       return {
@@ -190,6 +192,7 @@ export async function testConnectionAction(accountId: string): Promise<TestConne
         lastConnectionTestAt: timestamp,
         lastConnectionTestStatus: 'error',
         lastConnectionTestMessage: error instanceof Error ? error.message : 'Unknown error',
+        updatedBy: 'system',
       });
     } catch {
       // Ignore update errors
