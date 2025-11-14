@@ -15,6 +15,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 // ============================================================================
 // CONSTANTS
@@ -69,6 +70,17 @@ async function getPaymentTypesHandler(request: NextRequest) {
   try {
     console.log('[PAYMENTS] Fetching payment types from Google Sheets...');
 
+    // Get account-specific configuration
+    const account = await getAccountFromSession();
+    if (!account) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    console.log(`[PAYMENTS] Using sheet for: ${account.companyName}`);
+
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -76,10 +88,10 @@ async function getPaymentTypesHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const spreadsheetId = account.sheetId;
 
     if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID environment variable not set');
+      throw new Error('Sheet ID not configured for this account');
     }
 
     // Read payment types from Data!D2:D
@@ -138,6 +150,17 @@ async function updatePaymentTypesHandler(request: NextRequest) {
       );
     }
 
+    // Get account-specific configuration
+    const account = await getAccountFromSession();
+    if (!account) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    console.log(`[PAYMENTS] Updating payments for: ${account.companyName}`);
+
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -145,10 +168,10 @@ async function updatePaymentTypesHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const spreadsheetId = account.sheetId;
 
     if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID environment variable not set');
+      throw new Error('Sheet ID not configured for this account');
     }
 
     // First, get current payment types

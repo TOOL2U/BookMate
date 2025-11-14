@@ -15,6 +15,7 @@ import { google } from 'googleapis';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 
 // ============================================================================
 // CONSTANTS
@@ -69,6 +70,26 @@ async function getHandler(request: NextRequest) {
   try {
     console.log('[PROPERTIES] Fetching properties from Google Sheets...');
 
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -76,11 +97,9 @@ async function getHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const spreadsheetId = account.sheetId; // Use account-specific sheet ID
 
-    if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID environment variable not set');
-    }
+    console.log(`[PROPERTIES] Using sheet ID from account: ${account.companyName}`);
 
     // Read properties from Data!C2:C
     const response = await sheets.spreadsheets.values.get({
@@ -138,6 +157,26 @@ async function postHandler(request: NextRequest) {
       );
     }
 
+    // Get account config for authenticated user
+    let account;
+    try {
+      account = await getAccountFromSession();
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'NO_ACCOUNT_FOUND', message: 'No account configured for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
@@ -145,11 +184,9 @@ async function postHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const spreadsheetId = account.sheetId; // Use account-specific sheet ID
 
-    if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID environment variable not set');
-    }
+    console.log(`[PROPERTIES] Updating properties for: ${account.companyName}`);
 
     // First, get current properties
     const response = await sheets.spreadsheets.values.get({

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 import { google } from 'googleapis';
 import fs from 'fs';
 import path from 'path';
@@ -39,6 +40,17 @@ async function getHandler(request: NextRequest) {
   try {
     console.log('[EXPENSES] Fetching expense categories from Google Sheets...');
 
+    // Get account-specific configuration
+    const account = await getAccountFromSession();
+    if (!account) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    console.log(`[EXPENSES] Using sheet for: ${account.companyName}`);
+
     // Setup Google Sheets API
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
@@ -47,10 +59,10 @@ async function getHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const spreadsheetId = account.sheetId;
 
     if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID not configured');
+      throw new Error('Sheet ID not configured for this account');
     }
 
     // Read all expense categories from Data!B30:B (open-ended range)
@@ -110,6 +122,17 @@ async function postHandler(request: NextRequest) {
       );
     }
 
+    // Get account-specific configuration
+    const account = await getAccountFromSession();
+    if (!account) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    console.log(`[EXPENSES] Updating expenses for: ${account.companyName}`);
+
     // Setup Google Sheets API
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
@@ -118,10 +141,10 @@ async function postHandler(request: NextRequest) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const spreadsheetId = account.sheetId;
 
     if (!spreadsheetId) {
-      throw new Error('GOOGLE_SHEET_ID not configured');
+      throw new Error('Sheet ID not configured for this account');
     }
 
     // Get current categories

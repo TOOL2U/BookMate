@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withRateLimit, RATE_LIMITS } from '@/lib/api/ratelimit';
 import { withErrorHandling, APIErrors } from '@/lib/api/errors';
 import { withSecurityHeaders } from '@/lib/api/security';
+import { getAccountFromSession, NoAccountError, NotAuthenticatedError } from '@/lib/api/account-helper';
 import { google } from 'googleapis';
 
-const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID!;
 const DATA_REVENUE_START_ROW = 2;
 
 function getCredentials() {
@@ -19,17 +19,33 @@ async function getHandler() {
   try {
     console.log('[REVENUES] Fetching revenue items from Google Sheets...');
     
+    // Get account-specific configuration
+    const account = await getAccountFromSession();
+    if (!account) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    console.log(`[REVENUES] Using sheet for: ${account.companyName}`);
+    
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
+    const spreadsheetId = account.sheetId;
+
+    if (!spreadsheetId) {
+      throw new Error('Sheet ID not configured for this account');
+    }
 
     const range = `Data!A${DATA_REVENUE_START_ROW}:A`;
     
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: GOOGLE_SHEET_ID,
+      spreadsheetId,
       range,
     });
 
@@ -65,16 +81,32 @@ async function postHandler(request: NextRequest) {
     const body = await request.json();
     const { action, newValue, oldValue, index } = body;
 
+    // Get account-specific configuration
+    const account = await getAccountFromSession();
+    if (!account) {
+      return NextResponse.json(
+        { ok: false, error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    console.log(`[REVENUES] Updating revenues for: ${account.companyName}`);
+
     const credentials = getCredentials();
     const auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
+    const spreadsheetId = account.sheetId;
+
+    if (!spreadsheetId) {
+      throw new Error('Sheet ID not configured for this account');
+    }
 
     // Get current revenues
     const getResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: GOOGLE_SHEET_ID,
+      spreadsheetId,
       range: `Data!A${DATA_REVENUE_START_ROW}:A`,
     });
 
@@ -150,7 +182,7 @@ async function postHandler(request: NextRequest) {
     // Update the sheet
     const updateRange = `Data!A${DATA_REVENUE_START_ROW}:A${DATA_REVENUE_START_ROW + revenues.length - 1}`;
     await sheets.spreadsheets.values.update({
-      spreadsheetId: GOOGLE_SHEET_ID,
+      spreadsheetId,
       range: updateRange,
       valueInputOption: 'RAW',
       requestBody: {
@@ -163,7 +195,7 @@ async function postHandler(request: NextRequest) {
       const clearStart = DATA_REVENUE_START_ROW + revenues.length;
       const clearEnd = clearStart + 10;
       await sheets.spreadsheets.values.clear({
-        spreadsheetId: GOOGLE_SHEET_ID,
+        spreadsheetId,
         range: `Data!A${clearStart}:A${clearEnd}`,
       });
     }
