@@ -10,6 +10,9 @@ import { checkAdminAccess } from '@/lib/auth/admin';
 import { getAllAccounts, serializeAccountConfig } from '@/lib/accounts';
 import LogoutButton from '@/components/admin/LogoutButton';
 
+// Force dynamic rendering (uses cookies for auth)
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Accounts | BookMate Admin',
   description: 'Manage BookMate accounts',

@@ -46,12 +46,20 @@ function getCredentials() {
   }
 
   // Try config file (for local development)
-  try {
-    const credentials = require('../../../../config/google-credentials.json');
-    console.log('[PROPERTIES] Using credentials from config/google-credentials.json');
-    return credentials;
-  } catch (error) {
-    // Config file doesn't exist
+  // Note: This will only work at runtime, not during build
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const credPath = path.join(process.cwd(), 'config', 'google-credentials.json');
+      if (fs.existsSync(credPath)) {
+        const credentials = JSON.parse(fs.readFileSync(credPath, 'utf8'));
+        console.log('[PROPERTIES] Using credentials from config/google-credentials.json');
+        return credentials;
+      }
+    } catch (error) {
+      // Config file doesn't exist or can't be read
+    }
   }
 
   throw new Error(

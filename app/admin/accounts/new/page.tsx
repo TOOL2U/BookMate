@@ -11,6 +11,9 @@ import CreateAccountForm from './CreateAccountForm';
 import { Shield, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
+// Force dynamic rendering (uses cookies for auth)
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Create New Account | BookMate Admin',
   description: 'Create a new BookMate account with spreadsheet configuration',
