@@ -60,28 +60,16 @@ export async function getUserSpreadsheetId(request: NextRequest): Promise<string
   // SPECIAL CASE: Admin account (shaun@siamoon.com) always uses original spreadsheet
   if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     console.log('⭐ Admin account detected - using original spreadsheet');
-    
-    // If admin doesn't have spreadsheet assigned yet, assign it now
-    if (!user.spreadsheetId || user.spreadsheetId !== ORIGINAL_SPREADSHEET_ID) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          spreadsheetId: ORIGINAL_SPREADSHEET_ID,
-          spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${ORIGINAL_SPREADSHEET_ID}/edit`,
-          spreadsheetCreatedAt: user.spreadsheetCreatedAt || new Date(),
-        },
-      });
-    }
-    
     return ORIGINAL_SPREADSHEET_ID;
   }
   
-  // For all other users, they must have their own spreadsheet
-  if (!user.spreadsheetId) {
-    throw new Error('No spreadsheet configured for this user. Please contact support.');
+  // For all other users, use DEFAULT_SHEET_ID from env
+  // TODO: Implement multi-tenant spreadsheet assignment
+  if (!DEFAULT_SHEET_ID) {
+    throw new Error('No spreadsheet configured. Please contact support.');
   }
 
-  return user.spreadsheetId;
+  return DEFAULT_SHEET_ID;
 }
 
 /**
