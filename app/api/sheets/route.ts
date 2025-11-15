@@ -3,18 +3,11 @@ import { validatePayload, ReceiptPayload } from '@/utils/validatePayload';
 import { matchProperty, matchTypeOfOperation, matchTypeOfPayment } from '@/utils/matchOption';
 import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
-// Google Sheets webhook configuration
-const SHEETS_WEBHOOK_URL = process.env.SHEETS_WEBHOOK_URL;
-const SHEETS_WEBHOOK_SECRET = process.env.SHEETS_WEBHOOK_SECRET;
-
 export async function GET() {
   // Health check endpoint
-  const configured = !!(SHEETS_WEBHOOK_URL && SHEETS_WEBHOOK_SECRET);
-  
   return NextResponse.json({
     status: 'ok',
-    service: 'Google Sheets Webhook',
-    configured,
+    service: 'Google Sheets Multi-Tenant Webhook',
     timestamp: new Date().toISOString()
   });
 }
@@ -44,17 +37,23 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    // Check if webhook is configured
-    if (!SHEETS_WEBHOOK_URL || !SHEETS_WEBHOOK_SECRET) {
-      console.error('[✖] Google Sheets webhook not configured');
+    // Use account-specific webhook URL and secret (multi-tenant)
+    const accountWebhookUrl = account.scriptUrl;
+    const accountWebhookSecret = account.scriptSecret;
+    
+    if (!accountWebhookUrl || !accountWebhookSecret) {
+      console.error(`[✖] Account ${account.accountId} missing scriptUrl or scriptSecret`);
       return NextResponse.json(
         {
           success: false,
-          error: 'Google Sheets webhook not configured. Please set SHEETS_WEBHOOK_URL and SHEETS_WEBHOOK_SECRET in .env.local'
+          error: 'Account webhook not configured. Please contact administrator.'
         },
         { status: 500 }
       );
     }
+
+    console.log(`[SHEETS] Using account-specific webhook for: ${account.accountId}`);
+    console.log(`[SHEETS] Webhook URL: ${accountWebhookUrl.substring(0, 50)}...`);
 
     // Parse request body
     const body: ReceiptPayload = await request.json();
@@ -108,18 +107,17 @@ export async function POST(request: NextRequest) {
       typeOfPayment: normalizedData.typeOfPayment,
     });
 
-    // Send to Google Sheets webhook with secret in POST body
-    // (Apps Script has better support for body params than headers)
-    console.log('[SHEETS] Sending to webhook with secret in POST body...');
+    // Send to account-specific Google Sheets webhook
+    console.log(`[SHEETS] Sending to account ${account.accountId} webhook...`);
 
-    let response = await fetch(SHEETS_WEBHOOK_URL, {
+    let response = await fetch(accountWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         ...normalizedData,
-        secret: SHEETS_WEBHOOK_SECRET, // Send secret in body for better Apps Script compatibility
+        secret: accountWebhookSecret, // Use account-specific secret
       }),
       redirect: 'manual'  // Apps Script returns 302 - don't auto-follow
     });
@@ -181,11 +179,12 @@ export async function POST(request: NextRequest) {
       }
       // Check for success in JSON format
       if (responseData.ok === true || responseData.success) {
-        console.log('[✔] Sheets append → status: SUCCESS (JSON format)');
-        console.log('✅ Accounting Buddy Receipt Upload Complete — Data appended to Google Sheets');
+        console.log(`[✔] Sheets append → status: SUCCESS (JSON format) for account: ${account.accountId}`);
+        console.log(`✅ Transaction added to ${account.companyName}'s Google Sheet`);
         return NextResponse.json({
           success: true,
-          message: 'Receipt added to Google Sheet successfully',
+          message: `Receipt added to ${account.companyName}'s Google Sheet successfully`,
+          accountId: account.accountId,
         });
       }
     } catch (jsonError) {
@@ -195,11 +194,12 @@ export async function POST(request: NextRequest) {
 
     // Check if Apps Script returned success (plain text format)
     if (responseText.includes('Success')) {
-      console.log('[✔] Sheets append → status: SUCCESS (text format)');
-      console.log('✅ Accounting Buddy Receipt Upload Complete — Data appended to Google Sheets');
+      console.log(`[✔] Sheets append → status: SUCCESS (text format) for account: ${account.accountId}`);
+      console.log(`✅ Transaction added to ${account.companyName}'s Google Sheet`);
       return NextResponse.json({
         success: true,
-        message: 'Receipt added to Google Sheet successfully',
+        message: `Receipt added to ${account.companyName}'s Google Sheet successfully`,
+        accountId: account.accountId,
       });
     }
 
