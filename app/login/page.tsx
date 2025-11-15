@@ -30,6 +30,8 @@ export default function LoginPage() {
 
   // Password reset state
   const [resetEmail, setResetEmail] = useState('');
+  const [resetNewPassword, setResetNewPassword] = useState('');
+  const [resetConfirmPassword, setResetConfirmPassword] = useState('');
   const [resetError, setResetError] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -187,37 +189,55 @@ export default function LoginPage() {
       return;
     }
     
+    if (!resetNewPassword) {
+      setResetError('Please enter a new password');
+      return;
+    }
+    
+    if (resetNewPassword.length < 8) {
+      setResetError('Password must be at least 8 characters long');
+      return;
+    }
+    
+    if (resetNewPassword !== resetConfirmPassword) {
+      setResetError('Passwords do not match');
+      return;
+    }
+    
     setIsResetting(true);
     
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch('/api/auth/confirm-reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: resetEmail }),
+        body: JSON.stringify({ 
+          email: resetEmail,
+          newPassword: resetNewPassword
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send reset email');
+        throw new Error(data.error || 'Failed to reset password');
       }
       
       setResetSuccess(true);
       
-      // In development, show the reset link
-      if (data.resetLink) {
-        setResetLink(data.resetLink);
-      }
+      // Pre-fill login email
+      setUsername(resetEmail);
       
-      // Clear form and switch to login after 5 seconds
+      // Clear form and switch to login after 3 seconds
       setTimeout(() => {
         setMode('login');
         setResetEmail('');
+        setResetNewPassword('');
+        setResetConfirmPassword('');
         setResetSuccess(false);
         setResetLink('');
-      }, 5000);
+      }, 3000);
       
     } catch (err: any) {
       setResetError(err.message || 'Failed to send password reset email. Please try again.');
@@ -500,26 +520,11 @@ export default function LoginPage() {
               {resetSuccess && (
                 <div className="bg-success/10 border border-success/30 rounded-xl2 p-4 animate-in slide-in-from-top-2">
                   <p className="text-success text-sm font-aileron mb-2">
-                    ✓ Password reset instructions have been sent to your email!
+                    ✓ Password reset successfully!
                   </p>
                   <p className="text-text-secondary text-xs font-aileron">
-                    Check your inbox and follow the link to reset your password.
+                    You can now login with your new password.
                   </p>
-                  {resetLink && (
-                    <div className="mt-3 p-3 bg-black/50 rounded-lg">
-                      <p className="text-yellow text-xs font-aileron mb-1">
-                        🔧 Development Mode - Reset Link:
-                      </p>
-                      <a 
-                        href={resetLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-yellow/80 text-xs break-all hover:underline"
-                      >
-                        {resetLink}
-                      </a>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -545,6 +550,52 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {/* New Password Field */}
+              <div>
+                <label htmlFor="reset-new-password" className="block text-sm font-medium text-text-primary mb-2 font-aileron">
+                  New Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-text-secondary" />
+                  </div>
+                  <input
+                    id="reset-new-password"
+                    type="password"
+                    value={resetNewPassword}
+                    onChange={(e) => setResetNewPassword(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-3 bg-black border border-border-card rounded-xl2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow focus:border-transparent transition-all font-aileron"
+                    placeholder="Enter new password (min. 8 characters)"
+                    required
+                    disabled={isResetting || resetSuccess}
+                    minLength={8}
+                  />
+                </div>
+              </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <label htmlFor="reset-confirm-password" className="block text-sm font-medium text-text-primary mb-2 font-aileron">
+                  Confirm New Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-text-secondary" />
+                  </div>
+                  <input
+                    id="reset-confirm-password"
+                    type="password"
+                    value={resetConfirmPassword}
+                    onChange={(e) => setResetConfirmPassword(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-3 bg-black border border-border-card rounded-xl2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-yellow focus:border-transparent transition-all font-aileron"
+                    placeholder="Confirm new password"
+                    required
+                    disabled={isResetting || resetSuccess}
+                    minLength={8}
+                  />
+                </div>
+              </div>
+
               {/* Error Message */}
               {resetError && (
                 <div className="bg-error/10 border border-error/30 rounded-xl2 p-3 animate-in slide-in-from-top-2">
@@ -555,7 +606,7 @@ export default function LoginPage() {
               {/* Info Message */}
               <div className="bg-yellow/10 border border-yellow/30 rounded-xl2 p-3">
                 <p className="text-yellow text-xs font-aileron">
-                  ⓘ Enter the email address associated with your BookMate account. We&apos;ll send you instructions to reset your password.
+                  ⓘ Enter your email and choose a new password. Your password will be updated in both the database and Firebase.
                 </p>
               </div>
 
@@ -568,12 +619,12 @@ export default function LoginPage() {
                 {isResetting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Sending reset link...</span>
+                    <span>Resetting password...</span>
                   </>
                 ) : (
                   <>
-                    <Mail className="w-5 h-5" />
-                    <span>Send Reset Link</span>
+                    <Lock className="w-5 h-5" />
+                    <span>Reset Password</span>
                   </>
                 )}
               </button>
