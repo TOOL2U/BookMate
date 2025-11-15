@@ -4,6 +4,8 @@
  * Fetches balance summary from Google Sheets Balance Summary sheet
  * Uses Apps Script V9 action: balanceGetSummary
  * 
+ * Multi-tenant: Uses account-specific scriptUrl and scriptSecret
+ * 
  * Returns:
  * {
  *   ok: true,
@@ -25,20 +27,42 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('[Balance Summary API] Fetching balance summary from Google Sheets');
 
-    // Use SHEETS_BALANCE_URL for V9 balance operations
-    const webhookUrl = process.env.SHEETS_BALANCE_URL;
-    const secret = process.env.SHEETS_WEBHOOK_SECRET;
+    // Authenticate user and get account config
+    let account;
+    try {
+      account = await getAccountFromRequest(request);
+      console.log(`[Balance Summary API] Authenticated: ${account.userEmail}, Account: ${account.accountId}`);
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { ok: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { ok: false, error: 'No account found for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
+
+    // Use account-specific webhook URL and secret
+    const webhookUrl = account.scriptUrl;
+    const secret = account.scriptSecret;
 
     if (!webhookUrl || !secret) {
-      console.error('[Balance Summary API] Missing environment variables');
+      console.error(`[Balance Summary API] Account ${account.accountId} missing scriptUrl or scriptSecret`);
       return NextResponse.json({
         ok: false,
-        error: 'Server configuration error: Missing SHEETS_BALANCE_URL or secret'
+        error: 'Account webhook not configured. Please contact administrator.'
       }, { status: 500 });
     }
 
@@ -46,7 +70,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const month = searchParams.get('month') || 'ALL';
 
-    console.log('[Balance Summary API] Calling Apps Script with month:', month);
+    console.log(`[Balance Summary API] Calling account ${account.accountId} with month: ${month}`);
 
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -71,7 +95,7 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    console.log('[Balance Summary API] Success:', {
+    console.log(`[Balance Summary API] Success for ${account.accountId}:`, {
       accountCount: data.data?.accounts?.length || 0,
       totalBalance: data.data?.totalBalance || 0
     });
