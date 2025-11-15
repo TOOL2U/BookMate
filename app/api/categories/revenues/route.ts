@@ -15,7 +15,7 @@ function getCredentials() {
   return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
 }
 
-async function getHandler() {
+async function getHandler(request: NextRequest) {
   try {
     console.log('[REVENUES] Fetching revenue items from Google Sheets...');
     
