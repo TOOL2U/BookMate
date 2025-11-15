@@ -44,11 +44,12 @@ export interface ValidationResult {
 /**
  * Validates and sanitizes receipt payload
  * @param payload - Raw receipt data from form
+ * @param request - Optional NextRequest for authentication context
  * @returns Validation result with sanitized data or error message
  * 
  * ⚠️ ASYNC: Now fetches live dropdown options from /api/options
  */
-export async function validatePayload(payload: ReceiptPayload): Promise<ValidationResult> {
+export async function validatePayload(payload: ReceiptPayload, request?: NextRequest): Promise<ValidationResult> {
   // Check for required fields
   // For TRANSFERS: day, month, year, typeOfOperation, typeOfPayment, detail, ref are required; property is OPTIONAL
   // For REVENUE/EXPENSES: day, month, year, property, typeOfOperation, typeOfPayment, detail are required; ref is optional
@@ -142,8 +143,15 @@ export async function validatePayload(payload: ReceiptPayload): Promise<Validati
     // Server-side: use direct import from route handler instead of HTTP fetch
     // This avoids port/URL issues and is faster
     const { GET } = await import('../app/api/options/route');
-    const request = new NextRequest('http://localhost/api/options');
-    const response = await GET(request);
+    
+    // Create request with authentication headers if provided
+    const optionsRequest = request 
+      ? new NextRequest('http://localhost/api/options', {
+          headers: request.headers
+        })
+      : new NextRequest('http://localhost/api/options');
+    
+    const response = await GET(optionsRequest);
 
     if (!response.ok) {
       console.error('[VALIDATION] Failed to fetch /api/options:', response.status);

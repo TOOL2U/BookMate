@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validatePayload, ReceiptPayload } from '@/utils/validatePayload';
 import { matchProperty, matchTypeOfOperation, matchTypeOfPayment } from '@/utils/matchOption';
+import { getAccountFromRequest, NoAccountError, NotAuthenticatedError } from '@/lib/api/auth-middleware';
 
 // Google Sheets webhook configuration
 const SHEETS_WEBHOOK_URL = process.env.SHEETS_WEBHOOK_URL;
@@ -21,6 +22,27 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     console.log('[SHEETS] Starting Google Sheets append...');
+
+    // Authenticate user and get account config
+    let account;
+    try {
+      account = await getAccountFromRequest(request);
+      console.log(`[SHEETS] Authenticated user: ${account.userEmail}, Account: ${account.accountId}`);
+    } catch (error) {
+      if (error instanceof NotAuthenticatedError) {
+        return NextResponse.json(
+          { success: false, error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+      if (error instanceof NoAccountError) {
+        return NextResponse.json(
+          { success: false, error: 'No account found for your email' },
+          { status: 403 }
+        );
+      }
+      throw error;
+    }
 
     // Check if webhook is configured
     if (!SHEETS_WEBHOOK_URL || !SHEETS_WEBHOOK_SECRET) {
@@ -47,8 +69,8 @@ export async function POST(request: NextRequest) {
       credit: body.credit,
     });
 
-    // Validate and sanitize payload
-    const validation = await validatePayload(body);
+    // Validate and sanitize payload (pass request for authentication context)
+    const validation = await validatePayload(body, request);
 
     if (!validation.isValid || !validation.data) {
       console.error('[✖] Payload validation failed:', validation.error);
