@@ -257,12 +257,12 @@ export async function validatePayload(payload: ReceiptPayload, request?: NextReq
   // TRANSFER-SPECIFIC VALIDATION RULES
   // ========================================
   if (isTransfer) {
-    // Rule 1: Detail must contain "Transfer to" or "Transfer from"
-    const detailLower = detail.toLowerCase();
-    if (!detailLower.includes('transfer to') && !detailLower.includes('transfer from')) {
+    // Rule 1: Detail is required but doesn't need specific text
+    // The ref field links transfer pairs, not the detail text
+    if (!detail || detail.trim().length === 0) {
       return {
         isValid: false,
-        error: 'Transfer entries must have detail containing "Transfer to" or "Transfer from"',
+        error: 'Transfer entries require a detail description',
       };
     }
 
