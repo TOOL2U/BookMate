@@ -14,20 +14,25 @@ export default function LogoutButton() {
         credentials: 'include', // Include cookies
       });
 
-      // Clear client-side storage
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('username');
+      // Clear ALL client-side storage to prevent data leakage between accounts
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear cookies
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
 
-      // Redirect to login page
-      router.push('/login');
-      router.refresh(); // Force a refresh to clear any cached data
+      // Force full page refresh to clear all caches
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout error:', error);
-      // Still redirect to login even if API call fails
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('username');
-      router.push('/login');
-      router.refresh();
+      // Still clear storage and redirect even if API call fails
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/login';
     }
   };
 

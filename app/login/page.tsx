@@ -80,11 +80,12 @@ export default function LoginPage() {
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('user', JSON.stringify(data.user));
       
+      // Force full page refresh to clear all caches when switching accounts
       // Navigate to admin dashboard for admin users, regular dashboard for others
       if (data.user.role === 'admin') {
-        router.push('/admin/accounts');
+        window.location.href = '/admin/accounts';
       } else {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid username or password');

@@ -65,9 +65,19 @@ export default function AdminShell({ children }: AdminShellProps) {
     : baseNavItems;
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('username');
-    router.push('/login');
+    // Clear ALL client-side storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Clear cookies
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    
+    // Force full page refresh to clear all caches
+    window.location.href = '/login';
   };
 
   return (
